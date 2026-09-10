@@ -7,8 +7,48 @@ export const searchUsername = async (username) => {
   return response.data
 }
 
+export const captureUsernameEvidence = async (data) => {
+  const response = await axios.post(`${API_BASE}/username/evidence/capture`, data)
+  return response.data
+}
+
+export const listUsernameEvidence = async () => {
+  const response = await axios.get(`${API_BASE}/username/evidence/list`)
+  return response.data
+}
+
+export const getUsernameEvidence = async (evidenceId) => {
+  const response = await axios.get(`${API_BASE}/username/evidence/${evidenceId}`)
+  return response.data
+}
+
+export const deleteUsernameEvidence = async (evidenceId) => {
+  const response = await axios.delete(`${API_BASE}/username/evidence/${evidenceId}`)
+  return response.data
+}
+
 export const searchEmail = async (email) => {
   const response = await axios.post(`${API_BASE}/email/search`, { email })
+  return response.data
+}
+
+export const captureEmailEvidence = async (data) => {
+  const response = await axios.post(`${API_BASE}/email/evidence/capture`, data)
+  return response.data
+}
+
+export const listEmailEvidence = async () => {
+  const response = await axios.get(`${API_BASE}/email/evidence/list`)
+  return response.data
+}
+
+export const getEmailEvidence = async (evidenceId) => {
+  const response = await axios.get(`${API_BASE}/email/evidence/${evidenceId}`)
+  return response.data
+}
+
+export const deleteEmailEvidence = async (evidenceId) => {
+  const response = await axios.delete(`${API_BASE}/email/evidence/${evidenceId}`)
   return response.data
 }
 
@@ -17,27 +57,6 @@ export const lookupPhone = async (phoneNumber, countryCode = 'US') => {
     phone_number: phoneNumber, 
     country_code: countryCode 
   })
-  return response.data
-}
-
-export const lookupDomain = async (domain) => {
-  const [whoisResp, dnsResp] = await Promise.all([
-    axios.post(`${API_BASE}/domain/whois`, { domain }),
-    axios.post(`${API_BASE}/domain/dns`, { domain })
-  ])
-  return {
-    whois: whoisResp.data,
-    dns: dnsResp.data
-  }
-}
-
-export const subdomainEnum = async (domain) => {
-  const response = await axios.post(`${API_BASE}/domain/subdomains`, { domain })
-  return response.data
-}
-
-export const investigateURL = async (url) => {
-  const response = await axios.post(`${API_BASE}/url/investigate`, { url })
   return response.data
 }
 
@@ -61,7 +80,68 @@ export const deleteEvidence = async (evidenceId) => {
   return response.data
 }
 
-export const exportEvidence = async (data) => {
-  const response = await axios.post(`${API_BASE}/phone/evidence/export`, data)
+export const lookupDomain = async (domain) => {
+  const [whoisResp, dnsResp] = await Promise.all([
+    axios.post(`${API_BASE}/domain/whois`, { domain }),
+    axios.post(`${API_BASE}/domain/dns`, { domain })
+  ])
+  return {
+    whois: whoisResp.data,
+    dns: dnsResp.data
+  }
+}
+
+export const getDomainFootprint = async (domain) => {
+  const response = await axios.post(`${API_BASE}/domain/footprint`, { domain })
+  return response.data
+}
+
+export const subdomainEnum = async (domain) => {
+  const response = await axios.post(`${API_BASE}/domain/subdomains`, { domain })
+  return response.data
+}
+
+export const captureDomainEvidence = async (data) => {
+  const response = await axios.post(`${API_BASE}/domain/evidence/capture`, data)
+  return response.data
+}
+
+export const listDomainEvidence = async () => {
+  const response = await axios.get(`${API_BASE}/domain/evidence/list`)
+  return response.data
+}
+
+export const getDomainEvidence = async (evidenceId) => {
+  const response = await axios.get(`${API_BASE}/domain/evidence/${evidenceId}`)
+  return response.data
+}
+
+export const deleteDomainEvidence = async (evidenceId) => {
+  const response = await axios.delete(`${API_BASE}/domain/evidence/${evidenceId}`)
+  return response.data
+}
+
+export const investigateURL = async (url) => {
+  const response = await axios.post(`${API_BASE}/url/investigate`, { url })
+  return response.data
+}
+
+export const captureURLEvidence = async (data) => {
+  const response = await axios.post(`${API_BASE}/url/evidence/capture`, data)
+  return response.data
+}
+
+export const listURLEvidence = async () => {
+  const response = await axios.get(`${API_BASE}/url/evidence/list`)
+  return response.data
+}
+
+export const getURLEvidence = async (evidenceId) => {
+  const response = await axios.get(`${API_BASE}/url/evidence/${evidenceId}`)
+  return response.data
+}
+
+export const deleteURLEvidence = async (evidenceId) => {
+  const response = await axios.delete(`${API_BASE}/url/evidence/${evidenceId}`)
   return response.data
 }

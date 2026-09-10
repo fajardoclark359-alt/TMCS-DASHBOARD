@@ -1,16 +1,38 @@
-import { useState } from 'react'
-import { searchUsername } from '../services/api'
-import { FiSearch, FiExternalLink, FiUser, FiMail, FiShield, FiAlertTriangle, FiGlobe, FiCalendar, FiImage, FiTerminal } from 'react-icons/fi'
+import { useState, useEffect } from 'react'
+import { searchUsername, captureUsernameEvidence, listUsernameEvidence } from '../services/api'
+import { FiSearch, FiExternalLink, FiUser, FiMail, FiShield, FiAlertTriangle, FiGlobe, FiCalendar, FiImage, FiTerminal, FiSave, FiFileText, FiClock, FiTag } from 'react-icons/fi'
 
 function UsernameSearch() {
   const [username, setUsername] = useState('')
   const [results, setResults] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [notes, setNotes] = useState('')
+  const [tags, setTags] = useState('')
+  const [priority, setPriority] = useState('medium')
+  const [caseId, setCaseId] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [evidenceList, setEvidenceList] = useState([])
+  const [showEvidence, setShowEvidence] = useState(false)
+
+  useEffect(() => {
+    fetchEvidenceList()
+  }, [])
+
+  const fetchEvidenceList = async () => {
+    try {
+      const data = await listUsernameEvidence()
+      setEvidenceList(data)
+    } catch (err) {
+      console.error('Failed to fetch evidence list')
+    }
+  }
 
   const handleSearch = async (e) => {
     e.preventDefault()
     if (!username) return
     setLoading(true)
+    setSaved(false)
     try {
       const data = await searchUsername(username)
       setResults(data)
@@ -19,6 +41,26 @@ function UsernameSearch() {
       alert('Error searching username')
     }
     setLoading(false)
+  }
+
+  const handleCaptureEvidence = async () => {
+    if (!results) return
+    setSaving(true)
+    try {
+      const data = await captureUsernameEvidence({
+        username: username,
+        notes: notes,
+        tags: tags.split(',').map(t => t.trim()).filter(t => t),
+        priority: priority,
+        case_id: caseId
+      })
+      setSaved(true)
+      fetchEvidenceList()
+    } catch (err) {
+      console.error(err)
+      alert('Error saving evidence')
+    }
+    setSaving(false)
   }
 
   const riskColor = (score) => {
@@ -48,10 +90,10 @@ function UsernameSearch() {
           <FiTerminal className="text-blue-400" />
           <h1 className="title-cyber text-2xl font-bold text-blue-400 glow-text">USERNAME OSINT</h1>
         </div>
-        <p className="text-slate-500 text-sm font-mono ml-7">Enumerate digital footprint across 50+ platforms</p>
+        <p className="text-slate-500 text-sm font-mono ml-7">Enumerate digital footprint across 50+ platforms + evidence capture</p>
       </div>
 
-      <form onSubmit={handleSearch} className="flex gap-3 mb-8">
+      <form onSubmit={handleSearch} className="flex gap-3 mb-6">
         <input type="text" value={username} onChange={(e) => setUsername(e.target.value)}
           placeholder="$ enter-target-username..."
           className="flex-1 font-mono text-sm px-4 py-3" />
@@ -60,6 +102,104 @@ function UsernameSearch() {
           <FiSearch /> {loading ? 'SCANNING...' : 'ENUMERATE'}
         </button>
       </form>
+
+      {/* EVIDENCE CAPTURE FORM */}
+      {results && (
+        <div className="card-cyber p-4 rounded-lg mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="title-cyber text-sm font-bold flex items-center gap-2 text-blue-400">
+              <FiSave /> EVIDENCE CAPTURE
+            </h2>
+            <button onClick={() => setShowEvidence(!showEvidence)}
+              className="text-xs text-slate-500 hover:text-blue-400 font-mono flex items-center gap-1">
+              <FiFileText /> {showEvidence ? 'HIDE' : 'SHOW'} SAVED ({evidenceList.length})
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <div>
+              <label className="text-[10px] text-slate-500 font-mono block mb-1">CASE ID</label>
+              <input type="text" value={caseId} onChange={(e) => setCaseId(e.target.value)}
+                placeholder="CASE-2026-001"
+                className="w-full bg-slate-900/50 rounded px-3 py-2 font-mono text-xs cyber-border" />
+            </div>
+            <div>
+              <label className="text-[10px] text-slate-500 font-mono block mb-1">PRIORITY</label>
+              <select value={priority} onChange={(e) => setPriority(e.target.value)}
+                className="w-full bg-slate-900/50 rounded px-3 py-2 font-mono text-xs cyber-border">
+                <option value="low">LOW</option>
+                <option value="medium">MEDIUM</option>
+                <option value="high">HIGH</option>
+                <option value="critical">CRITICAL</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="mb-3">
+            <label className="text-[10px] text-slate-500 font-mono block mb-1">NOTES</label>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
+              placeholder="Investigation notes, context, findings..."
+              rows={2}
+              className="w-full bg-slate-900/50 rounded px-3 py-2 font-mono text-xs cyber-border" />
+          </div>
+          
+          <div className="mb-3">
+            <label className="text-[10px] text-slate-500 font-mono block mb-1">TAGS (comma separated)</label>
+            <input type="text" value={tags} onChange={(e) => setTags(e.target.value)}
+              placeholder="suspect, scam, verification"
+              className="w-full bg-slate-900/50 rounded px-3 py-2 font-mono text-xs cyber-border" />
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <button onClick={handleCaptureEvidence} disabled={saving}
+              className={`px-4 py-2 rounded text-xs font-mono flex items-center gap-2 ${saved ? 'bg-green-600/30 text-green-400' : 'btn-cyber'}`}>
+              {saved ? <><FiCheck /> SAVED</> : saving ? 'SAVING...' : <><FiSave /> CAPTURE EVIDENCE</>}
+            </button>
+            {saved && (
+              <span className="text-green-400 text-xs font-mono">Evidence captured successfully</span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* EVIDENCE LIST */}
+      {showEvidence && evidenceList.length > 0 && (
+        <div className="card-cyber p-4 rounded-lg mb-6">
+          <h2 className="title-cyber text-sm font-bold mb-3 flex items-center gap-2 text-blue-400">
+            <FiFileText /> SAVED EVIDENCE ({evidenceList.length})
+          </h2>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {evidenceList.map((ev, i) => (
+              <div key={i} className="bg-slate-900/50 p-2 rounded cyber-border text-xs font-mono">
+                <div className="flex items-center justify-between">
+                  <span className="text-blue-400">{ev.evidence_id}</span>
+                  <span className={`px-1.5 py-0.5 rounded text-[9px] ${
+                    ev.priority === 'critical' ? 'bg-red-600/30 text-red-400' :
+                    ev.priority === 'high' ? 'bg-orange-600/30 text-orange-400' :
+                    ev.priority === 'medium' ? 'bg-yellow-600/30 text-yellow-400' :
+                    'bg-slate-600/30 text-slate-400'
+                  }`}>{ev.priority?.toUpperCase()}</span>
+                </div>
+                <div className="text-slate-500 text-[10px] mt-1">
+                  <FiClock className="inline mr-1" />{ev.timestamp?.split('T')[0]}
+                  <FiUser className="inline ml-2 mr-1" />{ev.target}
+                </div>
+                {ev.notes && <p className="text-slate-400 text-[10px] mt-1">{ev.notes}</p>}
+                {ev.tags?.length > 0 && (
+                  <div className="mt-1 flex gap-1 flex-wrap">
+                    {ev.tags.map((tag, j) => (
+                      <span key={j} className="bg-blue-600/20 text-blue-400 px-1 rounded text-[9px]">
+                        <FiTag className="inline" /> {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="text-[9px] text-slate-600 mt-1">HASH: {ev.evidence_hash}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {results && (
         <div className="space-y-5">
