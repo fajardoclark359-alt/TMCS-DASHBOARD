@@ -1,0 +1,102 @@
+# OSINT TMC/CLARK - Cyber Intelligence Platform
+
+Advanced Open Source Intelligence gathering platform for cybersecurity professionals and penetration testers.
+
+## Features
+
+### Username OSINT
+- Search 50+ platforms (GitHub, GitLab, Reddit, Twitter/X, Instagram, TikTok, YouTube, Twitch, Steam, Facebook, LinkedIn, Telegram, Discord, TryHackMe, HackTheBox, and more)
+- Digital footprint evidence scoring
+- Profile image collection
+- Account timeline analysis
+
+### Email OSINT
+- HIBP breach and paste checking
+- Social account discovery by email
+- Gravatar profile lookup
+- DNS/MX/SPF/DMARC analysis
+- Disposable email detection
+- Email age estimation
+- Reputation scoring
+
+### Phone OSINT
+- 27 countries supported (US, PH, UK, CA, AU, DE, FR, JP, IN, CN, BR, MX, and more)
+- Carrier detection
+- Timezone identification
+- Line type validation
+
+### Domain Recon
+- WHOIS lookup
+- DNS enumeration (A, AAAA, MX, NS, TXT, CNAME, SOA)
+- Subdomain discovery
+
+### URL Investigation
+- IP resolution (IPv4/IPv6)
+- Exact geolocation with Google Maps link
+- SSL certificate analysis
+- Security headers check
+- Technology stack detection
+- Phishing/scam detection
+- Redirect chain analysis
+- Domain status (active/offline)
+- Reputation scoring
+
+## Tech Stack
+
+- **Backend**: Python FastAPI
+- **Frontend**: React + Tailwind CSS
+- **Deployment**: Docker + Docker Compose
+
+## Quick Start
+
+### Using Docker
+
+```bash
+docker-compose up --build
+```
+
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+
+### Manual Setup
+
+**Backend:**
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/username/search` | POST | Search username across 50+ platforms |
+| `/api/email/search` | POST | Email investigation with breach check |
+| `/api/phone/lookup` | POST | Phone number lookup |
+| `/api/domain/whois` | POST | WHOIS lookup |
+| `/api/domain/dns` | POST | DNS enumeration |
+| `/api/domain/subdomains` | POST | Subdomain discovery |
+| `/api/url/investigate` | POST | Full URL investigation |
+
+## Legal Disclaimer
+
+This tool is intended for authorized security research and penetration testing only. Users are responsible for ensuring they have proper authorization before conducting any reconnaissance activities.
+
+## Environment Variables
+
+For production use:
+
+```bash
+# Have I Been Pwned API Key (optional, for breach checks)
+HIBP_API_KEY=your_key_here
+```
