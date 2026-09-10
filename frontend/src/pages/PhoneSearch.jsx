@@ -26,8 +26,8 @@ function PhoneSearch() {
     <div>
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <FiTerminal className="text-green-400" />
-          <h1 className="title-cyber text-2xl font-bold text-green-400 glow-text">PHONE OSINT</h1>
+          <FiTerminal className="text-blue-400" />
+          <h1 className="title-cyber text-2xl font-bold text-blue-400 glow-text">PHONE OSINT</h1>
         </div>
         <p className="text-slate-500 text-sm font-mono ml-7">Phone intelligence - 27 countries, carrier, timezone analysis</p>
       </div>
@@ -74,7 +74,7 @@ function PhoneSearch() {
 
       {results && (
         <div className="card-cyber p-5 rounded-lg">
-          <h2 className="title-cyber text-lg font-bold mb-4 flex items-center gap-2 text-green-400"><FiPhone /> PHONE INTELLIGENCE</h2>
+          <h2 className="title-cyber text-lg font-bold mb-4 flex items-center gap-2 text-blue-400"><FiPhone /> PHONE INTELLIGENCE</h2>
 
           {results.error && (
             <p className="text-red-400 text-sm font-mono mb-4">! {results.error}</p>
@@ -87,11 +87,11 @@ function PhoneSearch() {
             </div>
             <div className="bg-slate-900/50 p-3 rounded cyber-border">
               <p className="text-[10px] text-slate-500 font-mono mb-1">E.164 FORMAT</p>
-              <p className="font-mono text-sm text-green-400">{results.formatted || 'N/A'}</p>
+              <p className="font-mono text-sm text-blue-400">{results.formatted || 'N/A'}</p>
             </div>
             <div className="bg-slate-900/50 p-3 rounded cyber-border">
               <p className="text-[10px] text-slate-500 font-mono mb-1">VALID</p>
-              <p className={`text-sm font-mono font-bold ${results.valid ? 'text-green-400' : 'text-red-400'}`}>
+              <p className={`text-sm font-mono font-bold ${results.valid ? 'text-blue-400' : 'text-red-400'}`}>
                 {results.valid ? <span className="flex items-center gap-1"><FiCheck /> VALID</span> : <span className="flex items-center gap-1"><FiX /> INVALID</span>}
               </p>
             </div>

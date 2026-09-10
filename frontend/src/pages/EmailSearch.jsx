@@ -22,7 +22,7 @@ function EmailSearch() {
   }
 
   const riskColor = (level) => {
-    if (level === 'LOW') return 'text-green-400 glow-text'
+    if (level === 'LOW') return 'text-blue-400 glow-text'
     if (level === 'MEDIUM') return 'text-yellow-400'
     if (level === 'HIGH') return 'text-orange-400'
     return 'text-red-400 glow-text-red'
@@ -39,8 +39,8 @@ function EmailSearch() {
     <div>
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <FiTerminal className="text-green-400" />
-          <h1 className="title-cyber text-2xl font-bold text-green-400 glow-text">EMAIL OSINT</h1>
+          <FiTerminal className="text-blue-400" />
+          <h1 className="title-cyber text-2xl font-bold text-blue-400 glow-text">EMAIL OSINT</h1>
         </div>
         <p className="text-slate-500 text-sm font-mono ml-7">Deep email intelligence - breaches, social discovery, DNS analysis</p>
       </div>
@@ -60,7 +60,7 @@ function EmailSearch() {
 
           {results.breaches.reputation && (
             <div className="card-cyber p-5 rounded-lg">
-              <h2 className="title-cyber text-lg font-bold mb-3 flex items-center gap-2 text-green-400"><FiStar /> REPUTATION SCORE</h2>
+              <h2 className="title-cyber text-lg font-bold mb-3 flex items-center gap-2 text-blue-400"><FiStar /> REPUTATION SCORE</h2>
               <div className="flex items-center gap-6 mb-3">
                 <div className="text-5xl font-bold title-cyber text-white">{results.breaches.reputation.score}</div>
                 <div className={`text-2xl font-bold title-cyber ${riskColor(results.breaches.reputation.risk_level)}`}>{results.breaches.reputation.risk_level} RISK</div>
@@ -78,32 +78,32 @@ function EmailSearch() {
 
           {results.breaches.username_hints?.possible_usernames?.length > 0 && (
             <div className="card-cyber p-4 rounded-lg">
-              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-green-400"><FiUser /> EXTRACTED USERNAMES</h2>
+              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-blue-400"><FiUser /> EXTRACTED USERNAMES</h2>
               <p className="text-slate-500 text-xs font-mono mb-2">$ username candidates from email local-part:</p>
               <div className="flex flex-wrap gap-2">
                 {results.breaches.username_hints.possible_usernames.map((u, i) => (
-                  <span key={i} className="bg-green-950/50 text-green-300 px-3 py-1 rounded text-xs font-mono cyber-border">{u}</span>
+                  <span key={i} className="bg-blue-950/50 text-blue-300 px-3 py-1 rounded text-xs font-mono cyber-border">{u}</span>
                 ))}
               </div>
               {results.breaches.username_hints.possible_names?.length > 0 && (
-                <p className="text-slate-500 text-xs font-mono mt-2">$ likely name: <span className="text-green-400">{results.breaches.username_hints.possible_names[0]}</span></p>
+                <p className="text-slate-500 text-xs font-mono mt-2">$ likely name: <span className="text-blue-400">{results.breaches.username_hints.possible_names[0]}</span></p>
               )}
             </div>
           )}
 
           {results.breaches.social_accounts && Object.keys(results.breaches.social_accounts).length > 0 && (
             <div className="card-cyber p-4 rounded-lg">
-              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-green-400"><FiLink /> LINKED SOCIAL ACCOUNTS</h2>
+              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-blue-400"><FiLink /> LINKED SOCIAL ACCOUNTS</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {Object.entries(results.breaches.social_accounts).map(([platform, info]) => (
                   <div key={platform} className="bg-slate-900/50 p-2 rounded cyber-border flex items-center justify-between">
                     <div>
-                      <span className="font-bold text-green-400 uppercase text-xs font-mono">[{platform}]</span>
+                      <span className="font-bold text-blue-400 uppercase text-xs font-mono">[{platform}]</span>
                       {info.username && <span className="text-slate-300 ml-2 text-xs">{info.username}</span>}
                       {info.reputation && <span className="text-slate-500 ml-2 text-xs">rep:{info.reputation}</span>}
                     </div>
                     {info.url && (
-                      <a href={info.url} target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300 text-xs">&#9656; VIEW</a>
+                      <a href={info.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs">&#9656; VIEW</a>
                     )}
                   </div>
                 ))}
@@ -113,7 +113,7 @@ function EmailSearch() {
 
           {results.breaches.phone_numbers?.length > 0 && (
             <div className="card-cyber p-4 rounded-lg">
-              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-green-400"><FiPhone /> PHONE / CONTACT LEAKS</h2>
+              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-blue-400"><FiPhone /> PHONE / CONTACT LEAKS</h2>
               {results.breaches.phone_numbers.map((p, i) => (
                 <p key={i} className="text-orange-400 text-xs font-mono">! {p}</p>
               ))}
@@ -122,7 +122,7 @@ function EmailSearch() {
 
           {results.breaches.leaked_info?.length > 0 && (
             <div className="card-cyber p-4 rounded-lg">
-              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-green-400"><FiAlertTriangle /> LEAKED INFORMATION</h2>
+              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-blue-400"><FiAlertTriangle /> LEAKED INFORMATION</h2>
               <div className="space-y-2">
                 {results.breaches.leaked_info.map((info, i) => (
                   <div key={i} className="bg-slate-900/50 p-2 rounded cyber-border flex items-start gap-3">
@@ -140,7 +140,7 @@ function EmailSearch() {
 
           {results.breaches.leaked_files?.length > 0 && (
             <div className="card-cyber p-4 rounded-lg">
-              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-green-400"><FiFileText /> LEAKED FILES / DATA</h2>
+              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-blue-400"><FiFileText /> LEAKED FILES / DATA</h2>
               <div className="space-y-2">
                 {results.breaches.leaked_files.map((f, i) => (
                   <div key={i} className="bg-slate-900/50 p-2 rounded cyber-border">
@@ -155,31 +155,31 @@ function EmailSearch() {
           )}
 
           <div className="card-cyber p-4 rounded-lg">
-            <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-green-400"><FiCheck /> VALIDATION</h2>
+            <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-blue-400"><FiCheck /> VALIDATION</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              <div className={`p-2 rounded text-center cyber-border ${results.validation.valid ? 'bg-green-950/30' : 'bg-red-950/30'}`}>
+              <div className={`p-2 rounded text-center cyber-border ${results.validation.valid ? 'bg-blue-950/30' : 'bg-red-950/30'}`}>
                 <p className="text-[10px] text-slate-500 font-mono">FORMAT</p>
-                <p className={`text-xs font-mono font-bold ${results.validation.valid ? 'text-green-400' : 'text-red-400'}`}>{results.validation.valid ? 'VALID' : 'INVALID'}</p>
+                <p className={`text-xs font-mono font-bold ${results.validation.valid ? 'text-blue-400' : 'text-red-400'}`}>{results.validation.valid ? 'VALID' : 'INVALID'}</p>
               </div>
-              <div className={`p-2 rounded text-center cyber-border ${results.validation.is_disposable ? 'bg-red-950/30' : 'bg-green-950/30'}`}>
+              <div className={`p-2 rounded text-center cyber-border ${results.validation.is_disposable ? 'bg-red-950/30' : 'bg-blue-950/30'}`}>
                 <p className="text-[10px] text-slate-500 font-mono">DISPOSABLE</p>
-                <p className={`text-xs font-mono font-bold ${results.validation.is_disposable ? 'text-red-400' : 'text-green-400'}`}>{results.validation.is_disposable ? 'YES' : 'NO'}</p>
+                <p className={`text-xs font-mono font-bold ${results.validation.is_disposable ? 'text-red-400' : 'text-blue-400'}`}>{results.validation.is_disposable ? 'YES' : 'NO'}</p>
               </div>
               <div className={`p-2 rounded text-center cyber-border ${results.validation.is_free_provider ? 'bg-yellow-950/30' : 'bg-slate-900/50'}`}>
                 <p className="text-[10px] text-slate-500 font-mono">FREE EMAIL</p>
                 <p className={`text-xs font-mono font-bold ${results.validation.is_free_provider ? 'text-yellow-400' : 'text-slate-400'}`}>{results.validation.is_free_provider ? 'YES' : 'NO'}</p>
               </div>
-              <div className={`p-2 rounded text-center cyber-border ${results.validation.mx_valid ? 'bg-green-950/30' : 'bg-red-950/30'}`}>
+              <div className={`p-2 rounded text-center cyber-border ${results.validation.mx_valid ? 'bg-blue-950/30' : 'bg-red-950/30'}`}>
                 <p className="text-[10px] text-slate-500 font-mono">MX RECORDS</p>
-                <p className={`text-xs font-mono font-bold ${results.validation.mx_valid ? 'text-green-400' : 'text-red-400'}`}>{results.validation.mx_valid ? 'VALID' : 'NONE'}</p>
+                <p className={`text-xs font-mono font-bold ${results.validation.mx_valid ? 'text-blue-400' : 'text-red-400'}`}>{results.validation.mx_valid ? 'VALID' : 'NONE'}</p>
               </div>
             </div>
           </div>
 
           {results.breaches.email_age?.estimated_age && (
             <div className="card-cyber p-4 rounded-lg">
-              <h2 className="title-cyber text-sm font-bold mb-1 text-green-400">&#9656; DOMAIN AGE</h2>
-              <p className="text-green-400 text-sm font-mono">age: {results.breaches.email_age.estimated_age}</p>
+              <h2 className="title-cyber text-sm font-bold mb-1 text-blue-400">&#9656; DOMAIN AGE</h2>
+              <p className="text-blue-400 text-sm font-mono">age: {results.breaches.email_age.estimated_age}</p>
               {results.breaches.email_age.domain_creation && (
                 <p className="text-slate-500 text-xs font-mono">created: {results.breaches.email_age.domain_creation}</p>
               )}
@@ -188,9 +188,9 @@ function EmailSearch() {
 
           {results.breaches.dns_info && (
             <div className="card-cyber p-4 rounded-lg">
-              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-green-400"><FiGlobe /> DNS / EMAIL PROVIDER</h2>
+              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-blue-400"><FiGlobe /> DNS / EMAIL PROVIDER</h2>
               {results.breaches.dns_info.provider && (
-                <p className="text-green-400 text-sm font-mono mb-2">provider: {results.breaches.dns_info.provider}</p>
+                <p className="text-blue-400 text-sm font-mono mb-2">provider: {results.breaches.dns_info.provider}</p>
               )}
               {results.breaches.dns_info.mx_records?.length > 0 && (
                 <div className="mt-2">
@@ -217,8 +217,8 @@ function EmailSearch() {
 
           {results.breaches.gravatar?.exists && (
             <div className="card-cyber p-4 rounded-lg">
-              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-green-400"><FiUser /> GRAVATAR PROFILE</h2>
-              <p className="text-green-400 text-xs font-mono">[+] Gravatar account discovered</p>
+              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-blue-400"><FiUser /> GRAVATAR PROFILE</h2>
+              <p className="text-blue-400 text-xs font-mono">[+] Gravatar account discovered</p>
               {results.breaches.gravatar.display_name && (
                 <p className="text-slate-300 text-xs font-mono mt-1">name: {results.breaches.gravatar.display_name}</p>
               )}
@@ -226,7 +226,7 @@ function EmailSearch() {
                 <div className="mt-2">
                   <p className="text-slate-500 text-xs font-mono">linked websites:</p>
                   {results.breaches.gravatar.linked_urls.map((link, i) => (
-                    <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="text-green-400 text-xs font-mono block ml-4 hover:text-green-300">{link.title}: {link.url}</a>
+                    <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs font-mono block ml-4 hover:text-blue-300">{link.title}: {link.url}</a>
                   ))}
                 </div>
               )}
@@ -234,14 +234,14 @@ function EmailSearch() {
           )}
 
           <div className="card-cyber p-4 rounded-lg">
-            <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-green-400"><FiAlertTriangle /> DATA BREACHES ({results.breaches.breach_count})</h2>
+            <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-blue-400"><FiAlertTriangle /> DATA BREACHES ({results.breaches.breach_count})</h2>
             {results.breaches.breach_count > 0 ? (
               <div className="space-y-2">
                 {results.breaches.breaches.map((breach, idx) => (
                   <div key={idx} className="bg-slate-900/50 p-3 rounded cyber-border">
                     <div className="flex items-center gap-2">
                       <p className="font-bold text-white text-sm font-mono">{breach.title}</p>
-                      {breach.is_verified && <span className="text-[9px] bg-green-600/30 text-green-400 px-1.5 py-0.5 rounded font-mono">VERIFIED</span>}
+                      {breach.is_verified && <span className="text-[9px] bg-blue-600/30 text-blue-400 px-1.5 py-0.5 rounded font-mono">VERIFIED</span>}
                       {breach.is_sensitive && <span className="text-[9px] bg-red-600/30 text-red-400 px-1.5 py-0.5 rounded font-mono">SENSITIVE</span>}
                     </div>
                     <p className="text-[10px] text-slate-500 font-mono mt-1">domain:{breach.domain} | date:{breach.breach_date} | records:{breach.pwn_count?.toLocaleString()}</p>
@@ -252,7 +252,7 @@ function EmailSearch() {
                 ))}
               </div>
             ) : (
-              <p className="text-green-400 font-mono text-sm">$ no breaches found for this target</p>
+              <p className="text-blue-400 font-mono text-sm">$ no breaches found for this target</p>
             )}
           </div>
 

@@ -30,8 +30,8 @@ function DomainSearch() {
     <div>
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <FiTerminal className="text-green-400" />
-          <h1 className="title-cyber text-2xl font-bold text-green-400 glow-text">DOMAIN RECON</h1>
+          <FiTerminal className="text-blue-400" />
+          <h1 className="title-cyber text-2xl font-bold text-blue-400 glow-text">DOMAIN RECON</h1>
         </div>
         <p className="text-slate-500 text-sm font-mono ml-7">Domain reconnaissance - WHOIS, DNS, subdomain enumeration</p>
       </div>
@@ -49,14 +49,14 @@ function DomainSearch() {
       {results && (
         <div className="space-y-5">
           <div className="card-cyber p-5 rounded-lg">
-            <h2 className="title-cyber text-sm font-bold mb-3 flex items-center gap-2 text-green-400"><FiGlobe /> WHOIS INTEL</h2>
+            <h2 className="title-cyber text-sm font-bold mb-3 flex items-center gap-2 text-blue-400"><FiGlobe /> WHOIS INTEL</h2>
             {results.whois.error ? (
               <p className="text-red-400 font-mono text-sm">! {results.whois.error}</p>
             ) : (
               <div className="grid grid-cols-2 gap-3 text-xs font-mono">
                 <div className="bg-slate-900/50 p-2 rounded cyber-border"><span className="text-slate-500">registrar:</span> <span className="text-white">{results.whois.registrar}</span></div>
                 <div className="bg-slate-900/50 p-2 rounded cyber-border"><span className="text-slate-500">org:</span> <span className="text-white">{results.whois.org}</span></div>
-                <div className="bg-slate-900/50 p-2 rounded cyber-border"><span className="text-slate-500">created:</span> <span className="text-green-400">{results.whois.creation_date}</span></div>
+                <div className="bg-slate-900/50 p-2 rounded cyber-border"><span className="text-slate-500">created:</span> <span className="text-blue-400">{results.whois.creation_date}</span></div>
                 <div className="bg-slate-900/50 p-2 rounded cyber-border"><span className="text-slate-500">expires:</span> <span className="text-yellow-400">{results.whois.expiration_date}</span></div>
                 <div className="bg-slate-900/50 p-2 rounded cyber-border"><span className="text-slate-500">country:</span> <span className="text-white">{results.whois.country}</span></div>
                 {results.whois.emails?.length > 0 && (
@@ -70,11 +70,11 @@ function DomainSearch() {
           </div>
 
           <div className="card-cyber p-5 rounded-lg">
-            <h2 className="title-cyber text-sm font-bold mb-3 text-green-400">&#9656; DNS RECORDS</h2>
+            <h2 className="title-cyber text-sm font-bold mb-3 text-blue-400">&#9656; DNS RECORDS</h2>
             <div className="space-y-2">
               {Object.entries(results.dns.records).map(([type, records]) => (
                 <div key={type}>
-                  <p className="text-green-400 font-bold text-xs font-mono">[{type}]</p>
+                  <p className="text-blue-400 font-bold text-xs font-mono">[{type}]</p>
                   {records.map((record, idx) => (
                     <p key={idx} className="font-mono text-xs ml-4 text-slate-400">{record}</p>
                   ))}
@@ -88,12 +88,12 @@ function DomainSearch() {
 
           {subdomains && (
             <div className="card-cyber p-5 rounded-lg">
-              <h2 className="title-cyber text-sm font-bold mb-3 flex items-center gap-2 text-green-400">
+              <h2 className="title-cyber text-sm font-bold mb-3 flex items-center gap-2 text-blue-400">
                 <FiServer /> SUBDOMAINS ({subdomains.total_found} found)
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {subdomains.subdomains.map((sub, idx) => (
-                  <div key={idx} className="bg-slate-900/50 px-3 py-2 rounded text-xs font-mono cyber-border text-green-300">
+                  <div key={idx} className="bg-slate-900/50 px-3 py-2 rounded text-xs font-mono cyber-border text-blue-300">
                     + {sub}
                   </div>
                 ))}
