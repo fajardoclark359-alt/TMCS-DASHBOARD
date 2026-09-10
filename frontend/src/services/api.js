@@ -40,3 +40,28 @@ export const investigateURL = async (url) => {
   const response = await axios.post(`${API_BASE}/url/investigate`, { url })
   return response.data
 }
+
+export const captureEvidence = async (data) => {
+  const response = await axios.post(`${API_BASE}/phone/evidence/capture`, data)
+  return response.data
+}
+
+export const listEvidence = async () => {
+  const response = await axios.get(`${API_BASE}/phone/evidence/list`)
+  return response.data
+}
+
+export const getEvidence = async (evidenceId) => {
+  const response = await axios.get(`${API_BASE}/phone/evidence/${evidenceId}`)
+  return response.data
+}
+
+export const deleteEvidence = async (evidenceId) => {
+  const response = await axios.delete(`${API_BASE}/phone/evidence/${evidenceId}`)
+  return response.data
+}
+
+export const exportEvidence = async (data) => {
+  const response = await axios.post(`${API_BASE}/phone/evidence/export`, data)
+  return response.data
+}

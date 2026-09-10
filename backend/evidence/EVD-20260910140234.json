@@ -1,0 +1,61 @@
+{
+  "evidence_id": "EVD-20260910140234",
+  "timestamp": "2026-09-10T14:02:34.785895",
+  "investigation_type": "phone_lookup",
+  "target": "+14155552671",
+  "country_code": "US",
+  "notes": "Test evidence capture",
+  "tags": [
+    "test",
+    "demo"
+  ],
+  "priority": "high",
+  "case_id": "CASE-2026-001",
+  "data": {
+    "phone_number": "+14155552671",
+    "valid": true,
+    "formatted": "+14155552671",
+    "country": "US",
+    "country_name": "United States",
+    "carrier": "",
+    "line_type": "Fixed Line or Mobile",
+    "timezone": "America/Los_Angeles",
+    "location": "San Francisco, CA",
+    "error": null,
+    "owner_info": {
+      "possible_names": [],
+      "possible_locations": [],
+      "carrier_owner": "",
+      "country": "United States",
+      "location": "San Francisco, CA",
+      "timezone": "America/Los_Angeles",
+      "number_type": "Fixed Line or Mobile",
+      "is_business": false,
+      "is_spam": false,
+      "risk_flags": []
+    },
+    "social_accounts": {},
+    "breach_data": [],
+    "spam_reports": [],
+    "linked_emails": [],
+    "reputation": {
+      "score": 100,
+      "risk_level": "LOW",
+      "flags": []
+    },
+    "formatted_international": "+1 415-555-2671",
+    "formatted_national": "(415) 555-2671",
+    "national_format": "(415) 555-2671",
+    "local_digits": "4155552671"
+  },
+  "metadata": {
+    "investigator": "OSINT TMC/CLARK",
+    "tool_version": "2.0.0",
+    "evidence_type": "phone_investigation",
+    "chain_of_custody": {
+      "created_at": "2026-09-10T14:02:34.785921",
+      "hash": null,
+      "verified": true
+    }
+  }
+}
