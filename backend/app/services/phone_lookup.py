@@ -1,6 +1,7 @@
 import httpx
 import re
-from typing import Optional, Dict, Any
+import hashlib
+from typing import Optional, Dict, Any, List
 import phonenumbers
 from phonenumbers import carrier, timezone, geocoder
 
@@ -18,13 +19,22 @@ class PhoneService:
             "carrier": None,
             "line_type": None,
             "timezone": None,
+            "location": None,
             "error": None,
+            "owner_info": {},
+            "social_accounts": {},
+            "breach_data": [],
+            "spam_reports": [],
+            "linked_emails": [],
+            "reputation": {},
         }
 
         try:
             parsed = phonenumbers.parse(phone_number, country_code)
             result["valid"] = phonenumbers.is_valid_number(parsed)
             result["formatted"] = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+            result["formatted_international"] = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+            result["formatted_national"] = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.NATIONAL)
             region = phonenumbers.region_code_for_number(parsed)
             result["country"] = region
 
@@ -53,6 +63,11 @@ class PhoneService:
             except Exception:
                 pass
 
+            try:
+                result["location"] = geocoder.description_for_number(parsed, "en")
+            except Exception:
+                pass
+
             num_type = phonenumbers.number_type(parsed)
             type_map = {
                 phonenumbers.PhoneNumberType.FIXED_LINE: "Fixed Line",
@@ -69,11 +84,214 @@ class PhoneService:
             }
             result["line_type"] = type_map.get(num_type, "Unknown")
 
+            national = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.NATIONAL)
+            result["national_format"] = national
+            digits_only = re.sub(r'[^\d]', '', national)
+            result["local_digits"] = digits_only
+
         except Exception as e:
             result["error"] = f"Invalid phone number format: {str(e)}"
             return result
 
+        async with httpx.AsyncClient(follow_redirects=True, timeout=8.0) as client:
+            result["owner_info"] = await self._trace_owner(client, phone_number, result)
+            result["social_accounts"] = await self._check_phone_social(client, phone_number, result)
+            result["breach_data"] = await self._check_phone_breaches(client, phone_number)
+            result["spam_reports"] = await self._check_spam(client, phone_number)
+            result["linked_emails"] = await self._find_linked_emails(client, phone_number, result)
+
+        result["reputation"] = self._calculate_reputation(result)
+
         return result
+
+    async def _trace_owner(self, client: httpx.AsyncClient, phone_number: str, info: Dict) -> Dict[str, Any]:
+        owner = {
+            "possible_names": [],
+            "possible_locations": [],
+            "carrier_owner": info.get("carrier"),
+            "country": info.get("country_name"),
+            "location": info.get("location"),
+            "timezone": info.get("timezone"),
+            "number_type": info.get("line_type"),
+            "is_business": False,
+            "is_spam": False,
+            "risk_flags": [],
+        }
+
+        if info.get("line_type") in ["Premium Rate", "Shared Cost", "UAN"]:
+            owner["is_business"] = True
+            owner["risk_flags"].append("Business/premium number detected")
+
+        if info.get("line_type") == "VoIP":
+            owner["risk_flags"].append("VoIP number - harder to trace owner")
+
+        if info.get("line_type") == "Toll Free":
+            owner["is_business"] = True
+            owner["risk_flags"].append("Toll-free business number")
+
+        if info.get("carrier"):
+            carrier_lower = info["carrier"].lower()
+            if any(spam in carrier_lower for spam in ["unknown", "mobile", "generic"]):
+                owner["risk_flags"].append("Generic carrier - possible prepaid/burner")
+
+        try:
+            resp = await client.get(
+                f"https://api.numverify.com/v2/validate",
+                params={"access_key": "free", "number": phone_number, "country_code": info.get("country", "")}
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("valid"):
+                    owner["is_valid_line"] = True
+                    if data.get("carrier"):
+                        owner["carrier_owner"] = data["carrier"]
+                    if data.get("location"):
+                        owner["possible_locations"].append(data["location"])
+        except Exception:
+            pass
+
+        return owner
+
+    async def _check_phone_social(self, client: httpx.AsyncClient, phone_number: str, info: Dict) -> Dict[str, Any]:
+        accounts = {}
+        phone_digits = re.sub(r'[^\d]', '', phone_number)
+
+        try:
+            resp = await client.get(f"https://api.github.com/search/users?q={phone_digits}")
+            if resp.status_code == 200:
+                items = resp.json().get("items", [])
+                if items:
+                    accounts["github"] = {"username": items[0].get("login"), "url": items[0].get("html_url"), "source": "phone number search"}
+        except Exception:
+            pass
+
+        try:
+            resp = await client.get(f"https://api.telegram.org/bot{phone_digits}/getMe")
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("result"):
+                    accounts["telegram"] = {"username": data["result"].get("username"), "bot": data["result"].get("is_bot")}
+        except Exception:
+            pass
+
+        try:
+            resp = await client.get(f"https://api.viber.com/api/get_user_details", params={"id": phone_digits})
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("status") == 0:
+                    accounts["viber"] = {"name": data.get("name"), "avatar": data.get("avatar")}
+        except Exception:
+            pass
+
+        try:
+            resp = await client.get(f"https://www.whatsapp.com/send?phone={phone_digits}")
+            if resp.status_code == 200:
+                accounts["whatsapp"] = {"status": "number exists on WhatsApp", "url": f"https://wa.me/{phone_digits}"}
+        except Exception:
+            pass
+
+        return accounts
+
+    async def _check_phone_breaches(self, client: httpx.AsyncClient, phone_number: str) -> List[Dict[str, Any]]:
+        breaches = []
+        phone_digits = re.sub(r'[^\d]', '', phone_number)
+
+        try:
+            resp = await client.get(
+                f"https://haveibeenpwned.com/api/v3/breachedaccount/{phone_digits}",
+                headers={"hibp-api-key": "", "user-agent": "OSINT-Tool-1.0"},
+                params={"truncateResponse": "false"}
+            )
+            if resp.status_code == 200:
+                for b in resp.json():
+                    breaches.append({
+                        "name": b.get("Name"),
+                        "title": b.get("Title"),
+                        "domain": b.get("Domain"),
+                        "breach_date": b.get("BreachDate"),
+                        "pwn_count": b.get("PwnCount"),
+                        "data_classes": b.get("DataClasses", []),
+                        "is_verified": b.get("IsVerified"),
+                    })
+        except Exception:
+            pass
+
+        return breaches
+
+    async def _check_spam(self, client: httpx.AsyncClient, phone_number: str) -> List[Dict[str, Any]]:
+        reports = []
+        phone_digits = re.sub(r'[^\d]', '', phone_number)
+
+        try:
+            resp = await client.get(f"https://api.numverify.com/v2/validate", params={"access_key": "free", "number": phone_digits})
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("valid") is False:
+                    reports.append({"source": "NumVerify", "status": "Number not valid", "risk": "high"})
+        except Exception:
+            pass
+
+        return reports
+
+    async def _find_linked_emails(self, client: httpx.AsyncClient, phone_number: str, info: Dict) -> List[Dict[str, Any]]:
+        emails = []
+        phone_digits = re.sub(r'[^\d]', '', phone_number)
+
+        try:
+            resp = await client.get(f"https://api.github.com/search/users?q={phone_digits}+in:email")
+            if resp.status_code == 200:
+                items = resp.json().get("items", [])
+                for item in items:
+                    if item.get("email"):
+                        emails.append({"email": item["email"], "source": "GitHub", "username": item.get("login")})
+        except Exception:
+            pass
+
+        return emails
+
+    def _calculate_reputation(self, data: Dict) -> Dict[str, Any]:
+        score = 100
+        flags = []
+
+        if not data.get("valid"):
+            score -= 30
+            flags.append("Invalid phone number")
+
+        if data.get("line_type") == "VoIP":
+            score -= 15
+            flags.append("VoIP number - harder to trace")
+
+        if data.get("line_type") == "Toll Free":
+            score -= 10
+            flags.append("Toll-free number")
+
+        if data.get("line_type") in ["Premium Rate", "Shared Cost"]:
+            score -= 20
+            flags.append("Premium/shared cost number")
+
+        if data.get("breach_data"):
+            score -= len(data["breach_data"]) * 10
+            flags.append(f"Found in {len(data['breach_data'])} data breach(es)")
+
+        if data.get("spam_reports"):
+            score -= len(data["spam_reports"]) * 5
+            flags.append(f"Flagged in {len(data['spam_reports'])} spam report(s)")
+
+        if data.get("owner_info", {}).get("risk_flags"):
+            for flag in data["owner_info"]["risk_flags"]:
+                score -= 5
+                flags.append(flag)
+
+        if data.get("social_accounts"):
+            social_count = len(data["social_accounts"])
+            if social_count > 0:
+                score += social_count * 3
+                flags.append(f"Found on {social_count} social platform(s)")
+
+        score = max(0, min(100, score))
+        risk = "LOW" if score >= 80 else "MEDIUM" if score >= 50 else "HIGH" if score >= 20 else "CRITICAL"
+
+        return {"score": score, "risk_level": risk, "flags": flags}
 
     def validate_email(self, email: str) -> Dict[str, Any]:
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
