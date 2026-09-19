@@ -205,10 +205,7 @@ export async function clientAnalyzeMedia(file) {
         Object.assign(exifObj, segments)
       }
 
-      // Remove raw GPS entries to avoid duplication in display
-      delete exifObj.latitude
-      delete exifObj.longitude
-      delete exifObj.altitude
+      // Remove raw GPS entries to avoid duplication in display, but keep date fields
       delete exifObj.GPSLatitude
       delete exifObj.GPSLongitude
       delete exifObj.GPSAltitude

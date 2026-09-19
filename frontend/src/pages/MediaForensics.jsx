@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { analyzeMedia, clientAnalyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence, mediaExportUrl } from '../services/api'
-import { FiSearch, FiShield, FiCamera, FiVideo, FiMapPin, FiSave, FiFileText, FiClock, FiTag, FiCheck, FiDownload, FiEye, FiTrash2, FiCopy, FiTerminal } from 'react-icons/fi'
+import { FiSearch, FiShield, FiCamera, FiVideo, FiMapPin, FiSave, FiFileText, FiClock, FiTag, FiCheck, FiDownload, FiEye, FiTrash2, FiCopy, FiTerminal, FiCrosshair } from 'react-icons/fi'
 
 function downloadFile(filename, content, mime) {
   const blob = content instanceof Blob ? content : new Blob([content], { type: mime })
@@ -25,14 +25,42 @@ function buildHtmlReport(analysis) {
   const tags = (analysis.video && analysis.video.tags) || {}
   const risk = analysis.risk || {}
   const kv = (obj) => Object.entries(obj).map(([k, v]) => `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(typeof v === 'object' ? JSON.stringify(v) : v)}</td></tr>`).join('') || '<tr><td colspan="2">None</td></tr>'
+  // Extract origin fields for the report
+  const captureDate = exif.DateTimeOriginal || exif.CreateDate || exif.DateTimeDigitized || exif.DateTime || exif.ModifyDate || null
+  const make = exif.Make || null
+  const model = exif.Model || null
+  const lensModel = exif.LensModel || null
+  const software = exif.Software || null
+  const iso = exif.ISOSpeedRatings || null
+  const aperture = exif.FNumber || null
+  const focal = exif.FocalLength || null
+  const exposure = exif.ExposureTime || null
+  const serial = exif.SerialNumber || exif.CameraSerialNumber || null
+  const owner = exif.OwnerName || exif.Artist || null
+  const originRows = [
+    captureDate && `<tr><td>Captured</td><td>${escapeHtml(String(captureDate))}</td></tr>`,
+    gps && `<tr><td>Latitude</td><td>${escapeHtml(String(gps.latitude))}°</td></tr>`,
+    gps && `<tr><td>Longitude</td><td>${escapeHtml(String(gps.longitude))}° <a href="${gps.maps_url}">View on Maps</a></td></tr>`,
+    gps?.altitude_m && `<tr><td>Altitude</td><td>${escapeHtml(String(gps.altitude_m))} m</td></tr>`,
+    make && `<tr><td>Camera Make</td><td>${escapeHtml(make)}</td></tr>`,
+    model && `<tr><td>Camera Model</td><td>${escapeHtml(model)}</td></tr>`,
+    lensModel && `<tr><td>Lens</td><td>${escapeHtml(lensModel)}</td></tr>`,
+    software && `<tr><td>Software</td><td>${escapeHtml(software)}</td></tr>`,
+    iso && `<tr><td>ISO</td><td>${escapeHtml(String(iso))}</td></tr>`,
+    aperture && `<tr><td>Aperture</td><td>f/${escapeHtml(String(aperture))}</td></tr>`,
+    focal && `<tr><td>Focal Length</td><td>${escapeHtml(String(focal))}</td></tr>`,
+    exposure && `<tr><td>Exposure</td><td>${escapeHtml(String(exposure))}s</td></tr>`,
+    serial && `<tr><td>Serial Number</td><td style="color:#f87171">${escapeHtml(serial)}</td></tr>`,
+    owner && `<tr><td>Owner</td><td style="color:#f87171">${escapeHtml(owner)}</td></tr>`,
+  ].filter(Boolean).join('')
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Media Metadata Report - ${escapeHtml(f.filename || '')}</title>
-<style>body{font-family:monospace;background:#0f172a;color:#e2e8f0;max-width:900px;margin:2em auto;padding:0 1em}h1,h2{color:#60a5fa}table{width:100%;border-collapse:collapse;margin:1em 0}td{border:1px solid #334155;padding:6px 10px;font-size:13px;word-break:break-all}td:first-child{color:#94a3b8;width:30%}</style></head><body>
+<style>body{font-family:monospace;background:#0f172a;color:#e2e8f0;max-width:900px;margin:2em auto;padding:0 1em}h1,h2{color:#60a5fa}h2.purple{color:#a78bfa}table{width:100%;border-collapse:collapse;margin:1em 0}td{border:1px solid #334155;padding:6px 10px;font-size:13px;word-break:break-all}td:first-child{color:#94a3b8;width:30%}.red{color:#f87171}</style></head><body>
 <h1>Media Metadata Report</h1><p>Generated ${escapeHtml(analysis.analyzed_at || '')} | ${escapeHtml(analysis.tool || '')}</p>
 <h2>Risk: ${escapeHtml(risk.score ?? '?')} / 100 — ${escapeHtml(risk.risk_level || '')}</h2>
 <ul>${(risk.flags || []).map((x) => `<li>${escapeHtml(x)}</li>`).join('') || '<li>No flags</li>'}</ul>
 <h2>File</h2><table>${kv({ filename: f.filename, size: f.size_human, mime: f.mime_type, sha256: f.sha256, md5: f.md5 })}</table>
-<h2>Location</h2>${gps ? `<p>Lat ${gps.latitude}, Lon ${gps.longitude} <a href="${gps.maps_url}">View on Google Maps</a></p>` : '<p>No GPS coordinates embedded.</p>'}
-<h2>EXIF / Image tags</h2><table>${kv(exif.GPSInfo ? { ...exif, GPSInfo: '[see Location]' } : exif)}</table>
+${originRows ? `<h2 class="purple">DATA ORIGIN — Where, When & With What</h2><p style="color:#94a3b8;font-size:12px">Real metadata embedded in the file by the capture device. Not fabricated.</p><table>${originRows}</table>` : ''}
+<h2>EXIF / Image tags</h2><table>${kv(exif.GPSInfo ? { ...exif, GPSInfo: '[see Origin above]' } : exif)}</table>
 <h2>Video container tags</h2><table>${kv(tags)}</table></body></html>`
 }
 
@@ -190,6 +218,135 @@ function MediaForensics() {
               <button onClick={handleCopy} className="px-4 py-2 rounded text-xs font-mono flex items-center gap-2 bg-slate-800/60 text-slate-300 border border-slate-700"><FiCopy /> {copied ? 'COPIED!' : 'COPY JSON'}</button>
             </div>
           </div>
+
+          {/* ── DATA ORIGIN PANEL ── */}
+          {(() => {
+            const exif = results.exif || {}
+            const gps = results.gps
+
+            // Date & Time: try multiple EXIF fields in priority order
+            const captureDate = exif.DateTimeOriginal || exif.CreateDate || exif.DateTimeDigitized
+              || exif['Exif.DateTimeOriginal'] || exif['Exif.CreateDate'] || exif.DateTime
+              || exif['EXIF.DateTimeOriginal'] || exif['EXIF.DateTime'] || exif.ModifyDate
+              || exif['XMP.CreateDate'] || exif['XMP.DateTimeOriginal'] || null
+            const gpsDate = exif.GPSDateStamp || (gps?.gps_date) || null
+            const gpsTime = exif.GPSTimeStamp || null
+
+            // Camera / Device
+            const make = exif.Make || exif['Exif.Make'] || exif['EXIF.Make'] || null
+            const model = exif.Model || exif['Exif.Model'] || exif['EXIF.Model'] || null
+            const lensMake = exif.LensMake || exif['Exif.LensMake'] || null
+            const lensModel = exif.LensModel || exif['Exif.LensModel'] || exif['EXIF.LensModel'] || null
+            const software = exif.Software || exif['Exif.Software'] || exif['EXIF.Software'] || null
+            const firmware = exif.Firmware || null
+
+            // Capture settings
+            const focalLength = exif.FocalLength || exif['Exif.FocalLength'] || null
+            const aperture = exif.FNumber || exif.ApertureValue || exif['Exif.FNumber'] || null
+            const iso = exif.ISOSpeedRatings || exif['Exif.ISOSpeedRatings'] || null
+            const exposure = exif.ExposureTime || exif['Exif.ExposureTime'] || null
+            const flash = exif.Flash || exif['Exif.Flash'] || null
+            const wb = exif.WhiteBalance || exif['Exif.WhiteBalance'] || null
+            const colorSpace = exif.ColorSpace || null
+
+            // Serial / Owner (sensitive)
+            const serial = exif.SerialNumber || exif.CameraSerialNumber || exif['Exif.BodySerialNumber'] || null
+            const lensSerial = exif.LensSerialNumber || exif['Exif.LensSerialNumber'] || null
+            const owner = exif.OwnerName || exif.Artist || exif.Author || null
+            const copyright = exif.Copyright || null
+
+            const hasOrigin = captureDate || make || model || gps || serial || owner || software
+            if (!hasOrigin) return null
+
+            const fmtDate = (d) => {
+              if (!d) return null
+              const s = String(d)
+              // exifr may return Date object or ISO string or EXIF format "YYYY:MM:DD HH:MM:SS"
+              if (d instanceof Date) return d.toLocaleString()
+              if (/^\d{4}-/.test(s)) return s  // ISO
+              if (/^\d{4}:\d{2}:\d{2}/.test(s)) return s.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3')
+              return s
+            }
+
+            return (
+              <div className="card-cyber p-5 rounded-lg mb-5 border border-purple-500/30">
+                <h2 className="title-cyber text-lg font-bold mb-4 flex items-center gap-2 text-purple-400"><FiCrosshair /> DATA ORIGIN — Where, When & With What</h2>
+                <p className="text-slate-500 text-[11px] font-mono mb-4 -mt-2">Real metadata embedded in the file by the capture device. Not fabricated.</p>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                  {/* ── WHEN ── */}
+                  <div className="bg-slate-900/60 p-4 rounded cyber-border">
+                    <p className="text-[10px] text-purple-400 font-mono font-bold mb-3 tracking-wider">📅 WHEN CAPTURED</p>
+                    {captureDate ? (
+                      <div className="space-y-2 text-xs font-mono">
+                        <div><span className="text-slate-500">date_time:</span><br/><span className="text-white text-sm">{fmtDate(captureDate)}</span></div>
+                        {gpsDate && <div><span className="text-slate-500">gps_date:</span><br/><span className="text-blue-400">{fmtDate(gpsDate)}</span></div>}
+                        {exif.OffsetTimeOriginal && <div><span className="text-slate-500">timezone_offset:</span><br/><span className="text-cyan-400">{exif.OffsetTimeOriginal}</span></div>}
+                      </div>
+                    ) : <p className="text-slate-600 font-mono text-xs">No capture timestamp found.</p>}
+                  </div>
+
+                  {/* ── WHERE ── */}
+                  <div className="bg-slate-900/60 p-4 rounded cyber-border">
+                    <p className="text-[10px] text-purple-400 font-mono font-bold mb-3 tracking-wider">📍 WHERE CAPTURED</p>
+                    {gps ? (
+                      <div className="space-y-2 text-xs font-mono">
+                        <div><span className="text-slate-500">latitude:</span><br/><span className="text-yellow-400 text-sm">{gps.latitude}°</span></div>
+                        <div><span className="text-slate-500">longitude:</span><br/><span className="text-yellow-400 text-sm">{gps.longitude}°</span></div>
+                        {gps.altitude_m != null && <div><span className="text-slate-500">altitude:</span><br/><span className="text-white">{gps.altitude_m} m</span></div>}
+                        <a href={gps.maps_url} target="_blank" rel="noopener noreferrer" className="inline-block mt-1 px-2 py-1 bg-purple-900/30 rounded text-purple-400 hover:text-purple-300 text-[10px]">▸ VIEW ON GOOGLE MAPS</a>
+                      </div>
+                    ) : <p className="text-slate-600 font-mono text-xs">No GPS coordinates — location stripped or never recorded.</p>}
+                  </div>
+
+                  {/* ── DEVICE ── */}
+                  <div className="bg-slate-900/60 p-4 rounded cyber-border">
+                    <p className="text-[10px] text-purple-400 font-mono font-bold mb-3 tracking-wider">📷 DEVICE USED</p>
+                    {(make || model || lensModel) ? (
+                      <div className="space-y-2 text-xs font-mono">
+                        {make && <div><span className="text-slate-500">camera_make:</span><br/><span className="text-white text-sm">{make}</span></div>}
+                        {model && <div><span className="text-slate-500">camera_model:</span><br/><span className="text-white text-sm">{model}</span></div>}
+                        {lensMake && <div><span className="text-slate-500">lens_make:</span><br/><span className="text-slate-300">{lensMake}</span></div>}
+                        {lensModel && <div><span className="text-slate-500">lens_model:</span><br/><span className="text-slate-300">{lensModel}</span></div>}
+                        {software && <div><span className="text-slate-500">software:</span><br/><span className="text-cyan-400">{software}</span></div>}
+                        {firmware && <div><span className="text-slate-500">firmware:</span><br/><span className="text-slate-400">{firmware}</span></div>}
+                      </div>
+                    ) : <p className="text-slate-600 font-mono text-xs">No camera identifiers found.</p>}
+                  </div>
+                </div>
+
+                {/* ── CAPTURE SETTINGS ── */}
+                {(focalLength || aperture || iso || exposure || flash || wb || colorSpace) && (
+                  <div className="mt-4 bg-slate-900/40 p-4 rounded cyber-border">
+                    <p className="text-[10px] text-purple-400 font-mono font-bold mb-3 tracking-wider">⚙️ CAPTURE SETTINGS</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs font-mono">
+                      {focalLength && <div className="bg-slate-900/50 p-2 rounded"><span className="text-slate-500">focal_length:</span><br/><span className="text-white">{String(focalLength)}</span></div>}
+                      {aperture && <div className="bg-slate-900/50 p-2 rounded"><span className="text-slate-500">aperture:</span><br/><span className="text-white">f/{String(aperture)}</span></div>}
+                      {iso && <div className="bg-slate-900/50 p-2 rounded"><span className="text-slate-500">iso:</span><br/><span className="text-white">{String(iso)}</span></div>}
+                      {exposure && <div className="bg-slate-900/50 p-2 rounded"><span className="text-slate-500">exposure:</span><br/><span className="text-white">{String(exposure)}s</span></div>}
+                      {flash && <div className="bg-slate-900/50 p-2 rounded"><span className="text-slate-500">flash:</span><br/><span className="text-white">{String(flash)}</span></div>}
+                      {wb && <div className="bg-slate-900/50 p-2 rounded"><span className="text-slate-500">white_balance:</span><br/><span className="text-white">{String(wb)}</span></div>}
+                      {colorSpace && <div className="bg-slate-900/50 p-2 rounded"><span className="text-slate-500">color_space:</span><br/><span className="text-white">{String(colorSpace)}</span></div>}
+                    </div>
+                  </div>
+                )}
+
+                {/* ── SERIAL / OWNER (SENSITIVE) ── */}
+                {(serial || lensSerial || owner || copyright) && (
+                  <div className="mt-4 bg-red-950/20 p-4 rounded border border-red-500/20">
+                    <p className="text-[10px] text-red-400 font-mono font-bold mb-3 tracking-wider">⚠️ SENSITIVE IDENTIFIERS — Unique Device / Owner Info</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs font-mono">
+                      {serial && <div className="bg-slate-900/50 p-2 rounded border border-red-500/30"><span className="text-red-400">body_serial:</span><br/><span className="text-white">{serial}</span></div>}
+                      {lensSerial && <div className="bg-slate-900/50 p-2 rounded border border-red-500/30"><span className="text-red-400">lens_serial:</span><br/><span className="text-white">{lensSerial}</span></div>}
+                      {owner && <div className="bg-slate-900/50 p-2 rounded border border-red-500/30"><span className="text-red-400">owner:</span><br/><span className="text-white">{owner}</span></div>}
+                      {copyright && <div className="bg-slate-900/50 p-2 rounded border border-red-500/30"><span className="text-red-400">copyright:</span><br/><span className="text-white">{String(copyright)}</span></div>}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })()}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
             <div className="card-cyber p-4 rounded-lg">
