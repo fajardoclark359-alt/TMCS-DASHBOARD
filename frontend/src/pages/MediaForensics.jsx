@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { analyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence, mediaExportUrl } from '../services/api'
+import { analyzeMedia, clientAnalyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence, mediaExportUrl } from '../services/api'
 import { FiSearch, FiShield, FiCamera, FiVideo, FiMapPin, FiSave, FiFileText, FiClock, FiTag, FiCheck, FiDownload, FiEye, FiTrash2, FiCopy, FiTerminal } from 'react-icons/fi'
 
 function downloadFile(filename, content, mime) {
@@ -51,6 +51,7 @@ function MediaForensics() {
   const [showEvidence, setShowEvidence] = useState(false)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState('')
+  const [clientMode, setClientMode] = useState(false)
 
   useEffect(() => { fetchEvidenceList() }, [])
 
@@ -63,11 +64,18 @@ function MediaForensics() {
   const handleAnalyze = async (e) => {
     e.preventDefault()
     if (!file) return
-    setLoading(true); setSaved(false); setError('')
-    try { setResults(await analyzeMedia(file)) }
-    catch (err) {
-      if (!err.response) setError('Cannot reach backend API — is the backend running? (local: uvicorn on :8000 / docker; live site needs a hosted backend + VITE_API_URL)')
-      else setError(err.response?.data?.detail || 'Error analyzing file')
+    setLoading(true); setSaved(false); setError(''); setClientMode(false)
+    try {
+      setResults(await analyzeMedia(file))
+    } catch (err) {
+      // Backend unavailable — fall back to client-side EXIF extraction
+      try {
+        setClientMode(true)
+        setResults(await clientAnalyzeMedia(file))
+      } catch (clientErr) {
+        setClientMode(false)
+        setError(`Client-side scan failed: ${clientErr.message || 'Could not parse file'}`)
+      }
     }
     setLoading(false)
   }
@@ -153,6 +161,12 @@ function MediaForensics() {
       {error && (
         <div className="card-cyber p-4 rounded-lg mb-6 border border-red-500/40 bg-red-950/20">
           <p className="text-red-400 text-xs font-mono">! SCAN FAILED: {error}</p>
+        </div>
+      )}
+
+      {clientMode && results && (
+        <div className="card-cyber p-3 rounded-lg mb-5 border border-yellow-500/30 bg-yellow-950/10">
+          <p className="text-yellow-300 text-xs font-mono">⚡ Scanned in-browser — backend offline, results are from local EXIF extraction</p>
         </div>
       )}
 

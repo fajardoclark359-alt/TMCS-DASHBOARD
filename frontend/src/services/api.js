@@ -179,3 +179,7 @@ export const deleteMediaEvidence = async (evidenceId) => {
   const response = await axios.delete(`${API_BASE}/media/evidence/${evidenceId}`)
   return response.data
 }
+
+// Client-side fallback — uses exifr in the browser, no backend needed
+import { clientAnalyzeMedia as _clientAnalyzeMedia } from './clientExif'
+export const clientAnalyzeMedia = _clientAnalyzeMedia
