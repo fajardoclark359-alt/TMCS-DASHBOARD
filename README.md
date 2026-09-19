@@ -41,6 +41,14 @@ Advanced Open Source Intelligence gathering platform for cybersecurity professio
 - Domain status (active/offline)
 - Reputation scoring
 
+### Media Forensics (NEW)
+- Photo metadata scan: EXIF, camera make/model, timestamps, serials
+- Video metadata scan: container tags, encoder, duration, resolution
+- GPS extraction with Google Maps link + altitude
+- Privacy risk score (0-100) with leak flags
+- Report export: download JSON / printable HTML, copy JSON
+- Evidence capture: save/view/export/delete reports with chain-of-custody hash
+
 ## Tech Stack
 
 - **Backend**: Python FastAPI
@@ -87,6 +95,12 @@ npm run dev
 | `/api/domain/dns` | POST | DNS enumeration |
 | `/api/domain/subdomains` | POST | Subdomain discovery |
 | `/api/url/investigate` | POST | Full URL investigation |
+| `/api/media/analyze` | POST | Scan photo/video metadata (multipart upload) |
+| `/api/media/evidence/capture` | POST | Save media report as evidence |
+| `/api/media/evidence/list` | GET | List saved media reports |
+| `/api/media/evidence/{id}` | GET | View a saved media report |
+| `/api/media/evidence/{id}/export?format=json\|html` | GET | Export report as JSON or HTML |
+| `/api/media/evidence/{id}` | DELETE | Delete a saved media report |
 
 ## Legal Disclaimer
 

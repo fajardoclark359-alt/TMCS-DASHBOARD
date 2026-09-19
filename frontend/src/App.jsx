@@ -5,7 +5,8 @@ import EmailSearch from './pages/EmailSearch'
 import PhoneSearch from './pages/PhoneSearch'
 import DomainSearch from './pages/DomainSearch'
 import URLInvestigation from './pages/URLInvestigation'
-import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal } from 'react-icons/fi'
+import MediaForensics from './pages/MediaForensics'
+import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal, FiCamera } from 'react-icons/fi'
 
 function App() {
   return (
@@ -51,6 +52,11 @@ function App() {
                 <FiLink size={16} /> <span className="text-sm">URL INVESTIGATE</span>
               </NavLink>
             </li>
+            <li>
+              <NavLink to="/media" className={({isActive}) => `flex items-center gap-3 p-2.5 rounded transition-all ${isActive ? 'bg-blue-900/30 text-blue-400 border border-blue-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-blue-300 border border-transparent'}`}>
+                <FiCamera size={16} /> <span className="text-sm">MEDIA FORENSICS</span>
+              </NavLink>
+            </li>
           </ul>
 
           <div className="mt-8 p-3 bg-slate-900/50 rounded cyber-border text-xs">
@@ -74,6 +80,7 @@ function App() {
             <Route path="/phone" element={<PhoneSearch />} />
             <Route path="/domain" element={<DomainSearch />} />
             <Route path="/url" element={<URLInvestigation />} />
+            <Route path="/media" element={<MediaForensics />} />
           </Routes>
         </main>
       </div>

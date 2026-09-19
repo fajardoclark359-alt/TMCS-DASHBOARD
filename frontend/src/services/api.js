@@ -145,3 +145,32 @@ export const deleteURLEvidence = async (evidenceId) => {
   const response = await axios.delete(`${API_BASE}/url/evidence/${evidenceId}`)
   return response.data
 }
+
+export const analyzeMedia = async (file) => {
+  const form = new FormData()
+  form.append('file', file)
+  const response = await axios.post(`${API_BASE}/media/analyze`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return response.data
+}
+
+export const captureMediaEvidence = async (data) => {
+  const response = await axios.post(`${API_BASE}/media/evidence/capture`, data)
+  return response.data
+}
+
+export const listMediaEvidence = async () => {
+  const response = await axios.get(`${API_BASE}/media/evidence/list`)
+  return response.data
+}
+
+export const getMediaEvidence = async (evidenceId) => {
+  const response = await axios.get(`${API_BASE}/media/evidence/${evidenceId}`)
+  return response.data
+}
+
+export const deleteMediaEvidence = async (evidenceId) => {
+  const response = await axios.delete(`${API_BASE}/media/evidence/${evidenceId}`)
+  return response.data
+}

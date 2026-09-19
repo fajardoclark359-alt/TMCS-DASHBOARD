@@ -8,7 +8,7 @@ import os
 
 router = APIRouter()
 
-EVIDENCE_DIR = "/home/clark/Work/osint-tool/backend/evidence"
+EVIDENCE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "evidence")
 os.makedirs(EVIDENCE_DIR, exist_ok=True)
 
 class UsernameRequest(BaseModel):

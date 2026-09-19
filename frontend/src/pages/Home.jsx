@@ -1,4 +1,4 @@
-import { FiUser, FiMail, FiPhone, FiGlobe, FiShield, FiLink, FiTerminal, FiLock, FiDatabase, FiSearch } from 'react-icons/fi'
+import { FiUser, FiMail, FiPhone, FiGlobe, FiShield, FiLink, FiTerminal, FiLock, FiDatabase, FiSearch, FiCamera } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
 
 function Home() {
@@ -8,13 +8,14 @@ function Home() {
     { icon: <FiPhone size={28} />, title: 'PHONE OSINT', desc: '27 countries, carrier, timezone, validation', path: '/phone', color: 'from-indigo-600/20 to-indigo-900/20', border: 'border-indigo-500/30', hover: 'hover:border-indigo-400/50' },
     { icon: <FiGlobe size={28} />, title: 'DOMAIN RECON', desc: 'WHOIS, DNS, subdomains, fingerprints', path: '/domain', color: 'from-sky-600/20 to-sky-900/20', border: 'border-sky-500/30', hover: 'hover:border-sky-400/50' },
     { icon: <FiLink size={28} />, title: 'URL INVESTIGATE', desc: 'IP, geolocation, SSL, tech, phishing detect', path: '/url', color: 'from-blue-700/20 to-blue-950/20', border: 'border-blue-600/30', hover: 'hover:border-blue-500/50' },
+    { icon: <FiCamera size={28} />, title: 'MEDIA FORENSICS', desc: 'Photo/video EXIF, GPS, device IDs + report export', path: '/media', color: 'from-purple-600/20 to-purple-950/20', border: 'border-purple-500/30', hover: 'hover:border-purple-400/50' },
   ]
 
   const stats = [
     { label: 'PLATFORMS', value: '50+', icon: <FiDatabase /> },
     { label: 'COUNTRIES', value: '27', icon: <FiGlobe /> },
     { label: 'BREACH DB', value: 'HIBP', icon: <FiLock /> },
-    { label: 'MODULES', value: '6', icon: <FiTerminal /> },
+    { label: 'MODULES', value: '7', icon: <FiTerminal /> },
   ]
 
   return (
@@ -93,6 +94,8 @@ function Home() {
             'Technology Stack Detection',
             'Phishing Detection Engine',
             'Reputation Scoring System',
+            'Photo/Video EXIF + GPS Scan',
+            'Media Report Export (JSON/HTML)',
           ].map((mod, i) => (
             <div key={i} className="flex items-center gap-2 text-slate-400">
               <span className="text-blue-500">&#9656;</span>
