@@ -114,3 +114,17 @@ For production use:
 # Have I Been Pwned API Key (optional, for breach checks)
 HIBP_API_KEY=your_key_here
 ```
+
+### GitHub Pages (frontend only)
+
+The `gh-pages` branch hosts the built frontend. The API calls default to
+same-origin `/api`, so the scan/investigation features need a reachable
+backend. Point the frontend at a hosted backend at build time:
+
+```bash
+cd frontend
+VITE_API_URL=https://your-backend-host:8000 npm run build -- --base=/cyber-intelligence-platform/
+```
+
+Without `VITE_API_URL`, the Media Forensics page reports
+"Cannot reach backend API" instead of failing silently.

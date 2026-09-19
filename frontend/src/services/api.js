@@ -1,6 +1,11 @@
 import axios from 'axios'
 
-const API_BASE = '/api'
+// '/api' by default (vite dev proxy + docker nginx). For GitHub Pages or a
+// separately hosted backend, set VITE_API_URL, e.g. VITE_API_URL=https://my-backend.onrender.com
+const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api`
+
+export const mediaExportUrl = (evidenceId, format = 'json') =>
+  `${API_BASE}/media/evidence/${evidenceId}/export?format=${format}`
 
 export const searchUsername = async (username) => {
   const response = await axios.post(`${API_BASE}/username/search`, { username })

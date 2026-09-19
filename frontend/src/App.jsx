@@ -10,7 +10,7 @@ import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal,
 
 function App() {
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <div className="min-h-screen flex">
         <nav className="w-64 nav-cyber p-4 relative">
           <div className="mb-8">

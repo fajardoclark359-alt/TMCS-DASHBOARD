@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { analyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence } from '../services/api'
+import { analyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence, mediaExportUrl } from '../services/api'
 import { FiSearch, FiShield, FiCamera, FiVideo, FiMapPin, FiSave, FiFileText, FiClock, FiTag, FiCheck, FiDownload, FiEye, FiTrash2, FiCopy, FiTerminal } from 'react-icons/fi'
 
 function downloadFile(filename, content, mime) {
@@ -50,6 +50,7 @@ function MediaForensics() {
   const [evidenceList, setEvidenceList] = useState([])
   const [showEvidence, setShowEvidence] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => { fetchEvidenceList() }, [])
 
@@ -62,9 +63,12 @@ function MediaForensics() {
   const handleAnalyze = async (e) => {
     e.preventDefault()
     if (!file) return
-    setLoading(true); setSaved(false)
+    setLoading(true); setSaved(false); setError('')
     try { setResults(await analyzeMedia(file)) }
-    catch (err) { alert(err.response?.data?.detail || 'Error analyzing file') }
+    catch (err) {
+      if (!err.response) setError('Cannot reach backend API — is the backend running? (local: uvicorn on :8000 / docker; live site needs a hosted backend + VITE_API_URL)')
+      else setError(err.response?.data?.detail || 'Error analyzing file')
+    }
     setLoading(false)
   }
 
@@ -145,6 +149,12 @@ function MediaForensics() {
           <FiSearch /> {loading ? 'SCANNING...' : 'SCAN METADATA'}
         </button>
       </form>
+
+      {error && (
+        <div className="card-cyber p-4 rounded-lg mb-6 border border-red-500/40 bg-red-950/20">
+          <p className="text-red-400 text-xs font-mono">! SCAN FAILED: {error}</p>
+        </div>
+      )}
 
       {results && (
         <>
@@ -268,7 +278,7 @@ function MediaForensics() {
                     const data = await getMediaEvidence(ev.evidence_id)
                     if (data.data) downloadFile(`${ev.evidence_id}.json`, JSON.stringify(data, null, 2), 'application/json')
                   }} className="text-slate-400 hover:text-slate-200 text-[10px] flex items-center gap-1"><FiDownload /> JSON</button>
-                  <button onClick={() => window.open(`/api/media/evidence/${ev.evidence_id}/export?format=html`, '_blank')} className="text-slate-400 hover:text-slate-200 text-[10px] flex items-center gap-1"><FiDownload /> HTML</button>
+                  <button onClick={() => window.open(mediaExportUrl(ev.evidence_id, 'html'), '_blank')} className="text-slate-400 hover:text-slate-200 text-[10px] flex items-center gap-1"><FiDownload /> HTML</button>
                   <button onClick={async () => { await deleteMediaEvidence(ev.evidence_id); fetchEvidenceList() }} className="text-red-400 hover:text-red-300 text-[10px] flex items-center gap-1"><FiTrash2 /> DELETE</button>
                 </div>
                 <div className="text-[9px] text-slate-600 mt-1">HASH: {ev.evidence_hash}</div>
