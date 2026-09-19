@@ -130,7 +130,7 @@ export async function clientAnalyzeMedia(file) {
   }
 
   if (kind === 'image') {
-    // Parse EXIF, IPTC, XMP, ICC, GPS all at once
+    // Parse EXIF, IPTC, XMP, ICC, GPS — merged flat output (all fields at top level)
     const data = await exifr.parse(file, {
       exif: true,
       iptc: true,
@@ -138,81 +138,48 @@ export async function clientAnalyzeMedia(file) {
       icc: true,
       gps: true,
       reviveValues: true,
-      mergeOutput: false,
+      mergeOutput: true,
     })
 
     if (data) {
-      // Flatten all segments into a single exif object for display
       const exifObj = {}
-
-      // exifr returns merged by default, but with mergeOutput: false we get segments
-      // Try to extract from the merged output or individual segments
-      const segments = data
-      if (typeof segments === 'object') {
-        // exifr with mergeOutput:false returns { exif, iptc, xmp, icc, gps } etc.
-        // With mergeOutput:true (default) it returns a flat object.
-        // We'll handle both cases.
-
-        // If it's segmented, extract each
-        if (segments.exif && typeof segments.exif === 'object') {
-          Object.assign(exifObj, segments.exif)
-        }
-        if (segments.iptc && typeof segments.iptc === 'object') {
-          // Prefix IPTC keys to distinguish
-          Object.entries(segments.iptc).forEach(([k, v]) => {
-            exifObj[`IPTC.${k}`] = v
-          })
-        }
-        if (segments.xmp && typeof segments.xmp === 'object') {
-          Object.entries(segments.xmp).forEach(([k, v]) => {
-            exifObj[`XMP.${k}`] = v
-          })
-        }
-        if (segments.icc && typeof segments.icc === 'object') {
-          Object.entries(segments.icc).forEach(([k, v]) => {
-            exifObj[`ICC.${k}`] = v
-          })
-        }
-
-        // GPS
-        const gpsData = segments.gps || null
-        if (gpsData && gpsData.latitude != null && gpsData.longitude != null) {
-          result.gps = {
-            latitude: gpsData.latitude,
-            longitude: gpsData.longitude,
-            maps_url: buildGpsUrl(gpsData.latitude, gpsData.longitude),
-            altitude_m: gpsData.altitude ?? gpsData.altitudeRef ?? null,
-          }
-          exifObj.GPSInfo = `[GPS → lat=${gpsData.latitude}, lon=${gpsData.longitude}]`
-        }
-
-        // Also check if GPS is flat in the merged data
-        if (!result.gps && (exifObj.GPSLatitude || exifObj.latitude)) {
-          const lat = exifObj.GPSLatitude || exifObj.latitude
-          const lon = exifObj.GPSLongitude || exifObj.longitude
-          if (lat != null && lon != null) {
-            result.gps = {
-              latitude: lat,
-              longitude: lon,
-              maps_url: buildGpsUrl(lat, lon),
-              altitude_m: exifObj.GPSAltitude || null,
-            }
-            exifObj.GPSInfo = `[GPS → lat=${lat}, lon=${lon}]`
-          }
-        }
-      } else {
-        // Flat merged output
-        Object.assign(exifObj, segments)
+      const skipKeys = new Set([
+        'latitude', 'longitude', 'altitude', 'altitudeRef',
+        'GPSLatitude', 'GPSLongitude', 'GPSAltitude',
+        'GPSLatitudeRef', 'GPSLongitudeRef',
+        // exifr computed keys we don't want duplicated
+        'rawValue', 'description',
+      ])
+      for (const [k, v] of Object.entries(data)) {
+        if (skipKeys.has(k)) continue
+        if (v === undefined || v === null) continue
+        if (typeof v === 'object' && typeof v.byteLength !== 'undefined') continue // typed arrays
+        exifObj[k] = v
       }
 
-      // Remove raw GPS entries to avoid duplication in display, but keep date fields
-      delete exifObj.GPSLatitude
-      delete exifObj.GPSLongitude
-      delete exifObj.GPSAltitude
-      delete exifObj.GPSLatitudeRef
-      delete exifObj.GPSLongitudeRef
-
       result.exif = exifObj
+
+      // Extract GPS from merged flat data
+      if (data.latitude != null && data.longitude != null) {
+        result.gps = {
+          latitude: data.latitude,
+          longitude: data.longitude,
+          maps_url: buildGpsUrl(data.latitude, data.longitude),
+          altitude_m: data.altitude ?? data.GPSAltitude ?? null,
+          gps_date: data.GPSDateStamp || null,
+        }
+      }
+
+      // Extract GPS from merged flat data
+      if (data.latitude != null && data.longitude != null) {
+        result.gps = {
+          latitude: data.latitude,
+          longitude: data.longitude,
+          maps_url: buildGpsUrl(data.latitude, data.longitude),
+          altitude_m: data.altitude ?? data.GPSAltitude ?? null,
+          gps_date: data.GPSDateStamp || null,
+        }
+      }
 
       // Extract dimensions if available
       if (exifObj.ImageWidth || exifObj.ExifImageWidth) {
