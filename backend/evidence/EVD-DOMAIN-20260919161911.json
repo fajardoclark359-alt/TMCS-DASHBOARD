@@ -1,0 +1,93 @@
+{
+  "evidence_id": "EVD-DOMAIN-20260919161911",
+  "timestamp": "2026-09-19T16:19:11.179834",
+  "investigation_type": "domain_recon",
+  "target": "github.com",
+  "notes": "test",
+  "tags": [],
+  "priority": "medium",
+  "case_id": "",
+  "data": {
+    "domain": "github.com",
+    "whois": {
+      "registrar": "MarkMonitor, Inc.",
+      "creation_date": "[datetime.datetime(2007, 10, 9, 18, 20, 50), datetime.datetime(2007, 10, 9, 18, 20, 50, tzinfo=datetime.timezone.utc)]",
+      "expiration_date": "[datetime.datetime(2028, 10, 9, 18, 20, 50), datetime.datetime(2028, 10, 9, 0, 0, tzinfo=datetime.timezone.utc)]",
+      "name_servers": [
+        "DNS1.P08.NSONE.NET",
+        "DNS2.P08.NSONE.NET",
+        "DNS3.P08.NSONE.NET",
+        "DNS4.P08.NSONE.NET",
+        "NS-1283.AWSDNS-32.ORG",
+        "NS-1707.AWSDNS-21.CO.UK",
+        "NS-421.AWSDNS-52.COM",
+        "NS-520.AWSDNS-01.NET",
+        "dns4.p08.nsone.net",
+        "ns-1707.awsdns-21.co.uk",
+        "dns1.p08.nsone.net",
+        "dns2.p08.nsone.net",
+        "ns-520.awsdns-01.net",
+        "dns3.p08.nsone.net",
+        "ns-1283.awsdns-32.org",
+        "ns-421.awsdns-52.com"
+      ],
+      "emails": [
+        "abusecomplaints@markmonitor.com",
+        "whoisrequest@markmonitor.com"
+      ],
+      "org": "GitHub, Inc.",
+      "country": "US",
+      "address": null
+    },
+    "dns": {
+      "A": [
+        "20.205.243.166"
+      ],
+      "MX": [
+        "0 github-com.mail.protection.outlook.com."
+      ],
+      "NS": [
+        "dns2.p08.nsone.net.",
+        "ns-1283.awsdns-32.org.",
+        "ns-520.awsdns-01.net.",
+        "dns1.p08.nsone.net.",
+        "ns-1707.awsdns-21.co.uk.",
+        "dns3.p08.nsone.net.",
+        "ns-421.awsdns-52.com.",
+        "dns4.p08.nsone.net."
+      ],
+      "SOA": [
+        "dns1.p08.nsone.net. hostmaster.nsone.net. 1656468023 43200 7200 1209600 3600"
+      ],
+      "CAA": [
+        "0 issue \"sectigo.com\"",
+        "0 issue \"globalsign.com\"",
+        "0 issue \"letsencrypt.org\"",
+        "0 issuewild \"sectigo.com\"",
+        "0 issue \"digicert.com\"",
+        "0 issuewild \"digicert.com\"",
+        "0 issuewild \"letsencrypt.org\""
+      ]
+    },
+    "subdomains": [
+      "www.github.com",
+      "smtp.github.com",
+      "ns1.github.com",
+      "ns2.github.com",
+      "api.github.com",
+      "admin.github.com",
+      "blog.github.com"
+    ],
+    "total_subdomains": 7
+  },
+  "metadata": {
+    "investigator": "OSINT TMC/CLARK",
+    "tool_version": "2.0.0",
+    "evidence_type": "domain_investigation",
+    "chain_of_custody": {
+      "created_at": "2026-09-19T16:19:11.179864",
+      "hash": null,
+      "verified": true
+    }
+  }
+}

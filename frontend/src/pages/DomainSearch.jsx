@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { lookupDomain, subdomainEnum, captureDomainEvidence, listDomainEvidence } from '../services/api'
+import { clientLookupDomain } from '../services/clientFallbacks'
 import { FiSearch, FiServer, FiTerminal, FiGlobe, FiSave, FiFileText, FiClock, FiTag, FiCheck } from 'react-icons/fi'
 
 function DomainSearch() {
@@ -15,6 +16,7 @@ function DomainSearch() {
   const [saved, setSaved] = useState(false)
   const [evidenceList, setEvidenceList] = useState([])
   const [showEvidence, setShowEvidence] = useState(false)
+  const [clientMode, setClientMode] = useState(false)
 
   useEffect(() => {
     fetchEvidenceList()
@@ -34,6 +36,7 @@ function DomainSearch() {
     if (!domain) return
     setLoading(true)
     setSaved(false)
+    setClientMode(false)
     try {
       const [domainData, subData] = await Promise.all([
         lookupDomain(domain),
@@ -42,8 +45,16 @@ function DomainSearch() {
       setResults(domainData)
       setSubdomains(subData)
     } catch (err) {
-      console.error(err)
-      alert('Error looking up domain')
+      console.error('Backend unavailable, using client-side fallback:', err.message)
+      try {
+        const data = await clientLookupDomain(domain)
+        setResults({ whois: data.whois, dns: data.dns })
+        setSubdomains(data.subdomains)
+        setClientMode(true)
+      } catch (clientErr) {
+        console.error(clientErr)
+        alert('Error looking up domain: ' + clientErr.message)
+      }
     }
     setLoading(false)
   }
@@ -87,6 +98,12 @@ function DomainSearch() {
           <FiSearch /> {loading ? 'SCANNING...' : 'ENUMERATE'}
         </button>
       </form>
+
+      {clientMode && (
+        <div className="card-cyber p-3 rounded-lg mb-5 border border-yellow-500/30 bg-yellow-950/10">
+          <p className="text-yellow-300 text-xs font-mono">⚡ Scanned in-browser — backend offline, DNS records from Cloudflare DoH</p>
+        </div>
+      )}
 
       {/* EVIDENCE CAPTURE FORM */}
       {results && (

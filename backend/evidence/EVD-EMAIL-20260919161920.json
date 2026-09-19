@@ -1,0 +1,121 @@
+{
+  "evidence_id": "EVD-EMAIL-20260919161920",
+  "timestamp": "2026-09-19T16:19:20.040061",
+  "investigation_type": "email_osint",
+  "target": "test@gmail.com",
+  "notes": "test",
+  "tags": [],
+  "priority": "medium",
+  "case_id": "",
+  "data": {
+    "email": "test@gmail.com",
+    "validation": {
+      "email": "test@gmail.com",
+      "valid": true,
+      "local_part": "test",
+      "domain": "gmail.com",
+      "is_disposable": false,
+      "is_free_provider": true,
+      "mx_valid": true
+    },
+    "breaches": {
+      "email": "test@gmail.com",
+      "breaches": [],
+      "breach_count": 0,
+      "pastes": [],
+      "paste_count": 0,
+      "gravatar": {
+        "exists": false,
+        "url": "https://gravatar.com/1aedb8d9dc4751e229a335e371db8058",
+        "profile_url": null
+      },
+      "dns_info": {
+        "domain": "gmail.com",
+        "mx_records": [
+          "40 alt4.gmail-smtp-in.l.google.com.",
+          "5 gmail-smtp-in.l.google.com.",
+          "30 alt3.gmail-smtp-in.l.google.com.",
+          "10 alt1.gmail-smtp-in.l.google.com.",
+          "20 alt2.gmail-smtp-in.l.google.com."
+        ],
+        "spf_record": "v=spf1 redirect=_spf.google.com",
+        "dmarc_record": "v=DMARC1; p=none; sp=quarantine; rua=mailto:mailauth-reports@google.com",
+        "has_mx": true,
+        "provider": "Google Workspace / Gmail"
+      },
+      "social_accounts": {
+        "gravatar": false,
+        "github": {
+          "username": "TestVaishnav",
+          "url": "https://github.com/TestVaishnav",
+          "source": "email search"
+        },
+        "gitlab": {
+          "username": "test",
+          "url": "https://gitlab.com/test",
+          "source": "username inference"
+        },
+        "twitch": {
+          "username": "test",
+          "url": "https://www.twitch.tv/test",
+          "source": "username inference"
+        },
+        "steam": {
+          "username": "test",
+          "url": "https://steamcommunity.com/id/test",
+          "source": "username inference"
+        },
+        "keybase": {
+          "username": "test",
+          "url": "https://keybase.io/test",
+          "source": "username inference"
+        },
+        "dockerhub": {
+          "username": "test",
+          "url": "https://hub.docker.com/u/test",
+          "source": "username inference"
+        },
+        "stackoverflow": {
+          "username": "test",
+          "url": "https://stackoverflow.com/users/101237",
+          "reputation": 18296,
+          "source": "username inference"
+        }
+      },
+      "phone_numbers": [],
+      "leaked_info": [],
+      "leaked_files": [],
+      "email_age": {
+        "domain": "gmail.com",
+        "estimated_age": "31 years, 1 months",
+        "domain_creation": "1995-08-13 04:00:00",
+        "is_estimated": true
+      },
+      "username_hints": {
+        "local_part": "test",
+        "possible_usernames": [
+          "test"
+        ],
+        "possible_names": []
+      },
+      "reputation": {
+        "score": 100,
+        "risk_level": "LOW",
+        "reasons": [
+          "No Gravatar profile",
+          "Found on 7 social platform(s)"
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "investigator": "OSINT TMC/CLARK",
+    "tool_version": "2.0.0",
+    "evidence_type": "email_investigation",
+    "chain_of_custody": {
+      "created_at": "2026-09-19T16:19:20.040085",
+      "hash": null,
+      "verified": true
+    }
+  }
+}

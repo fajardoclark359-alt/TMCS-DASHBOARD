@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { investigateURL, captureURLEvidence, listURLEvidence } from '../services/api'
+import { clientInvestigateURL } from '../services/clientFallbacks'
 import { FiSearch, FiShield, FiAlertTriangle, FiCheck, FiX, FiGlobe, FiServer, FiLock, FiMapPin, FiCpu, FiEye, FiTerminal, FiSave, FiFileText, FiClock, FiTag } from 'react-icons/fi'
 
 function URLInvestigation() {
@@ -37,8 +38,14 @@ function URLInvestigation() {
       const data = await investigateURL(url)
       setResults(data)
     } catch (err) {
-      console.error(err)
-      alert('Error investigating URL')
+      console.error('Backend unavailable, using client-side fallback:', err.message)
+      try {
+        const data = await clientInvestigateURL(url)
+        setResults(data)
+      } catch (clientErr) {
+        console.error(clientErr)
+        alert('Error investigating URL: ' + clientErr.message)
+      }
     }
     setLoading(false)
   }
@@ -93,6 +100,12 @@ function URLInvestigation() {
           <FiSearch /> {loading ? 'INVESTIGATING...' : 'INVESTIGATE'}
         </button>
       </form>
+
+      {results?.client_mode && (
+        <div className="card-cyber p-3 rounded-lg mb-5 border border-yellow-500/30 bg-yellow-950/10">
+          <p className="text-yellow-300 text-xs font-mono">⚡ Scanned in-browser — backend offline, results are from client-side URL analysis + DNS-over-HTTPS</p>
+        </div>
+      )}
 
       {/* EVIDENCE CAPTURE FORM */}
       {results && (

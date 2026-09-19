@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { searchEmail, captureEmailEvidence, listEmailEvidence } from '../services/api'
+import { clientSearchEmail } from '../services/clientFallbacks'
 import { FiSearch, FiAlertTriangle, FiCheck, FiShield, FiUser, FiGlobe, FiMail, FiPhone, FiFileText, FiLink, FiStar, FiTerminal, FiSave, FiClock, FiTag } from 'react-icons/fi'
 
 function EmailSearch() {
@@ -37,8 +38,14 @@ function EmailSearch() {
       const data = await searchEmail(email)
       setResults(data)
     } catch (err) {
-      console.error(err)
-      alert('Error investigating email')
+      console.error('Backend unavailable, using client-side fallback:', err.message)
+      try {
+        const data = await clientSearchEmail(email)
+        setResults(data)
+      } catch (clientErr) {
+        console.error(clientErr)
+        alert('Error investigating email: ' + clientErr.message)
+      }
     }
     setLoading(false)
   }
@@ -96,6 +103,12 @@ function EmailSearch() {
           <FiSearch /> {loading ? 'INVESTIGATING...' : 'INVESTIGATE'}
         </button>
       </form>
+
+      {results?.client_mode && (
+        <div className="card-cyber p-3 rounded-lg mb-5 border border-yellow-500/30 bg-yellow-950/10">
+          <p className="text-yellow-300 text-xs font-mono">⚡ Scanned in-browser — backend offline, results are from client-side OSINT</p>
+        </div>
+      )}
 
       {/* EVIDENCE CAPTURE FORM */}
       {results && (

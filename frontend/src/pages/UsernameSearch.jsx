@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { searchUsername, captureUsernameEvidence, listUsernameEvidence } from '../services/api'
+import { clientSearchUsername } from '../services/clientFallbacks'
 import { FiSearch, FiExternalLink, FiUser, FiMail, FiShield, FiAlertTriangle, FiGlobe, FiCalendar, FiImage, FiTerminal, FiSave, FiFileText, FiClock, FiTag } from 'react-icons/fi'
 
 function UsernameSearch() {
@@ -37,8 +38,14 @@ function UsernameSearch() {
       const data = await searchUsername(username)
       setResults(data)
     } catch (err) {
-      console.error(err)
-      alert('Error searching username')
+      console.error('Backend unavailable, using client-side fallback:', err.message)
+      try {
+        const data = await clientSearchUsername(username)
+        setResults(data)
+      } catch (clientErr) {
+        console.error(clientErr)
+        alert('Error searching username: ' + clientErr.message)
+      }
     }
     setLoading(false)
   }
@@ -102,6 +109,12 @@ function UsernameSearch() {
           <FiSearch /> {loading ? 'SCANNING...' : 'ENUMERATE'}
         </button>
       </form>
+
+      {results?.client_mode && (
+        <div className="card-cyber p-3 rounded-lg mb-5 border border-yellow-500/30 bg-yellow-950/10">
+          <p className="text-yellow-300 text-xs font-mono">⚡ Scanned in-browser — backend offline, results are from client-side OSINT</p>
+        </div>
+      )}
 
       {/* EVIDENCE CAPTURE FORM */}
       {results && (

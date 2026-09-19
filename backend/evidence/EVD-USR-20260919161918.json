@@ -1,0 +1,242 @@
+{
+  "evidence_id": "EVD-USR-20260919161918",
+  "timestamp": "2026-09-19T16:19:18.411038",
+  "investigation_type": "username_osint",
+  "target": "octocat",
+  "notes": "test",
+  "tags": [],
+  "priority": "medium",
+  "case_id": "",
+  "data": {
+    "profiles": [
+      {
+        "url": "https://github.com/octocat",
+        "bio": null,
+        "followers": 24126,
+        "following": 9,
+        "created_at": "2011-01-25T18:44:36Z",
+        "profile_image": "https://avatars.githubusercontent.com/u/583231?v=4",
+        "full_name": "The Octocat",
+        "email": null,
+        "platform": "github"
+      },
+      {
+        "url": "https://gitee.com/octocat",
+        "bio": null,
+        "followers": null,
+        "full_name": "octocat",
+        "created_at": "2017-05-19T16:51:41+08:00",
+        "platform": "gitee"
+      },
+      {
+        "url": "https://x.com/octocat",
+        "platform": "twitter"
+      },
+      {
+        "url": "https://x.com/octocat",
+        "platform": "x"
+      },
+      {
+        "url": "https://www.instagram.com/octocat",
+        "platform": "instagram"
+      },
+      {
+        "url": "https://www.twitch.tv/octocat",
+        "platform": "twitch"
+      },
+      {
+        "url": "https://www.facebook.com/octocat",
+        "platform": "facebook"
+      },
+      {
+        "url": "https://steamcommunity.com/id/octocat",
+        "platform": "steam"
+      },
+      {
+        "url": "https://www.pinterest.com/octocat",
+        "platform": "pinterest"
+      },
+      {
+        "url": "https://dev.to/octocat",
+        "bio": "3 articles published",
+        "platform": "devto"
+      },
+      {
+        "url": "https://news.ycombinator.com/user?id=octocat",
+        "followers": 7,
+        "created_at": 1370693218,
+        "platform": "hackernews"
+      },
+      {
+        "url": "https://www.snapchat.com/add/octocat",
+        "platform": "snapchat"
+      },
+      {
+        "url": "https://open.spotify.com/user/octocat",
+        "platform": "spotify"
+      },
+      {
+        "url": "https://stackoverflow.com/users/8317831",
+        "followers": 748,
+        "full_name": "Octocat",
+        "platform": "stackoverflow"
+      },
+      {
+        "url": "https://t.me/octocat",
+        "platform": "telegram"
+      },
+      {
+        "url": "https://replit.com/@octocat",
+        "platform": "replit"
+      },
+      {
+        "url": "https://glitch.com/@octocat",
+        "platform": "glitch"
+      },
+      {
+        "url": "https://octocat.notion.site",
+        "platform": "notion"
+      },
+      {
+        "url": "https://app.hackthebox.com/users/octocat",
+        "bio": "HackTheBox profile found",
+        "platform": "hackthebox"
+      }
+    ],
+    "evidence": {
+      "total_platforms": 19,
+      "full_name": "The Octocat",
+      "email_candidates": [],
+      "bio_snippets": [
+        {
+          "platform": "devto",
+          "bio": "3 articles published"
+        },
+        {
+          "platform": "hackthebox",
+          "bio": "HackTheBox profile found"
+        }
+      ],
+      "follower_counts": {
+        "github": 24126,
+        "hackernews": 7,
+        "stackoverflow": 748
+      },
+      "total_followers": 24881,
+      "creation_dates": [
+        {
+          "platform": "github",
+          "date": "2011-01-25T18:44:36Z"
+        },
+        {
+          "platform": "gitee",
+          "date": "2017-05-19T16:51:41+08:00"
+        },
+        {
+          "platform": "hackernews",
+          "date": 1370693218
+        }
+      ],
+      "profile_images": [
+        {
+          "platform": "github",
+          "url": "https://avatars.githubusercontent.com/u/583231?v=4"
+        }
+      ],
+      "linked_urls": [
+        {
+          "platform": "github",
+          "url": "https://github.com/octocat"
+        },
+        {
+          "platform": "gitee",
+          "url": "https://gitee.com/octocat"
+        },
+        {
+          "platform": "twitter",
+          "url": "https://x.com/octocat"
+        },
+        {
+          "platform": "x",
+          "url": "https://x.com/octocat"
+        },
+        {
+          "platform": "instagram",
+          "url": "https://www.instagram.com/octocat"
+        },
+        {
+          "platform": "twitch",
+          "url": "https://www.twitch.tv/octocat"
+        },
+        {
+          "platform": "facebook",
+          "url": "https://www.facebook.com/octocat"
+        },
+        {
+          "platform": "steam",
+          "url": "https://steamcommunity.com/id/octocat"
+        },
+        {
+          "platform": "pinterest",
+          "url": "https://www.pinterest.com/octocat"
+        },
+        {
+          "platform": "devto",
+          "url": "https://dev.to/octocat"
+        },
+        {
+          "platform": "hackernews",
+          "url": "https://news.ycombinator.com/user?id=octocat"
+        },
+        {
+          "platform": "snapchat",
+          "url": "https://www.snapchat.com/add/octocat"
+        },
+        {
+          "platform": "spotify",
+          "url": "https://open.spotify.com/user/octocat"
+        },
+        {
+          "platform": "stackoverflow",
+          "url": "https://stackoverflow.com/users/8317831"
+        },
+        {
+          "platform": "telegram",
+          "url": "https://t.me/octocat"
+        },
+        {
+          "platform": "replit",
+          "url": "https://replit.com/@octocat"
+        },
+        {
+          "platform": "glitch",
+          "url": "https://glitch.com/@octocat"
+        },
+        {
+          "platform": "notion",
+          "url": "https://octocat.notion.site"
+        },
+        {
+          "platform": "hackthebox",
+          "url": "https://app.hackthebox.com/users/octocat"
+        }
+      ],
+      "risk_score": 45,
+      "risk_factors": [
+        "High digital footprint: 19 platforms found",
+        "High influence: 24,881 total followers",
+        "Security-related accounts found: hackthebox"
+      ]
+    }
+  },
+  "metadata": {
+    "investigator": "OSINT TMC/CLARK",
+    "tool_version": "2.0.0",
+    "evidence_type": "username_investigation",
+    "chain_of_custody": {
+      "created_at": "2026-09-19T16:19:18.411062",
+      "hash": null,
+      "verified": true
+    }
+  }
+}

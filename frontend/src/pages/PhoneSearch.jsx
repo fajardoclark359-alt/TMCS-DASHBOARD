@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { lookupPhone, captureEvidence, listEvidence } from '../services/api'
+import { clientLookupPhone } from '../services/clientFallbacks'
 import { FiSearch, FiCheck, FiX, FiTerminal, FiPhone, FiUser, FiShield, FiAlertTriangle, FiLink, FiGlobe, FiMail, FiSave, FiFileText, FiClock, FiTag, FiDownload } from 'react-icons/fi'
 
 function PhoneSearch() {
@@ -38,8 +39,14 @@ function PhoneSearch() {
       const data = await lookupPhone(phoneNumber, countryCode)
       setResults(data)
     } catch (err) {
-      console.error(err)
-      alert('Error looking up phone')
+      console.error('Backend unavailable, using client-side fallback:', err.message)
+      try {
+        const data = await clientLookupPhone(phoneNumber, countryCode)
+        setResults(data)
+      } catch (clientErr) {
+        console.error(clientErr)
+        alert('Error looking up phone: ' + clientErr.message)
+      }
     }
     setLoading(false)
   }
@@ -122,6 +129,12 @@ function PhoneSearch() {
           <FiSearch /> {loading ? 'TRACING...' : 'TRACE'}
         </button>
       </form>
+
+      {results?.client_mode && (
+        <div className="card-cyber p-3 rounded-lg mb-5 border border-yellow-500/30 bg-yellow-950/10">
+          <p className="text-yellow-300 text-xs font-mono">⚡ Scanned in-browser — backend offline, results are from client-side OSINT</p>
+        </div>
+      )}
 
       {/* EVIDENCE CAPTURE FORM */}
       {results && (

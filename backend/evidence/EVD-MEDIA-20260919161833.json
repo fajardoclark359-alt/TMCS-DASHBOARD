@@ -1,0 +1,31 @@
+{
+  "evidence_id": "EVD-MEDIA-20260919161833",
+  "timestamp": "2026-09-19T16:18:33.100404",
+  "investigation_type": "media_metadata",
+  "target": "test-media.jpg",
+  "notes": "test capture",
+  "tags": [
+    "test"
+  ],
+  "priority": "low",
+  "case_id": "",
+  "data": {
+    "file": {
+      "filename": "test-media.jpg"
+    },
+    "risk": {
+      "score": 30,
+      "risk_level": "LOW"
+    }
+  },
+  "metadata": {
+    "investigator": "OSINT TMC/CLARK",
+    "tool_version": "2.1.0",
+    "evidence_type": "media_metadata",
+    "chain_of_custody": {
+      "created_at": "2026-09-19T16:18:33.100412",
+      "hash": "bba386b8a72cc4d776e0fc2478d3be74f43da4f8fd10aa39c9653aee930ac1d0",
+      "verified": true
+    }
+  }
+}

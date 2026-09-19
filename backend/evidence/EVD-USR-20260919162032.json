@@ -1,0 +1,264 @@
+{
+  "evidence_id": "EVD-USR-20260919162032",
+  "timestamp": "2026-09-19T16:20:32.795695",
+  "investigation_type": "username_osint",
+  "target": "testuser",
+  "notes": "test capture",
+  "tags": [],
+  "priority": "medium",
+  "case_id": "",
+  "data": {
+    "profiles": [
+      {
+        "url": "https://gitlab.com/testuser",
+        "bio": null,
+        "followers": null,
+        "created_at": null,
+        "profile_image": "https://secure.gravatar.com/avatar/12bcf0a4010fa5401c9bf6389f023ebfd1f138271b594d9b94fbc309b3d5e3c3?s=80&d=identicon",
+        "full_name": "test",
+        "platform": "gitlab"
+      },
+      {
+        "url": "https://gitee.com/testuser",
+        "bio": null,
+        "followers": null,
+        "full_name": "testuser",
+        "created_at": "2014-02-08T10:42:01+08:00",
+        "platform": "gitee"
+      },
+      {
+        "url": "https://codeberg.org/testuser",
+        "bio": "",
+        "followers": 0,
+        "full_name": "",
+        "created_at": null,
+        "platform": "codeberg"
+      },
+      {
+        "url": "https://x.com/testuser",
+        "platform": "twitter"
+      },
+      {
+        "url": "https://x.com/testuser",
+        "platform": "x"
+      },
+      {
+        "url": "https://www.instagram.com/testuser",
+        "platform": "instagram"
+      },
+      {
+        "url": "https://www.twitch.tv/testuser",
+        "platform": "twitch"
+      },
+      {
+        "url": "https://www.facebook.com/testuser",
+        "platform": "facebook"
+      },
+      {
+        "url": "https://steamcommunity.com/id/testuser",
+        "platform": "steam"
+      },
+      {
+        "url": "https://www.pinterest.com/testuser",
+        "platform": "pinterest"
+      },
+      {
+        "url": "https://dev.to/testuser",
+        "bio": "1 articles published",
+        "platform": "devto"
+      },
+      {
+        "url": "https://vimeo.com/testuser",
+        "platform": "vimeo"
+      },
+      {
+        "url": "https://www.snapchat.com/add/testuser",
+        "platform": "snapchat"
+      },
+      {
+        "url": "https://open.spotify.com/user/testuser",
+        "platform": "spotify"
+      },
+      {
+        "url": "https://stackoverflow.com/users/1369419",
+        "followers": 1745,
+        "full_name": "Testuser",
+        "platform": "stackoverflow"
+      },
+      {
+        "url": "https://gitlab.com/testuser",
+        "platform": "gitlab_ci"
+      },
+      {
+        "url": "https://t.me/testuser",
+        "platform": "telegram"
+      },
+      {
+        "url": "https://www.indiehackers.com/testuser",
+        "platform": "indiehackers"
+      },
+      {
+        "url": "https://replit.com/@testuser",
+        "platform": "replit"
+      },
+      {
+        "url": "https://glitch.com/@testuser",
+        "platform": "glitch"
+      },
+      {
+        "url": "https://testuser.notion.site",
+        "platform": "notion"
+      },
+      {
+        "url": "https://about.me/testuser",
+        "platform": "aboutme"
+      },
+      {
+        "url": "https://app.hackthebox.com/users/testuser",
+        "bio": "HackTheBox profile found",
+        "platform": "hackthebox"
+      }
+    ],
+    "evidence": {
+      "total_platforms": 23,
+      "full_name": "test",
+      "email_candidates": [],
+      "bio_snippets": [
+        {
+          "platform": "devto",
+          "bio": "1 articles published"
+        },
+        {
+          "platform": "hackthebox",
+          "bio": "HackTheBox profile found"
+        }
+      ],
+      "follower_counts": {
+        "codeberg": 0,
+        "stackoverflow": 1745
+      },
+      "total_followers": 1745,
+      "creation_dates": [
+        {
+          "platform": "gitee",
+          "date": "2014-02-08T10:42:01+08:00"
+        }
+      ],
+      "profile_images": [
+        {
+          "platform": "gitlab",
+          "url": "https://secure.gravatar.com/avatar/12bcf0a4010fa5401c9bf6389f023ebfd1f138271b594d9b94fbc309b3d5e3c3?s=80&d=identicon"
+        }
+      ],
+      "linked_urls": [
+        {
+          "platform": "gitlab",
+          "url": "https://gitlab.com/testuser"
+        },
+        {
+          "platform": "gitee",
+          "url": "https://gitee.com/testuser"
+        },
+        {
+          "platform": "codeberg",
+          "url": "https://codeberg.org/testuser"
+        },
+        {
+          "platform": "twitter",
+          "url": "https://x.com/testuser"
+        },
+        {
+          "platform": "x",
+          "url": "https://x.com/testuser"
+        },
+        {
+          "platform": "instagram",
+          "url": "https://www.instagram.com/testuser"
+        },
+        {
+          "platform": "twitch",
+          "url": "https://www.twitch.tv/testuser"
+        },
+        {
+          "platform": "facebook",
+          "url": "https://www.facebook.com/testuser"
+        },
+        {
+          "platform": "steam",
+          "url": "https://steamcommunity.com/id/testuser"
+        },
+        {
+          "platform": "pinterest",
+          "url": "https://www.pinterest.com/testuser"
+        },
+        {
+          "platform": "devto",
+          "url": "https://dev.to/testuser"
+        },
+        {
+          "platform": "vimeo",
+          "url": "https://vimeo.com/testuser"
+        },
+        {
+          "platform": "snapchat",
+          "url": "https://www.snapchat.com/add/testuser"
+        },
+        {
+          "platform": "spotify",
+          "url": "https://open.spotify.com/user/testuser"
+        },
+        {
+          "platform": "stackoverflow",
+          "url": "https://stackoverflow.com/users/1369419"
+        },
+        {
+          "platform": "gitlab_ci",
+          "url": "https://gitlab.com/testuser"
+        },
+        {
+          "platform": "telegram",
+          "url": "https://t.me/testuser"
+        },
+        {
+          "platform": "indiehackers",
+          "url": "https://www.indiehackers.com/testuser"
+        },
+        {
+          "platform": "replit",
+          "url": "https://replit.com/@testuser"
+        },
+        {
+          "platform": "glitch",
+          "url": "https://glitch.com/@testuser"
+        },
+        {
+          "platform": "notion",
+          "url": "https://testuser.notion.site"
+        },
+        {
+          "platform": "aboutme",
+          "url": "https://about.me/testuser"
+        },
+        {
+          "platform": "hackthebox",
+          "url": "https://app.hackthebox.com/users/testuser"
+        }
+      ],
+      "risk_score": 35,
+      "risk_factors": [
+        "High digital footprint: 23 platforms found",
+        "Security-related accounts found: hackthebox"
+      ]
+    }
+  },
+  "metadata": {
+    "investigator": "OSINT TMC/CLARK",
+    "tool_version": "2.0.0",
+    "evidence_type": "username_investigation",
+    "chain_of_custody": {
+      "created_at": "2026-09-19T16:20:32.795718",
+      "hash": null,
+      "verified": true
+    }
+  }
+}
