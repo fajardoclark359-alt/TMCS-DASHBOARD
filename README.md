@@ -1,6 +1,14 @@
-# OSINT TMC/CLARK - Cyber Intelligence Platform
+# 🛡️ OSINT TMC/CLARK — Cyber Intelligence Platform
 
-Advanced Open Source Intelligence gathering platform for cybersecurity professionals and penetration testers.
+> Advanced Open Source Intelligence gathering platform for cybersecurity professionals and penetration testers.
+
+---
+
+### 🚀 **[👉 CLICK HERE — LIVE DEMO](https://fajardoclark359-alt.github.io/cyber-intelligence-platform/)** 🚀
+
+> ⬆️ **Open the TMCS Threat Monitoring Center Dashboard** — Real-time threat monitoring with 8 Philippine cybercrime categories, Wazuh-style UI, incident reporting, and live threat feed.
+
+---
 
 ## Features
 
@@ -48,6 +56,24 @@ Advanced Open Source Intelligence gathering platform for cybersecurity professio
 - Privacy risk score (0-100) with leak flags
 - Report export: download JSON / printable HTML, copy JSON
 - Evidence capture: save/view/export/delete reports with chain-of-custody hash
+
+### 🛡️ TMCS — Threat Monitoring Center System (NEW)
+- **Wazuh-style dashboard** — Enterprise security monitoring UI
+- **8 Philippine Threat Categories:**
+  - 🎰 Illegal Online Gambling
+  - 💳 Financial Fraud
+  - 🚨 OSAEC (Online Sexual Abuse & Exploitation of Children)
+  - 🏛️ Threat to Government
+  - 📰 Information Disorder
+  - 💥 Violent Extremism
+  - 📦 Illicit Trade Services
+  - ⚠️ Unlawful Online Activities
+- **Real-time threat feed** with live alerts
+- **Incident reporting modal** with severity levels
+- **System status monitoring** with uptime tracking
+- **Severity breakdown** — Critical / High / Medium / Low / Info
+- **Geographic threat origins** by Philippine region
+- **DEFCON-style threat level indicator**
 
 ## Tech Stack
 
