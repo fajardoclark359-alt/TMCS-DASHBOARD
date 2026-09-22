@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, NavLink } from 'react-router-dom'
 import Home from './pages/Home'
 import UsernameSearch from './pages/UsernameSearch'
 import EmailSearch from './pages/EmailSearch'
@@ -11,7 +11,7 @@ import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal,
 
 function App() {
   return (
-    <Router basename={import.meta.env.BASE_URL}>
+    <Router>
       <div className="min-h-screen flex">
         <nav className="w-64 nav-cyber p-4 relative">
           <div className="mb-8">
