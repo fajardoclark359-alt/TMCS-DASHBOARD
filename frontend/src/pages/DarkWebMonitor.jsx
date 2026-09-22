@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FiEye, FiSearch, FiShield, FiAlertTriangle, FiGlobe, FiLock, FiServer, FiTerminal, FiSave, FiFileText, FiClock, FiTag, FiCheck, FiExternalLink, FiCopy, FiActivity, FiMessageCircle } from 'react-icons/fi'
 
-const DEFAULT_KEYWORDS = ['764', 'nihilistic extremism', 'accelerationism', 'O9A', 'Order of Nine Angles', 'siege culture', 'chan terrorism', 'radicalization', 'lone wolf', 'violent ideology', '764 network', 'cult of the frozen photons', 'com 764']
+const DEFAULT_KEYWORDS = ['764', 'nihilistic extremism', 'accelerationism', 'O9A', 'Order of Nine Angles', 'siege culture', 'chan terrorism', 'radicalization', 'lone wolf', 'violent ideology', '764 network', 'cult of the frozen photons', 'com 764', 'NULSEC', 'philippines breach', 'philippine hacktivist', 'pinoy ransomware']
 
 const SOURCE_COLORS = {
   'AlienVault OTX': 'text-orange-400 bg-orange-900/30 border-orange-500/30',
@@ -47,6 +47,48 @@ const SOCIAL_FEEDS = [
   { name: 'BleepingComputer', url: 'https://www.bleepingcomputer.com/feed/', type: 'rss', desc: 'Malware, breaches, vulnerability news' },
   { name: 'ThreatPost', url: 'https://threatpost.com/feed/', type: 'rss', desc: 'Threat intelligence and analysis' },
   { name: 'Cyberscoop', url: 'https://cyberscoop.com/feed/', type: 'rss', desc: 'Cybersecurity policy and news' },
+  // Philippines sources
+  { name: 'PH-CERT Advisories', url: 'https://www.cert.gov.ph/feed', type: 'rss', desc: 'Philippine CERT official advisories' },
+  { name: 'DICT Philippines', url: 'https://dict.gov.ph/feed', type: 'rss', desc: 'Dept of Information and Communications Technology' },
+  { name: 'Rappler Tech', url: 'https://www.rappler.com/technology/feed/', type: 'rss', desc: 'Philippine tech news and cybersecurity' },
+  { name: 'Inquirer.net Tech', url: 'https://technology.inquirer.net/feed', type: 'rss', desc: 'Philippine Inquirer technology section' },
+  { name: 'Manila Bulletin Tech', url: 'https://www.mb.com.ph/feed', type: 'rss', desc: 'Manila Bulletin tech and business' },
+  { name: 'ABS-CBN News Tech', url: 'https://news.abs-cbn.com/feed', type: 'rss', desc: 'ABS-CBN news feed' },
+  { name: 'Philstar Tech', url: 'https://www.philstar.com/feed', type: 'rss', desc: 'Philstar news feed' },
+]
+
+// ═══════════════════════════════════════════════════════════════
+// PHILIPPINES MONITORING
+// ═══════════════════════════════════════════════════════════════
+
+const PH_HACKER_GROUPS = [
+  { name: 'NULSEC', aliases: ['nulsec', 'nulsec ph', 'null security'], type: 'hacktivist', desc: 'Philippine hacktivist group — DDoS, defacements, data leaks against PH government and corporations', status: 'active', lastSeen: '2024-ongoing', targets: ['government', 'corporations', 'education'], keywords: ['nulsec', 'null security', 'philippine hacktivist'] },
+  { name: 'Anonymous Philippines', aliases: ['anon ph', 'anonymous philippines', 'anonph'], type: 'hacktivist', desc: 'PH chapter of Anonymous — political hacktivism, DDoS, defacements', status: 'active', lastSeen: '2023-ongoing', targets: ['government', 'political'], keywords: ['anonymous philippines', 'anonph', 'anon ph'] },
+  { name: 'PHCyberArmy', aliases: ['ph cyber army'], type: 'hacktivist', desc: 'Philippine cyber army — nationalist hacktivism, defacements', status: 'monitoring', lastSeen: '2023', targets: ['government', 'foreign'], keywords: ['phcyberarmy', 'philippine cyber army'] },
+  { name: 'TeamP01s0n', aliases: ['poison', 'p01s0n'], type: 'cybercrime', desc: 'PH-based cybercrime group — credential theft, carding', status: 'monitoring', lastSeen: '2024', targets: ['financial', 'e-commerce'], keywords: ['teamp01s0n', 'poison'] },
+  { name: 'DarkNebula PH', aliases: ['darknebula', 'dark nebula ph'], type: 'extremism', desc: 'Monitoring — nihilistic/violent extremism content targeting PH youth', status: 'watchlist', lastSeen: '2024', targets: ['youth', 'social media'], keywords: ['darknebula', 'dark nebula', '764 philippines'] },
+  { name: 'PH Ransomware Crew', aliases: ['ph ransom', 'pinoy ransom'], type: 'ransomware', desc: 'PH-origin ransomware operations targeting local businesses', status: 'monitoring', lastSeen: '2024', targets: ['businesses', 'healthcare', 'education'], keywords: ['philippine ransomware', 'pinoy ransom'] },
+  { name: 'TigerTeam PH', aliases: ['tigerteam'], type: 'pentesting', desc: 'Philippine red team / pentesting community', status: 'legitimate', lastSeen: 'ongoing', targets: ['authorized testing'], keywords: ['tigerteam ph'] },
+  { name: 'CyberGhost PH', aliases: ['cyberghost'], type: 'cybercrime', desc: 'PH underground — carding, credential stuffing, fraud', status: 'monitoring', lastSeen: '2024', targets: ['financial', 'e-commerce'], keywords: ['cyberghost philippines'] },
+  { name: 'Pinoy Hackers', aliases: ['pinoy hacker', 'pinoyhackers'], type: 'community', desc: 'Filipino hacker community — tools, tutorials, exploits', status: 'active', lastSeen: 'ongoing', targets: ['community'], keywords: ['pinoy hacker', 'pinoyhackers'] },
+  { name: 'PHWhiteHat', aliases: ['phwhitehat', 'ph white hat'], type: 'defensive', desc: 'Philippine white hat community — bug bounty, responsible disclosure', status: 'legitimate', lastSeen: 'ongoing', targets: ['defense'], keywords: ['phwhitehat'] },
+]
+
+const PH_RANSOMWARE_ACTORS = [
+  { name: 'LockBit (PH targets)', desc: 'LockBit ransomware campaigns targeting Philippine organizations' },
+  { name: 'BlackCat/ALPHV (PH)', desc: 'BlackCat ransomware — healthcare, education targets in PH' },
+  { name: 'Medusa (PH)', desc: 'Medusa ransomware — Philippine government and business targets' },
+  { name: 'Play (PH)', desc: 'Play ransomware — Philippine infrastructure targets' },
+  { name: 'PH-origin crews', desc: 'Locally operated ransomware targeting PH SMEs' },
+]
+
+const PH_DATA_BREACH_KEYWORDS = [
+  'philippines data breach', 'philippine data leak', 'ph government breach',
+  'depEd breach', 'philhealth breach', 'gsis breach', 'sss data leak',
+  'bdo breach', 'bpi breach', 'metrobank breach', 'pal breach',
+  'sm breach', 'jollibee breach', 'globe breach', 'smart breach',
+  'dito breach', 'maya breach', 'gcash breach', 'paymaya breach',
+  'philippine voter data', 'COMELEC breach', 'lto breach',
 ]
 
 const FORUM_CATS = {
@@ -79,8 +121,13 @@ function DarkWebMonitor() {
   const [socialPosts, setSocialPosts] = useState([])
   const [socialLoading, setSocialLoading] = useState(false)
   const [socialFilter, setSocialFilter] = useState('all')
+  const [philPosts, setPhilPosts] = useState([])
+  const [philLoading, setPhilLoading] = useState(false)
+  const [philFilter, setPhilFilter] = useState('all')
+  const [philGroups, setPhilGroups] = useState([])
+  const [philBreaches, setPhilBreaches] = useState([])
 
-  useEffect(() => { fetchFeeds(); fetchAlerts(); fetchTrends(); fetchForums(); fetchSocial() }, [])
+  useEffect(() => { fetchFeeds(); fetchAlerts(); fetchTrends(); fetchForums(); fetchSocial(); fetchPhil() }, [])
 
   // ═══ FEEDS ═══
   const fetchFeeds = async () => {
@@ -158,6 +205,84 @@ function DarkWebMonitor() {
     setSocialPosts(posts); setSocialLoading(false)
   }
 
+  // ═══ PHILIPPINES MONITORING ═══
+  const fetchPhil = async () => {
+    setPhilLoading(true)
+    const posts = []
+    // PH-specific RSS feeds
+    const phFeeds = SOCIAL_FEEDS.filter(f => f.name.includes('PH') || f.name.includes('Rappler') || f.name.includes('Inquirer') || f.name.includes('Manila') || f.name.includes('ABS') || f.name.includes('Philstar'))
+    for (const feed of phFeeds) {
+      try {
+        const x = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          for (const item of (d.items || []).slice(0, 10)) {
+            const text = `${item.title} ${item.description || ''}`.toLowerCase()
+            const isBreach = PH_DATA_BREACH_KEYWORDS.some(kw => text.includes(kw.toLowerCase())) || ['breach', 'leak', 'hack', 'stolen', 'exposed', 'compromised'].some(kw => text.includes(kw))
+            const isRansomware = ['ransomware', 'ransom', 'encrypt', 'lockbit', 'blackcat', 'medusa'].some(kw => text.includes(kw))
+            const isExtremism = ['extremist', 'terror', 'radical', 'violence', '764', 'nihilistic', 'o9a', 'acceleration', 'siege'].some(kw => text.includes(kw))
+            const isHacktivism = ['nulsec', 'anonymous', 'deface', 'hacktiv', 'ddos', 'cyberattack'].some(kw => text.includes(kw))
+            posts.push({
+              title: item.title,
+              source: feed.name,
+              description: (item.description || '').replace(/<[^>]+>/g, '').slice(0, 300),
+              published: item.pubDate || item.pub_date || '',
+              link: item.link,
+              categories: item.categories || [],
+              isBreach, isRansomware, isExtremism, isHacktivism,
+              feedType: feed.type,
+            })
+          }
+        }
+      } catch {}
+    }
+    // Search Ahmia for PH breach data
+    for (const kw of ['philippines data breach', 'philippine data leak', 'philhealth breach', 'COMELEC breach', 'philippine voter data']) {
+      try {
+        const x = await fetch(`https://ahmia.fi/api/v1/search/?q=${encodeURIComponent(kw)}`, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          for (const i of (d.items || d.results || []).slice(0, 3)) {
+            posts.push({ title: i.title || kw, source: 'Ahmia.fi', description: (i.description || '').slice(0, 300), published: '', link: i.onion_url || i.url || '', categories: [], isBreach: true, isRansomware: false, isExtremism: false, isHacktivism: false, feedType: 'darkweb' })
+          }
+        }
+      } catch {}
+    }
+    // Search URLhaus for PH-related malware
+    try {
+      const x = await fetch('https://urlhaus-api.abuse.ch/v1/urls/recent/', { mode: 'cors' })
+      if (x.ok) {
+        const d = await x.json()
+        for (const e of (d.urls || []).slice(0, 200)) {
+          const url = (e.url || '').toLowerCase()
+          const tags = (e.tags || []).join(' ').toLowerCase()
+          if (tags.includes('philippines') || tags.includes('ph') || url.includes('.ph') || tags.includes('pinoy')) {
+            posts.push({ title: `URLhaus: ${e.url_status || 'unknown'} — PH target`, source: 'URLhaus', description: `Threat: ${e.threat || 'unknown'} | Tags: ${(e.tags || []).join(', ')}`, published: e.dateadded || '', link: e.url, categories: [], isBreach: false, isRansomware: (e.threat || '').includes('malware_download'), isExtremism: false, isHacktivism: false, feedType: 'darkweb' })
+          }
+        }
+      }
+    } catch {}
+    // Search for NULSEC / PH hacker groups on Ahmia
+    for (const g of PH_HACKER_GROUPS) {
+      for (const alias of g.aliases.slice(0, 2)) {
+        try {
+          const x = await fetch(`https://ahmia.fi/api/v1/search/?q=${encodeURIComponent(alias)}`, { mode: 'cors' })
+          if (x.ok) {
+            const d = await x.json()
+            for (const i of (d.items || d.results || []).slice(0, 2)) {
+              posts.push({ title: `[${g.type.toUpperCase()}] ${i.title || alias}`, source: 'Ahmia.fi', description: (i.description || '').slice(0, 300), published: '', link: i.onion_url || i.url || '', categories: [g.type], isBreach: false, isRansomware: false, isExtremism: g.type === 'extremism', isHacktivism: g.type === 'hacktivist', feedType: 'darkweb' })
+            }
+          }
+        } catch {}
+      }
+    }
+    posts.sort((a, b) => (b.published || '').localeCompare(a.published || ''))
+    setPhilPosts(posts)
+    setPhilGroups(PH_HACKER_GROUPS)
+    setPhilBreaches(PH_RANSOMWARE_ACTORS)
+    setPhilLoading(false)
+  }
+
   // ═══ SEARCH ═══
   const handleSearch = async (e) => {
     e.preventDefault()
@@ -194,6 +319,7 @@ function DarkWebMonitor() {
     { id: 'feeds', label: 'THREAT FEEDS', icon: FiActivity },
     { id: 'forums', label: 'FORUMS', icon: FiMessageCircle },
     { id: 'social', label: 'SOCIAL / NEWS', icon: FiGlobe },
+    { id: 'philippines', label: '🇵🇭 PHILIPPINES', icon: FiShield },
     { id: 'search', label: 'DARK WEB SEARCH', icon: FiSearch },
     { id: 'iocs', label: 'IOCs', icon: FiLock },
     { id: 'keywords', label: 'KEYWORDS', icon: FiTag },
@@ -354,6 +480,114 @@ function DarkWebMonitor() {
             </div>
           )}
 
+          {/* ═══ PHILIPPINES TAB ═══ */}
+          {activeTab === 'philippines' && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="title-cyber text-sm font-bold text-blue-400">🇵🇭 PHILIPPINES CYBER THREAT MONITOR</h2>
+                <button onClick={fetchPhil} className="text-xs text-slate-500 hover:text-blue-400 font-mono">↻ REFRESH</button>
+              </div>
+
+              {/* NULSEC / PH Hacker Groups */}
+              <div className="card-cyber p-4 rounded-lg mb-4">
+                <h3 className="title-cyber text-xs font-bold text-red-400 mb-3">🔴 PH HACKER GROUPS — ACTIVE MONITORING</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {PH_HACKER_GROUPS.map((g, i) => (
+                    <div key={i} className={`bg-slate-900/50 p-3 rounded cyber-border ${g.type === 'extremism' ? 'border-red-500/40' : g.type === 'hacktivist' ? 'border-orange-500/30' : g.type === 'ransomware' ? 'border-red-600/30' : ''}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-white text-xs font-mono font-bold">{g.name}</span>
+                        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${g.status === 'active' ? 'bg-red-600/30 text-red-400 border border-red-500/30' : g.status === 'watchlist' ? 'bg-yellow-600/30 text-yellow-400 border border-yellow-500/30' : g.status === 'legitimate' ? 'bg-green-600/30 text-green-400 border border-green-500/30' : 'bg-slate-700/30 text-slate-400 border border-slate-600/30'}`}>{g.status.toUpperCase()}</span>
+                      </div>
+                      <p className="text-slate-400 text-[10px] font-mono">{g.desc}</p>
+                      <div className="flex gap-2 mt-1.5 text-[9px] font-mono">
+                        <span className="text-slate-500">type: <span className="text-cyan-400">{g.type}</span></span>
+                        <span className="text-slate-500">last: <span className="text-yellow-400">{g.lastSeen}</span></span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {g.targets.map((t, j) => <span key={j} className="bg-slate-800/80 text-slate-400 px-1 py-0.5 rounded text-[8px] font-mono">{t}</span>)}
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {g.keywords.map((k, j) => <span key={j} className="bg-purple-900/30 text-purple-400 px-1 py-0.5 rounded text-[8px] font-mono border border-purple-500/20">{k}</span>)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Ransomware Actors */}
+              <div className="card-cyber p-4 rounded-lg mb-4 bg-red-950/10 border border-red-500/20">
+                <h3 className="title-cyber text-xs font-bold text-red-400 mb-3">🔒 RANSOMWARE ACTORS — PH TARGETS</h3>
+                <div className="space-y-2">
+                  {PH_RANSOMWARE_ACTORS.map((r, i) => (
+                    <div key={i} className="bg-slate-900/50 p-2 rounded cyber-border flex items-center justify-between">
+                      <div>
+                        <span className="text-red-300 text-xs font-mono font-bold">{r.name}</span>
+                        <p className="text-slate-500 text-[10px] font-mono">{r.desc}</p>
+                      </div>
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-600/20 text-red-400">ACTIVE</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Data Breach Keywords */}
+              <div className="card-cyber p-4 rounded-lg mb-4 bg-yellow-950/10 border border-yellow-500/20">
+                <h3 className="title-cyber text-xs font-bold text-yellow-400 mb-3">⚠️ PH DATA BREACH KEYWORDS TRACKED</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {PH_DATA_BREACH_KEYWORDS.map((kw, i) => {
+                    const matches = philPosts.filter(p => `${p.title} ${p.description}`.toLowerCase().includes(kw.toLowerCase())).length
+                    return (
+                      <span key={i} className={`text-[9px] font-mono px-2 py-1 rounded ${matches > 0 ? 'bg-red-600/30 text-red-400 border border-red-500/30' : 'bg-slate-800/50 text-slate-500 border border-slate-700'}`}>{kw} {matches > 0 ? `(${matches})` : ''}</span>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Feed Filters */}
+              <div className="flex gap-2 mb-4 flex-wrap">
+                {[
+                  { id: 'all', label: `ALL (${philPosts.length})` },
+                  { id: 'breach', label: `🔴 BREACHES (${philPosts.filter(p => p.isBreach).length})` },
+                  { id: 'ransomware', label: `🔒 RANSOMWARE (${philPosts.filter(p => p.isRansomware).length})` },
+                  { id: 'extremism', label: `☠️ EXTREMISM (${philPosts.filter(p => p.isExtremism).length})` },
+                  { id: 'hacktivism', label: `⚡ HACKTIVISM (${philPosts.filter(p => p.isHacktivism).length})` },
+                ].map(f => (
+                  <button key={f.id} onClick={() => setPhilFilter(f.id)} className={`text-[10px] font-mono px-3 py-1 rounded ${philFilter === f.id ? 'bg-blue-900/30 text-blue-400 border border-blue-500/30' : 'bg-slate-900/50 text-slate-500 border border-slate-700'}`}>{f.label}</button>
+                ))}
+              </div>
+
+              {philLoading && <p className="text-slate-500 font-mono text-sm mb-3">Scanning PH threat landscape — feeds + Ahmia.fi + URLhaus...</p>}
+
+              <div className="space-y-3">
+                {philPosts.filter(p => {
+                  if (philFilter === 'all') return true
+                  if (philFilter === 'breach') return p.isBreach
+                  if (philFilter === 'ransomware') return p.isRansomware
+                  if (philFilter === 'extremism') return p.isExtremism
+                  if (philFilter === 'hacktivism') return p.isHacktivism
+                  return true
+                }).map((p, i) => (
+                  <div key={i} className={`card-cyber p-4 rounded-lg ${p.isBreach ? 'border border-red-500/30 bg-red-950/10' : p.isExtremism ? 'border border-red-600/30 bg-red-950/20' : p.isRansomware ? 'border border-orange-500/30 bg-orange-950/10' : p.isHacktivism ? 'border border-yellow-500/30 bg-yellow-950/10' : ''}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${p.source.includes('Ahmia') ? 'text-purple-400 bg-purple-900/30 border border-purple-500/30' : p.source.includes('URLhaus') ? 'text-red-400 bg-red-900/30 border border-red-500/30' : 'text-blue-400 bg-blue-900/30 border border-blue-500/30'}`}>{p.source}</span>
+                        {p.isBreach && <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-red-600/30 text-red-400 border border-red-500/30 font-bold">🔴 BREACH</span>}
+                        {p.isRansomware && <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-orange-600/30 text-orange-400 border border-orange-500/30 font-bold">🔒 RANSOM</span>}
+                        {p.isExtremism && <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-red-700/30 text-red-300 border border-red-400/30 font-bold">☠️ EXTREMISM</span>}
+                        {p.isHacktivism && <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-yellow-600/30 text-yellow-400 border border-yellow-500/30 font-bold">⚡ HACKTIVISM</span>}
+                      </div>
+                      <span className="text-[10px] text-slate-600 font-mono">{p.published?.slice(0, 16)}</span>
+                    </div>
+                    <h3 className="text-sm font-bold font-mono mb-1 text-white">{p.title}</h3>
+                    <p className="text-slate-400 text-xs font-mono line-clamp-2">{p.description}</p>
+                    {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-[10px] font-mono mt-2 inline-flex items-center gap-1 hover:text-blue-300"><FiExternalLink size={10} /> VIEW SOURCE</a>}
+                  </div>
+                ))}
+                {philPosts.length === 0 && !philLoading && <p className="text-slate-500 font-mono text-sm">No PH threat data loaded. Click REFRESH to scan.</p>}
+              </div>
+            </div>
+          )}
+
           {/* ═══ SEARCH TAB ═══ */}
           {activeTab === 'search' && (
             <div>
@@ -421,8 +655,8 @@ function DarkWebMonitor() {
                   return (
                     <div key={i} className={`card-cyber p-3 rounded-lg ${total > 0 ? 'border border-red-500/30' : ''}`}>
                       <p className="text-red-400 text-xs font-mono font-bold">{kw}</p>
-                      <p className="text-slate-500 text-[10px] font-mono mt-1">{total} match{total !== 1 ? 'es' : ''} across feeds + social</p>
-                      {total > 0 && <div className="flex gap-2 mt-1 text-[9px] font-mono"><span className="text-blue-400">feeds:{feedCount}</span><span className="text-purple-400">social:{socialCount}</span></div>}
+                      <p className="text-slate-500 text-[10px] font-mono mt-1">{total} match{total !== 1 ? 'es' : ''} across feeds + social + PH</p>
+                      {total > 0 && <div className="flex gap-2 mt-1 text-[9px] font-mono"><span className="text-blue-400">feeds:{feedCount}</span><span className="text-purple-400">social:{socialCount}</span><span className="text-cyan-400">ph:{philPosts.filter(p => `${p.title} ${p.description}`.toLowerCase().includes(kw.toLowerCase())).length}</span></div>}
                     </div>
                   )
                 })}
@@ -473,6 +707,49 @@ function DarkWebMonitor() {
             <div className="space-y-1 max-h-48 overflow-y-auto">
               {socialPosts.filter(p => p.isNVE).slice(0, 8).map((p, i) => (
                 <a key={i} href={p.link} target="_blank" rel="noopener noreferrer" className="block text-[10px] font-mono text-red-300 hover:text-red-200 truncate">▸ {p.title}</a>
+              ))}
+            </div>
+          </div>
+
+          {/* 🇵🇭 PHILIPPINES THREAT SUMMARY */}
+          <div className="card-cyber p-4 rounded-lg bg-blue-950/10 border border-blue-500/20">
+            <h2 className="title-cyber text-sm font-bold mb-3 flex items-center gap-2 text-blue-400"><FiShield /> 🇵🇭 PH THREATS</h2>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-[10px] font-mono">
+                <span className="text-slate-400">Hacker Groups</span>
+                <span className="text-red-400">{PH_HACKER_GROUPS.length} tracked</span>
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-mono">
+                <span className="text-slate-400">Active (red)</span>
+                <span className="text-red-400">{PH_HACKER_GROUPS.filter(g => g.status === 'active').length}</span>
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-mono">
+                <span className="text-slate-400">Watchlist</span>
+                <span className="text-yellow-400">{PH_HACKER_GROUPS.filter(g => g.status === 'watchlist').length}</span>
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-mono">
+                <span className="text-slate-400">Breaches found</span>
+                <span className="text-orange-400">{philPosts.filter(p => p.isBreach).length}</span>
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-mono">
+                <span className="text-slate-400">Ransomware</span>
+                <span className="text-red-400">{philPosts.filter(p => p.isRansomware).length}</span>
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-mono">
+                <span className="text-slate-400">Extremism</span>
+                <span className="text-red-300">{philPosts.filter(p => p.isExtremism).length}</span>
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-mono">
+                <span className="text-slate-400">Hacktivism</span>
+                <span className="text-yellow-400">{philPosts.filter(p => p.isHacktivism).length}</span>
+              </div>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-700/30">
+              <p className="text-[9px] text-slate-600 font-mono">Sources: Rappler, Inquirer, Manila Bulletin, ABS-CBN, PH-CERT, Ahmia.fi, URLhaus</p>
+            </div>
+            <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
+              {philPosts.filter(p => p.isBreach || p.isRansomware).slice(0, 5).map((p, i) => (
+                <a key={i} href={p.link} target="_blank" rel="noopener noreferrer" className="block text-[10px] font-mono text-blue-300 hover:text-blue-200 truncate">▸ {p.title}</a>
               ))}
             </div>
           </div>
