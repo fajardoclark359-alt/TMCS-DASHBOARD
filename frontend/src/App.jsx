@@ -6,7 +6,8 @@ import PhoneSearch from './pages/PhoneSearch'
 import DomainSearch from './pages/DomainSearch'
 import URLInvestigation from './pages/URLInvestigation'
 import MediaForensics from './pages/MediaForensics'
-import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal, FiCamera } from 'react-icons/fi'
+import DarkWebMonitor from './pages/DarkWebMonitor'
+import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal, FiCamera, FiEye } from 'react-icons/fi'
 
 function App() {
   return (
@@ -57,6 +58,11 @@ function App() {
                 <FiCamera size={16} /> <span className="text-sm">MEDIA FORENSICS</span>
               </NavLink>
             </li>
+            <li>
+              <NavLink to="/darkweb" className={({isActive}) => `flex items-center gap-3 p-2.5 rounded transition-all ${isActive ? 'bg-red-900/30 text-red-400 border border-red-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-red-300 border border-transparent'}`}>
+                <FiEye size={16} /> <span className="text-sm">DARK WEB MONITOR</span>
+              </NavLink>
+            </li>
           </ul>
 
           <div className="mt-8 p-3 bg-slate-900/50 rounded cyber-border text-xs">
@@ -81,6 +87,7 @@ function App() {
             <Route path="/domain" element={<DomainSearch />} />
             <Route path="/url" element={<URLInvestigation />} />
             <Route path="/media" element={<MediaForensics />} />
+            <Route path="/darkweb" element={<DarkWebMonitor />} />
           </Routes>
         </main>
       </div>

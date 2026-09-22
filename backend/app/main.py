@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import username, email, phone, domain, url, media
+from app.routers import username, email, phone, domain, url, media, darkweb
 
 app = FastAPI(
     title="OSINT TMC/CLARK",
@@ -31,6 +31,7 @@ app.include_router(phone.router, prefix="/api/phone", tags=["Phone"])
 app.include_router(domain.router, prefix="/api/domain", tags=["Domain"])
 app.include_router(url.router, prefix="/api/url", tags=["URL"])
 app.include_router(media.router, prefix="/api/media", tags=["Media"])
+app.include_router(darkweb.router)
 
 @app.get("/")
 def root():
