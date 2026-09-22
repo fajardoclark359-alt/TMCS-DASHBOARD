@@ -255,3 +255,66 @@ button:hover {
   0% { transform: translateY(-100%); opacity: 1; }
   100% { transform: translateY(100vh); opacity: 0; }
 }
+
+/* ─── TMCS Threat Dashboard Styles ─── */
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 4px currentColor; }
+  50% { opacity: 0.6; box-shadow: 0 0 12px currentColor; }
+}
+
+@keyframes threatGlow {
+  0%, 100% { box-shadow: 0 0 5px rgba(189, 36, 38, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(189, 36, 38, 0.5); }
+}
+
+@keyframes feedScroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.tmcs-pulse {
+  animation: threatGlow 2s ease-in-out infinite;
+}
+
+.tmcs-status-dot {
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+/* Severity badges */
+.sev-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.sev-critical { background: rgba(189,36,38,0.15); color: #bd2426; border: 1px solid rgba(189,36,38,0.3); }
+.sev-high { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
+.sev-medium { background: rgba(220,209,38,0.15); color: #dcd126; border: 1px solid rgba(220,209,38,0.3); }
+.sev-low { background: rgba(80,200,232,0.15); color: #50c8e8; border: 1px solid rgba(80,200,232,0.3); }
+.sev-info { background: rgba(108,117,125,0.15); color: #6c757d; border: 1px solid rgba(108,117,125,0.3); }
+
+/* Status badges */
+.status-active { background: rgba(189,36,38,0.12); color: #bd2426; }
+.status-investigating { background: rgba(245,166,35,0.12); color: #f5a623; }
+.status-mitigated { background: rgba(88,166,255,0.12); color: #58a6ff; }
+.status-resolved { background: rgba(63,185,80,0.12); color: #3fb950; }
+
+/* TMCS card hover */
+.tmcs-card-hover:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+/* Wazuh-style table rows */
+.tmcs-table-row:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.tmcs-table-row {
+  transition: background 0.15s ease;
+}

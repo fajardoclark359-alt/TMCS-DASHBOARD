@@ -8,7 +8,8 @@ import URLInvestigation from './pages/URLInvestigation'
 import MediaForensics from './pages/MediaForensics'
 import DarkWebMonitor from './pages/DarkWebMonitor'
 import GovMonitor from './pages/GovMonitor'
-import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal, FiCamera, FiEye, FiServer } from 'react-icons/fi'
+import ThreatDashboard from './pages/ThreatDashboard'
+import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal, FiCamera, FiEye, FiServer, FiAlertTriangle } from 'react-icons/fi'
 
 function App() {
   return (
@@ -60,6 +61,11 @@ function App() {
               </NavLink>
             </li>
             <li>
+              <NavLink to="/tmcs" className={({isActive}) => `flex items-center gap-3 p-2.5 rounded transition-all ${isActive ? 'bg-red-900/40 text-red-400 border border-red-500/40' : 'text-slate-400 hover:bg-slate-800/50 hover:text-red-300 border border-transparent'}`}>
+                <FiAlertTriangle size={16} /> <span className="text-sm font-bold">TMCS DASHBOARD</span>
+              </NavLink>
+            </li>
+            <li>
               <NavLink to="/darkweb" className={({isActive}) => `flex items-center gap-3 p-2.5 rounded transition-all ${isActive ? 'bg-red-900/30 text-red-400 border border-red-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-red-300 border border-transparent'}`}>
                 <FiEye size={16} /> <span className="text-sm">DARK WEB MONITOR</span>
               </NavLink>
@@ -93,6 +99,7 @@ function App() {
             <Route path="/domain" element={<DomainSearch />} />
             <Route path="/url" element={<URLInvestigation />} />
             <Route path="/media" element={<MediaForensics />} />
+            <Route path="/tmcs" element={<ThreatDashboard />} />
             <Route path="/darkweb" element={<DarkWebMonitor />} />
             <Route path="/gov" element={<GovMonitor />} />
           </Routes>
