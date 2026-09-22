@@ -72,6 +72,10 @@ const PH_HACKER_GROUPS = [
   { name: 'CyberGhost PH', aliases: ['cyberghost'], type: 'cybercrime', desc: 'PH underground — carding, credential stuffing, fraud', status: 'monitoring', lastSeen: '2024', targets: ['financial', 'e-commerce'], keywords: ['cyberghost philippines'] },
   { name: 'Pinoy Hackers', aliases: ['pinoy hacker', 'pinoyhackers'], type: 'community', desc: 'Filipino hacker community — tools, tutorials, exploits', status: 'active', lastSeen: 'ongoing', targets: ['community'], keywords: ['pinoy hacker', 'pinoyhackers'] },
   { name: 'PHWhiteHat', aliases: ['phwhitehat', 'ph white hat'], type: 'defensive', desc: 'Philippine white hat community — bug bounty, responsible disclosure', status: 'legitimate', lastSeen: 'ongoing', targets: ['defense'], keywords: ['phwhitehat'] },
+  { name: 'DNH Klammer', aliases: ['dnh', 'klammer', 'dnhklammer'], type: 'hacktivist', desc: 'PH hacktivist collective — DDoS campaigns, government defacements, data dumps', status: 'active', lastSeen: '2024-ongoing', targets: ['government', 'corporations', 'infrastructure'], keywords: ['dnh', 'klammer', 'dnhklammer', 'dnh klammer'] },
+  { name: 'Crimsonsec Philippines', aliases: ['crimsonsec', 'crimson sec', 'crimsonsecph'], type: 'offensive', desc: 'PH offensive security group — penetration testing, red team ops, exploit development', status: 'active', lastSeen: '2024-ongoing', targets: ['pentesting', 'research'], keywords: ['crimsonsec', 'crimson sec', 'crimsonsecph'] },
+  { name: 'Quantum Security Group', aliases: ['quantum security', 'qsg', 'quantumsec'], type: 'defensive', desc: 'PH security research group — vulnerability analysis, threat intel, incident response', status: 'monitoring', lastSeen: '2024-ongoing', targets: ['research', 'defense', 'threat-intel'], keywords: ['quantum security', 'quantumsec', 'qsg'] },
+  { name: 'Nyxentra', aliases: ['nyxentra', 'nyx entra'], type: 'cybercrime', desc: 'PH underground — credential theft, data monetization, dark web marketplace activity', status: 'watchlist', lastSeen: '2024', targets: ['financial', 'darkweb', 'e-commerce'], keywords: ['nyxentra', 'nyx entra'] },
 ]
 
 const PH_RANSOMWARE_ACTORS = [
