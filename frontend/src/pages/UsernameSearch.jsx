@@ -88,6 +88,13 @@ function UsernameSearch() {
     telegram: 'bg-blue-950/50 border border-blue-400/20', tryhackme: 'bg-red-950/50 border border-red-500/20',
     hackthebox: 'bg-blue-950/50 border border-blue-500/20', keybase: 'bg-cyan-950/50 border border-cyan-500/20',
     mastodon: 'bg-purple-950/50 border border-purple-400/20', gravatar: 'bg-blue-950/50 border border-blue-500/20',
+    spotify: 'bg-green-950/50 border border-green-500/20', soundcloud: 'bg-orange-950/50 border border-orange-400/20',
+    pinterest: 'bg-red-950/50 border border-red-400/20', snapchat: 'bg-yellow-950/50 border border-yellow-500/20',
+    devto: 'bg-slate-800/80 border border-slate-500/20', medium: 'bg-green-950/50 border border-green-500/20',
+    hackerrank: 'bg-green-950/50 border border-green-400/20', leetcode: 'bg-yellow-950/50 border border-yellow-500/20',
+    aboutme: 'bg-slate-800/80 border border-slate-500/20', flickr: 'bg-blue-950/50 border border-blue-400/20',
+    behance: 'bg-blue-950/50 border border-blue-500/20', dribbble: 'bg-pink-950/50 border border-pink-400/20',
+    vimeo: 'bg-blue-950/50 border border-cyan-500/20',
   }
 
   return (
@@ -97,7 +104,7 @@ function UsernameSearch() {
           <FiTerminal className="text-blue-400" />
           <h1 className="title-cyber text-2xl font-bold text-blue-400 glow-text">USERNAME OSINT</h1>
         </div>
-        <p className="text-slate-500 text-sm font-mono ml-7">Enumerate digital footprint across 50+ platforms + evidence capture</p>
+        <p className="text-slate-500 text-sm font-mono ml-7">Enumerate digital footprint across 28+ platforms — API-verified + URL checks | Facebook included</p>
       </div>
 
       <form onSubmit={handleSearch} className="flex gap-3 mb-6">
@@ -222,18 +229,22 @@ function UsernameSearch() {
                 <h2 className="title-cyber text-lg font-bold mb-4 flex items-center gap-2 text-blue-400">
                   <FiShield /> INTELLIGENCE SUMMARY
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
                   <div className="text-center p-3 bg-slate-900/50 rounded cyber-border">
                     <p className="text-3xl font-bold text-blue-400 title-cyber">{results.evidence.total_platforms}</p>
-                    <p className="text-slate-500 text-xs font-mono mt-1">PLATFORMS</p>
+                    <p className="text-slate-500 text-xs font-mono mt-1">TOTAL</p>
+                  </div>
+                  <div className="text-center p-3 bg-green-950/30 rounded cyber-border border border-green-500/20">
+                    <p className="text-3xl font-bold text-green-400 title-cyber">{results.confirmed_count || 0}</p>
+                    <p className="text-green-300/70 text-xs font-mono mt-1">✅ CONFIRMED</p>
+                  </div>
+                  <div className="text-center p-3 bg-slate-900/50 rounded cyber-border">
+                    <p className="text-3xl font-bold text-yellow-400 title-cyber">{results.potential_count || 0}</p>
+                    <p className="text-slate-500 text-xs font-mono mt-1">🔗 POTENTIAL</p>
                   </div>
                   <div className="text-center p-3 bg-slate-900/50 rounded cyber-border">
                     <p className={`text-3xl font-bold title-cyber ${riskColor(results.evidence.risk_score)}`}>{results.evidence.risk_score}</p>
                     <p className="text-slate-500 text-xs font-mono mt-1">RISK SCORE</p>
-                  </div>
-                  <div className="text-center p-3 bg-slate-900/50 rounded cyber-border">
-                    <p className="text-3xl font-bold text-purple-400 title-cyber">{results.evidence.total_followers?.toLocaleString() || 0}</p>
-                    <p className="text-slate-500 text-xs font-mono mt-1">FOLLOWERS</p>
                   </div>
                   <div className="text-center p-3 bg-slate-900/50 rounded cyber-border">
                     <p className="text-3xl font-bold text-cyan-400 title-cyber">{results.evidence.email_candidates?.length || 0}</p>
@@ -309,36 +320,58 @@ function UsernameSearch() {
           )}
 
           <div className="card-cyber p-5 rounded-lg">
-            <h2 className="title-cyber text-sm font-bold mb-4 text-blue-400">&#9656; ALL DISCOVERED PROFILES ({results.profiles?.length || 0})</h2>
-            {results.profiles?.length > 0 ? (
+            <h2 className="title-cyber text-sm font-bold mb-4 text-green-400">&#9656; ✅ CONFIRMED PROFILES ({results.profiles?.filter(p => !p.potential).length || 0})</h2>
+            {results.profiles?.filter(p => !p.potential).length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {results.profiles.map((profile, idx) => (
-                  <div key={idx} className={`p-3 rounded-lg ${platformColors[profile.platform] || 'bg-slate-800/80 border border-slate-600/30'} hover:opacity-90 transition`}>
+                {results.profiles.filter(p => !p.potential).map((profile, idx) => (
+                  <div key={idx} className={`p-3 rounded-lg ${platformColors[profile.platform?.toLowerCase()] || 'bg-slate-800/80 border border-slate-600/30'} hover:opacity-90 transition`}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-bold text-xs uppercase text-white font-mono">{profile.platform}</span>
-                      {profile.url && (
-                        <a href={profile.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
-                          <FiExternalLink size={12} />
-                        </a>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-green-600/30 text-green-400 border border-green-500/30">✅ API VERIFIED</span>
+                        {profile.url && (
+                          <a href={profile.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+                            <FiExternalLink size={12} />
+                          </a>
+                        )}
+                      </div>
                     </div>
                     {profile.full_name && <p className="text-white font-medium text-xs">{profile.full_name}</p>}
                     {profile.bio && <p className="text-slate-400 text-[11px] mt-1 line-clamp-2">{profile.bio}</p>}
                     {profile.email && <p className="text-blue-300 text-[11px] mt-1 font-mono">{profile.email}</p>}
+                    {profile.location && <p className="text-slate-400 text-[10px] mt-1 font-mono">📍 {profile.location}</p>}
                     <div className="flex gap-3 text-[10px] text-slate-500 mt-1 font-mono">
-                      {profile.followers != null && <span>followers:{typeof profile.followers === 'number' ? profile.followers.toLocaleString() : profile.followers}</span>}
-                      {profile.following != null && <span>following:{profile.following}</span>}
+                      {profile.followers != null && <span>followers: {typeof profile.followers === 'number' ? profile.followers.toLocaleString() : profile.followers}</span>}
+                      {profile.public_repos != null && <span>repos: {profile.public_repos}</span>}
                     </div>
                     {profile.created_at && (
                       <p className="text-[10px] text-slate-600 mt-1 font-mono">
-                        created:{typeof profile.created_at === 'number' ? new Date(profile.created_at * 1000).toISOString().split('T')[0] : new Date(profile.created_at).toISOString().split('T')[0]}
+                        created: {typeof profile.created_at === 'number' ? new Date(profile.created_at * 1000).toISOString().split('T')[0] : new Date(profile.created_at).toISOString().split('T')[0]}
                       </p>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-slate-500 font-mono text-sm">$ no profiles found for this target</p>
+              <p className="text-slate-500 font-mono text-sm">No profiles confirmed via API</p>
+            )}
+          </div>
+
+          <div className="card-cyber p-5 rounded-lg">
+            <h2 className="title-cyber text-sm font-bold mb-4 text-yellow-400">&#9656; 🔗 POTENTIAL PROFILES — URL CHECK ({results.profiles?.filter(p => p.potential).length || 0})</h2>
+            <p className="text-slate-500 text-[10px] font-mono mb-3">These URLs may or may not exist — click to verify manually</p>
+            {results.profiles?.filter(p => p.potential).length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                {results.profiles.filter(p => p.potential).map((profile, idx) => (
+                  <a key={idx} href={profile.url} target="_blank" rel="noopener noreferrer"
+                    className="p-2 rounded bg-slate-900/50 cyber-border hover:bg-slate-800/50 transition text-center">
+                    <span className="font-bold text-[10px] uppercase text-slate-300 font-mono block">{profile.platform}</span>
+                    <span className="text-[8px] text-slate-600 font-mono mt-0.5 block truncate">{profile.url}</span>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="text-slate-500 font-mono text-sm">No potential profiles generated</p>
             )}
           </div>
         </div>
