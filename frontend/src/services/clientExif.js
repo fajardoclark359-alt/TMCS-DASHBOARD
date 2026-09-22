@@ -126,7 +126,7 @@ export async function clientAnalyzeMedia(file) {
     video: { tags: {}, streams: {} },
     risk: { score: 0, risk_level: 'LOW', flags: [] },
     analyzed_at: new Date().toISOString(),
-    tool: 'OSINT TMC/CLARK media-forensics 1.0 (client-side)',
+    tool: 'ADVANCE OSINT Tools Developer Clark Fajardo media-forensics 1.0 (client-side)',
   }
 
   if (kind === 'image') {

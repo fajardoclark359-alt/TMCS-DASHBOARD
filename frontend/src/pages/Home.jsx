@@ -24,7 +24,7 @@ function Home() {
       <div className="text-center mb-10">
         <div className="flex items-center justify-center gap-3 mb-3">
           <FiTerminal className="text-blue-400 text-3xl" />
-          <h1 className="title-cyber text-4xl font-bold text-blue-400 glow-text">OSINT TMC/CLARK</h1>
+          <h1 className="title-cyber text-4xl font-bold text-blue-400 glow-text">ADVANCE OSINT Tools Developer Clark Fajardo</h1>
         </div>
         <p className="text-slate-500 text-sm mb-4">CYBER INTELLIGENCE PLATFORM v2.0</p>
         <p className="text-slate-400 max-w-2xl mx-auto text-sm leading-relaxed">
@@ -109,7 +109,7 @@ function Home() {
       <div className="mt-8 text-center">
         <div className="h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent mb-4"></div>
         <p className="text-slate-600 text-xs font-mono">
-          OSINT TMC/CLARK v2.0 | Built for Cybersecurity Professionals | Use Responsibly
+          ADVANCE OSINT Tools Developer Clark Fajardo v2.0 | Built for Cybersecurity Professionals | Use Responsibly
         </p>
       </div>
     </div>

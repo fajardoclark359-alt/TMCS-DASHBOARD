@@ -17,7 +17,7 @@ function App() {
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-1">
               <FiTerminal className="text-blue-400 text-xl" />
-              <h1 className="title-cyber text-xl font-bold text-blue-400 glow-text">OSINT TMC/CLARK</h1>
+              <h1 className="title-cyber text-xl font-bold text-blue-400 glow-text">ADVANCE OSINT Tools Developer Clark Fajardo</h1>
             </div>
             <p className="text-xs text-slate-500 ml-7">CYBER INTELLIGENCE PLATFORM</p>
           </div>
@@ -74,7 +74,7 @@ function App() {
           </div>
 
           <div className="mt-4 text-center">
-            <p className="text-[10px] text-slate-600 font-mono">v2.0.0 | TMC/CLARK</p>
+            <p className="text-[10px] text-slate-600 font-mono">v2.0.0 | Clark Fajardo</p>
           </div>
         </nav>
 
