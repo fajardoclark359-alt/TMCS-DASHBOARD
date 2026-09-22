@@ -89,20 +89,19 @@ function DarkWebMonitor() {
   const clientFetchFeeds = async () => {
     const results = []
 
-    // AlienVault OTX public pulses
+    // AlienVault OTX — public pulses (no auth needed)
     try {
-      const resp = await fetch('https://otx.alienvault.com/api/v1/pulses/subscribed?limit=10', { mode: 'cors' })
+      const resp = await fetch('https://otx.alienvault.com/otxapi/pulses?limit=15&sort=-created', { mode: 'cors' })
       if (resp.ok) {
         const data = await resp.json()
-        const pulses = data.results || data
-        for (const p of (Array.isArray(pulses) ? pulses : []).slice(0, 10)) {
+        for (const p of (data.results || []).slice(0, 15)) {
           results.push({
-            title: p.name,
+            title: p.name || 'OTX Pulse',
             source: 'AlienVault OTX',
-            description: p.description || p.summary || 'No description available',
+            description: (p.description || p.summary || 'No description').slice(0, 300),
             published: p.created || p.modified || new Date().toISOString(),
-            tags: p.tags || p.malware_families || [],
-            link: p.adversary ? `https://otx.alienvault.com/adversary/${p.adversary}` : `https://otx.alienvault.com/pulse/${p.id}`,
+            tags: p.tags || [],
+            link: `https://otx.alienvault.com/pulse/${p.id}`,
           })
         }
       }
@@ -112,15 +111,15 @@ function DarkWebMonitor() {
 
     // URLhaus recent URLs
     try {
-      const resp = await fetch('https://urlhaus-api.abuse.ch/v1/urls/recent/?limit=10', { mode: 'cors' })
+      const resp = await fetch('https://urlhaus-api.abuse.ch/v1/urls/recent/', { mode: 'cors' })
       if (resp.ok) {
         const data = await resp.json()
-        for (const entry of (data.urls || []).slice(0, 10)) {
+        for (const entry of (data.urls || []).slice(0, 15)) {
           results.push({
-            title: entry.url_status ? `URLhaus: ${entry.url_status.toUpperCase()} - ${entry.url}` : `URLhaus: ${entry.url}`,
+            title: `URLhaus: ${entry.url_status || 'unknown'} — ${(entry.url || '').slice(0, 80)}`,
             source: 'URLhaus',
-            description: entry.threat || entry.url_status || 'Malicious URL',
-            published: entry.date_added || new Date().toISOString(),
+            description: `Threat: ${entry.threat || 'unknown'} | Tags: ${(entry.tags || []).join(', ') || 'none'}`,
+            published: entry.dateadded || new Date().toISOString(),
             tags: entry.tags || [],
             link: entry.url,
           })
@@ -130,14 +129,54 @@ function DarkWebMonitor() {
       console.warn('URLhaus fetch failed:', e.message)
     }
 
-    // Ahmia.fi — recent hidden services
+    // BleepingComputer RSS
+    try {
+      const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://www.bleepingcomputer.com/feed/', { mode: 'cors' })
+      if (resp.ok) {
+        const data = await resp.json()
+        for (const item of (data.items || []).slice(0, 10)) {
+          results.push({
+            title: item.title,
+            source: 'BleepingComputer',
+            description: (item.description || '').replace(/<[^>]+>/g, '').slice(0, 300),
+            published: item.pubDate || new Date().toISOString(),
+            tags: item.categories || [],
+            link: item.link,
+          })
+        }
+      }
+    } catch (e) {
+      console.warn('BleepingComputer RSS failed:', e.message)
+    }
+
+    // The Hacker News RSS
+    try {
+      const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://feeds.feedburner.com/TheHackersNews', { mode: 'cors' })
+      if (resp.ok) {
+        const data = await resp.json()
+        for (const item of (data.items || []).slice(0, 10)) {
+          results.push({
+            title: item.title,
+            source: 'The Hacker News',
+            description: (item.description || '').replace(/<[^>]+>/g, '').slice(0, 300),
+            published: item.pubDate || new Date().toISOString(),
+            tags: item.categories || [],
+            link: item.link,
+          })
+        }
+      }
+    } catch (e) {
+      console.warn('The Hacker News RSS failed:', e.message)
+    }
+
+    // Ahmia.fi ping check
     try {
       const resp = await fetch('https://ahmia.fi/api/v1/ping', { mode: 'cors' })
       if (resp.ok) {
         results.push({
           title: 'Ahmia.fi — Dark Web Search Engine Online',
           source: 'Ahmia.fi',
-          description: 'Ahmia.fi search engine is accessible. Use the Dark Web Search tab to query for .onion sites.',
+          description: 'Ahmia.fi search engine is accessible. Use the Dark Web Search tab to query .onion sites.',
           published: new Date().toISOString(),
           tags: ['darkweb', 'onion'],
           link: 'https://ahmia.fi',
@@ -152,22 +191,72 @@ function DarkWebMonitor() {
 
   const clientSearchDarkWeb = async (query) => {
     const results = []
+    
+    // Try Ahmia.fi search (legal dark web search engine)
     try {
       const resp = await fetch(`https://ahmia.fi/api/v1/search/?q=${encodeURIComponent(query)}`, { mode: 'cors' })
       if (resp.ok) {
         const data = await resp.json()
-        for (const item of (data.items || data.results || []).slice(0, 20)) {
+        const items = data.items || data.results || []
+        for (const item of items.slice(0, 15)) {
           results.push({
             title: item.title || item.name || 'Untitled',
             onion_url: item.onion_url || item.url || '',
-            description: item.description || item.snippet || '',
+            description: (item.description || item.snippet || '').slice(0, 300),
             reliability: item.reliability_score || item.score || null,
+            source: 'Ahmia.fi',
           })
         }
       }
     } catch (e) {
       console.warn('Ahmia.fi search failed:', e.message)
     }
+
+    // Also search BleepingComputer for the keyword
+    try {
+      const resp = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.bleepingcomputer.com/feed/&q=${encodeURIComponent(query)}`, { mode: 'cors' })
+      if (resp.ok) {
+        const data = await resp.json()
+        for (const item of (data.items || []).slice(0, 5)) {
+          const text = `${item.title} ${item.description || ''}`.toLowerCase()
+          if (text.includes(query.toLowerCase())) {
+            results.push({
+              title: item.title,
+              onion_url: item.link,
+              description: (item.description || '').replace(/<[^>]+>/g, '').slice(0, 300),
+              reliability: null,
+              source: 'BleepingComputer',
+            })
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('BleepingComputer search failed:', e.message)
+    }
+
+    // Search URLhaus for malicious URLs matching query
+    try {
+      const resp = await fetch('https://urlhaus-api.abuse.ch/v1/urls/recent/', { mode: 'cors' })
+      if (resp.ok) {
+        const data = await resp.json()
+        for (const entry of (data.urls || []).slice(0, 50)) {
+          const tags = (entry.tags || []).join(' ').toLowerCase()
+          const url = (entry.url || '').toLowerCase()
+          if (tags.includes(query.toLowerCase()) || url.includes(query.toLowerCase())) {
+            results.push({
+              title: `URLhaus: ${entry.url_status || 'malicious'}`,
+              onion_url: entry.url,
+              description: `Threat: ${entry.threat || 'unknown'} | Tags: ${(entry.tags || []).join(', ')}`,
+              reliability: null,
+              source: 'URLhaus',
+            })
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('URLhaus search failed:', e.message)
+    }
+
     return results
   }
 
@@ -295,9 +384,48 @@ function DarkWebMonitor() {
       setAlerts(data.alerts || data.items || data)
       setClientMode(false)
     } catch (err) {
-      console.warn('Backend unavailable for alerts:', err.message)
-      setAlerts([
-        { id: 1, title: 'Backend offline — alerts require server', severity: 'MEDIUM', message: 'Connect backend to receive real-time alerts', timestamp: new Date().toISOString() }
+      console.warn('Backend unavailable for alerts, using client-side:', err.message)
+      // Fetch real alerts from URLhaus + OTX
+      const clientAlerts = []
+      try {
+        const resp = await fetch('https://urlhaus-api.abuse.ch/v1/urls/recent/', { mode: 'cors' })
+        if (resp.ok) {
+          const data = await resp.json()
+          for (const entry of (data.urls || []).slice(0, 8)) {
+            clientAlerts.push({
+              id: entry.id || Math.random().toString(36).slice(2),
+              title: `Malicious URL: ${(entry.url || '').slice(0, 60)}`,
+              description: `Status: ${entry.url_status || 'unknown'} | Threat: ${entry.threat || 'unknown'} | Tags: ${(entry.tags || []).join(', ')}`,
+              severity: entry.url_status === 'online' ? 'HIGH' : 'MEDIUM',
+              source: 'URLhaus',
+              url: entry.url,
+              created: entry.dateadded || new Date().toISOString(),
+              tags: entry.tags || [],
+            })
+          }
+        }
+      } catch {}
+      try {
+        const resp = await fetch('https://otx.alienvault.com/otxapi/pulses?limit=5&sort=-created', { mode: 'cors' })
+        if (resp.ok) {
+          const data = await resp.json()
+          for (const p of (data.results || []).slice(0, 5)) {
+            clientAlerts.push({
+              id: p.id || Math.random().toString(36).slice(2),
+              title: p.name || 'OTX Threat Pulse',
+              description: (p.description || '').slice(0, 200),
+              severity: 'HIGH',
+              source: 'AlienVault OTX',
+              url: `https://otx.alienvault.com/pulse/${p.id}`,
+              created: p.created || new Date().toISOString(),
+              tags: p.tags || [],
+            })
+          }
+        }
+      } catch {}
+      clientAlerts.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+      setAlerts(clientAlerts.length > 0 ? clientAlerts : [
+        { id: 1, title: 'Threat feeds loading...', severity: 'LOW', description: 'Fetching from public threat intelligence sources', source: 'System', created: new Date().toISOString() }
       ])
       setClientMode(true)
     }
@@ -314,11 +442,48 @@ function DarkWebMonitor() {
       setTrends(data)
       setClientMode(false)
     } catch (err) {
-      console.warn('Backend unavailable for trends:', err.message)
+      console.warn('Backend unavailable for trends, using client-side:', err.message)
+      // Build trends from RSS feeds
+      const topicCounts = {}
+      const sourceCounts = {}
+      const topicKeywords = {
+        'Ransomware': ['ransomware', 'ransom', 'encrypt'],
+        'Data Breach': ['breach', 'leak', 'exposed', 'stolen'],
+        'Phishing': ['phishing', 'phish', 'social engineering'],
+        'Malware': ['malware', 'trojan', 'virus', 'backdoor'],
+        'Zero-Day': ['zero-day', '0day', 'exploit', 'vulnerability'],
+        'Extremism': ['extremism', 'terrorist', 'radical', 'violent', '764', 'nihilistic'],
+        'APT': ['apt', 'nation-state', 'state-sponsored'],
+        'Infrastructure': ['botnet', 'ddos', 'infrastructure'],
+      }
+      try {
+        const feeds = [
+          { name: 'BleepingComputer', url: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.bleepingcomputer.com/feed/' },
+          { name: 'The Hacker News', url: 'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.feedburner.com/TheHackersNews' },
+        ]
+        for (const feed of feeds) {
+          try {
+            const resp = await fetch(feed.url, { mode: 'cors' })
+            if (resp.ok) {
+              const data = await resp.json()
+              for (const item of (data.items || [])) {
+                const text = `${item.title} ${item.description || ''}`.toLowerCase()
+                sourceCounts[feed.name] = (sourceCounts[feed.name] || 0) + 1
+                for (const [topic, keywords] of Object.entries(topicKeywords)) {
+                  if (keywords.some(kw => text.includes(kw))) {
+                    topicCounts[topic] = (topicCounts[topic] || 0) + 1
+                  }
+                }
+              }
+            }
+          } catch {}
+        }
+      } catch {}
       setTrends({
-        topics: {},
-        sources: { 'AlienVault OTX': feeds.filter(f => f.source === 'AlienVault OTX').length, 'URLhaus': feeds.filter(f => f.source === 'URLhaus').length, 'Ahmia.fi': feeds.filter(f => f.source === 'Ahmia.fi').length },
-        period: 'last_24h',
+        topics: Object.entries(topicCounts).map(([topic, count]) => ({ topic, count })).sort((a, b) => b.count - a.count),
+        sources: Object.entries(sourceCounts).map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count),
+        total_articles: Object.values(sourceCounts).reduce((a, b) => a + b, 0),
+        analyzed_at: new Date().toISOString(),
       })
       setClientMode(true)
     }
