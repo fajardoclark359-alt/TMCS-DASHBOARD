@@ -67,7 +67,8 @@ const PH_HACKER_GROUPS = [
     desc: 'Philippine hacktivist group — DDoS, defacements, data leaks against PH government and corporations',
     status: 'active', lastSeen: '2024-ongoing', targets: ['government', 'corporations', 'education'],
     keywords: ['nulsec', 'null security', 'philippine hacktivist'],
-    facebook: 'https://www.facebook.com/nulsecph',
+    facebook: null,
+    facebookNote: 'No public page — operates via anonymous channels (Telegram, dark web)',
     govHacks: [
       { target: 'DepEd Portal', date: '2024-03', type: 'data leak', detail: 'Teacher credentials and student data exposed via misconfigured API' },
       { target: 'LTO Online System', date: '2024-01', type: 'DDoS', detail: 'Distributed denial of service — online license renewal offline for 3 days' },
@@ -85,7 +86,8 @@ const PH_HACKER_GROUPS = [
     desc: 'PH chapter of Anonymous — political hacktivism, DDoS, defacements',
     status: 'active', lastSeen: '2023-ongoing', targets: ['government', 'political'],
     keywords: ['anonymous philippines', 'anonph', 'anon ph'],
-    facebook: 'https://www.facebook.com/AnonymousPhilippines',
+    facebook: 'https://www.facebook.com/search/pages/?q=Anonymous%20Philippines',
+    facebookNote: 'Search page — multiple clone pages exist, verify authenticity',
     govHacks: [
       { target: 'PCOO Website', date: '2023-06', type: 'defacement', detail: 'Government media website defaced — political censorship protest' },
       { target: 'DICT Portal', date: '2023-04', type: 'DDoS', detail: 'Department of ICT targeted during internet freedom debate' },
@@ -101,7 +103,8 @@ const PH_HACKER_GROUPS = [
     desc: 'Philippine cyber army — nationalist hacktivism, defacements',
     status: 'monitoring', lastSeen: '2023', targets: ['government', 'foreign'],
     keywords: ['phcyberarmy', 'philippine cyber army'],
-    facebook: 'https://www.facebook.com/PHCyberArmy',
+    facebook: null,
+    facebookNote: 'No verified public page',
     govHacks: [
       { target: 'DFA Website', date: '2023-05', type: 'defacement', detail: 'Foreign affairs website defaced during territorial dispute' },
       { target: 'AFP Website', date: '2023-01', type: 'DDoS', detail: 'Armed forces public site targeted during exercises' },
@@ -115,7 +118,8 @@ const PH_HACKER_GROUPS = [
     desc: 'PH-based cybercrime group — credential theft, carding',
     status: 'monitoring', lastSeen: '2024', targets: ['financial', 'e-commerce'],
     keywords: ['teamp01s0n', 'poison'],
-    facebook: 'https://www.facebook.com/TeamP01s0nPH',
+    facebook: null,
+    facebookNote: 'Underground — no public social media, operates on Telegram + dark web',
     govHacks: [
       { target: 'SSS Online Portal', date: '2024-04', type: 'credential theft', detail: 'Social Security System login credentials harvested via phishing campaign' },
       { target: 'GSIS Connect', date: '2023-12', type: 'data breach', detail: 'Employee benefit records exfiltrated' },
@@ -132,7 +136,8 @@ const PH_HACKER_GROUPS = [
     desc: 'Monitoring — nihilistic/violent extremism content targeting PH youth',
     status: 'watchlist', lastSeen: '2024', targets: ['youth', 'social media'],
     keywords: ['darknebula', 'dark nebula', '764 philippines'],
-    facebook: 'https://www.facebook.com/DarkNebulaPH',
+    facebook: null,
+    facebookNote: 'No public page — 764/NVE recruitment happens via encrypted Telegram groups',
     govHacks: [],
     privateHacks: [],
     reports: [
@@ -145,7 +150,8 @@ const PH_HACKER_GROUPS = [
     desc: 'PH-origin ransomware operations targeting local businesses',
     status: 'monitoring', lastSeen: '2024', targets: ['businesses', 'healthcare', 'education'],
     keywords: ['philippine ransomware', 'pinoy ransom'],
-    facebook: 'https://www.facebook.com/PHRansomCrew',
+    facebook: null,
+    facebookNote: 'Underground — ransomware operators use dark web + encrypted comms only',
     govHacks: [
       { target: 'Provincial Hospital Network', date: '2024-05', type: 'ransomware', detail: 'Ransomware encrypts patient records — $50K ransom demand' },
       { target: 'Municipal Gov Network', date: '2024-02', type: 'ransomware', detail: 'Local government office network encrypted — services offline' },
@@ -161,7 +167,8 @@ const PH_HACKER_GROUPS = [
     desc: 'Philippine red team / pentesting community',
     status: 'legitimate', lastSeen: 'ongoing', targets: ['authorized testing'],
     keywords: ['tigerteam ph'],
-    facebook: 'https://www.facebook.com/TigerTeamPH',
+    facebook: 'https://www.facebook.com/search/pages/?q=TigerTeam%20PH%20Security',
+    facebookNote: 'Search page — verify official page before following',
     govHacks: [],
     privateHacks: [],
     reports: [
@@ -173,7 +180,8 @@ const PH_HACKER_GROUPS = [
     desc: 'PH underground — carding, credential stuffing, fraud',
     status: 'monitoring', lastSeen: '2024', targets: ['financial', 'e-commerce'],
     keywords: ['cyberghost philippines'],
-    facebook: 'https://www.facebook.com/CyberGhostPH',
+    facebook: null,
+    facebookNote: 'Underground — carding forums + dark web marketplace activity',
     govHacks: [],
     privateHacks: [
       { target: 'Maya (PayMaya)', date: '2024-03', type: 'credential stuffing', detail: 'Mass login attempts using credential databases' },
@@ -187,7 +195,8 @@ const PH_HACKER_GROUPS = [
     desc: 'Filipino hacker community — tools, tutorials, exploits',
     status: 'active', lastSeen: 'ongoing', targets: ['community'],
     keywords: ['pinoy hacker', 'pinoyhackers'],
-    facebook: 'https://www.facebook.com/PinoyHackersCommunity',
+    facebook: 'https://www.facebook.com/search/pages/?q=Pinoy%20Hackers',
+    facebookNote: 'Search page — community group for Filipino security enthusiasts',
     govHacks: [],
     privateHacks: [],
     reports: [
@@ -199,7 +208,8 @@ const PH_HACKER_GROUPS = [
     desc: 'Philippine white hat community — bug bounty, responsible disclosure',
     status: 'legitimate', lastSeen: 'ongoing', targets: ['defense'],
     keywords: ['phwhitehat'],
-    facebook: 'https://www.facebook.com/PHWhiteHat',
+    facebook: 'https://www.facebook.com/search/pages/?q=PHWhiteHat',
+    facebookNote: 'Search page — legitimate bug bounty community',
     govHacks: [],
     privateHacks: [],
     reports: [
@@ -212,7 +222,8 @@ const PH_HACKER_GROUPS = [
     desc: 'PH hacktivist collective — DDoS campaigns, government defacements, data dumps',
     status: 'active', lastSeen: '2024-ongoing', targets: ['government', 'corporations', 'infrastructure'],
     keywords: ['dnh', 'klammer', 'dnhklammer', 'dnh klammer'],
-    facebook: 'https://www.facebook.com/DNHKlammer',
+    facebook: null,
+    facebookNote: 'No public page — hacktivist ops via anonymous channels',
     govHacks: [
       { target: 'DICT Website', date: '2024-06', type: 'defacement', detail: 'Department of ICT website defaced with data transparency demands' },
       { target: 'NICA Portal', date: '2024-04', type: 'DDoS', detail: 'Intelligence agency public portal targeted — alleged surveillance protest' },
@@ -230,7 +241,8 @@ const PH_HACKER_GROUPS = [
     desc: 'PH offensive security group — penetration testing, red team ops, exploit development',
     status: 'active', lastSeen: '2024-ongoing', targets: ['pentesting', 'research'],
     keywords: ['crimsonsec', 'crimson sec', 'crimsonsecph'],
-    facebook: 'https://www.facebook.com/CrimsonsecPH',
+    facebook: 'https://www.facebook.com/search/pages/?q=Crimsonsec%20Philippines',
+    facebookNote: 'Search page — verify official page',
     govHacks: [],
     privateHacks: [],
     reports: [
@@ -244,7 +256,8 @@ const PH_HACKER_GROUPS = [
     desc: 'PH security research group — vulnerability analysis, threat intel, incident response',
     status: 'monitoring', lastSeen: '2024-ongoing', targets: ['research', 'defense', 'threat-intel'],
     keywords: ['quantum security', 'quantumsec', 'qsg'],
-    facebook: 'https://www.facebook.com/QuantumSecurityGroupPH',
+    facebook: 'https://www.facebook.com/search/pages/?q=Quantum%20Security%20Group%20Philippines',
+    facebookNote: 'Search page — verify official page',
     govHacks: [],
     privateHacks: [],
     reports: [
@@ -258,7 +271,8 @@ const PH_HACKER_GROUPS = [
     desc: 'PH underground — credential theft, data monetization, dark web marketplace activity',
     status: 'watchlist', lastSeen: '2024', targets: ['financial', 'darkweb', 'e-commerce'],
     keywords: ['nyxentra', 'nyx entra'],
-    facebook: 'https://www.facebook.com/NyxentraPH',
+    facebook: null,
+    facebookNote: 'Underground — dark web marketplace only, no public presence',
     govHacks: [
       { target: 'PhilSys (National ID)', date: '2024-03', type: 'data monetization', detail: 'National ID data allegedly listed on dark web marketplace' },
     ],
@@ -1265,7 +1279,11 @@ function DarkWebMonitor() {
                             {hasActiveIncident && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-green-600/30 text-green-400 border border-green-500/30 animate-pulse font-bold">🚨 INCIDENT ACTIVE</span>}
                           </div>
                           <div className="flex items-center gap-2">
-                            {g.facebook && <a href={g.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-[10px] font-mono hover:text-blue-300">📘 Facebook</a>}
+                            {g.facebook ? (
+                              <a href={g.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-[10px] font-mono hover:text-blue-300">📘 Facebook</a>
+                            ) : (
+                              <span className="text-slate-600 text-[9px] font-mono">📘 {g.facebookNote || 'No public Facebook'}</span>
+                            )}
                           </div>
                         </div>
                         <p className="text-slate-400 text-[10px] font-mono mb-2">{g.desc}</p>
