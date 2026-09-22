@@ -71,7 +71,6 @@ const CATEGORY_COLORS = {
   local: 'text-lime-400 bg-lime-900/30 border-lime-500/30',
   digital: 'text-cyan-300 bg-cyan-950/30 border-cyan-400/30',
   social: 'text-rose-400 bg-rose-900/30 border-rose-500/30',
-  defense: 'text-red-400 bg-red-900/30 border-red-500/30',
 }
 
 function GovMonitor() {
