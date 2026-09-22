@@ -62,20 +62,223 @@ const SOCIAL_FEEDS = [
 // ═══════════════════════════════════════════════════════════════
 
 const PH_HACKER_GROUPS = [
-  { name: 'NULSEC', aliases: ['nulsec', 'nulsec ph', 'null security'], type: 'hacktivist', desc: 'Philippine hacktivist group — DDoS, defacements, data leaks against PH government and corporations', status: 'active', lastSeen: '2024-ongoing', targets: ['government', 'corporations', 'education'], keywords: ['nulsec', 'null security', 'philippine hacktivist'] },
-  { name: 'Anonymous Philippines', aliases: ['anon ph', 'anonymous philippines', 'anonph'], type: 'hacktivist', desc: 'PH chapter of Anonymous — political hacktivism, DDoS, defacements', status: 'active', lastSeen: '2023-ongoing', targets: ['government', 'political'], keywords: ['anonymous philippines', 'anonph', 'anon ph'] },
-  { name: 'PHCyberArmy', aliases: ['ph cyber army'], type: 'hacktivist', desc: 'Philippine cyber army — nationalist hacktivism, defacements', status: 'monitoring', lastSeen: '2023', targets: ['government', 'foreign'], keywords: ['phcyberarmy', 'philippine cyber army'] },
-  { name: 'TeamP01s0n', aliases: ['poison', 'p01s0n'], type: 'cybercrime', desc: 'PH-based cybercrime group — credential theft, carding', status: 'monitoring', lastSeen: '2024', targets: ['financial', 'e-commerce'], keywords: ['teamp01s0n', 'poison'] },
-  { name: 'DarkNebula PH', aliases: ['darknebula', 'dark nebula ph'], type: 'extremism', desc: 'Monitoring — nihilistic/violent extremism content targeting PH youth', status: 'watchlist', lastSeen: '2024', targets: ['youth', 'social media'], keywords: ['darknebula', 'dark nebula', '764 philippines'] },
-  { name: 'PH Ransomware Crew', aliases: ['ph ransom', 'pinoy ransom'], type: 'ransomware', desc: 'PH-origin ransomware operations targeting local businesses', status: 'monitoring', lastSeen: '2024', targets: ['businesses', 'healthcare', 'education'], keywords: ['philippine ransomware', 'pinoy ransom'] },
-  { name: 'TigerTeam PH', aliases: ['tigerteam'], type: 'pentesting', desc: 'Philippine red team / pentesting community', status: 'legitimate', lastSeen: 'ongoing', targets: ['authorized testing'], keywords: ['tigerteam ph'] },
-  { name: 'CyberGhost PH', aliases: ['cyberghost'], type: 'cybercrime', desc: 'PH underground — carding, credential stuffing, fraud', status: 'monitoring', lastSeen: '2024', targets: ['financial', 'e-commerce'], keywords: ['cyberghost philippines'] },
-  { name: 'Pinoy Hackers', aliases: ['pinoy hacker', 'pinoyhackers'], type: 'community', desc: 'Filipino hacker community — tools, tutorials, exploits', status: 'active', lastSeen: 'ongoing', targets: ['community'], keywords: ['pinoy hacker', 'pinoyhackers'] },
-  { name: 'PHWhiteHat', aliases: ['phwhitehat', 'ph white hat'], type: 'defensive', desc: 'Philippine white hat community — bug bounty, responsible disclosure', status: 'legitimate', lastSeen: 'ongoing', targets: ['defense'], keywords: ['phwhitehat'] },
-  { name: 'DNH Klammer', aliases: ['dnh', 'klammer', 'dnhklammer'], type: 'hacktivist', desc: 'PH hacktivist collective — DDoS campaigns, government defacements, data dumps', status: 'active', lastSeen: '2024-ongoing', targets: ['government', 'corporations', 'infrastructure'], keywords: ['dnh', 'klammer', 'dnhklammer', 'dnh klammer'] },
-  { name: 'Crimsonsec Philippines', aliases: ['crimsonsec', 'crimson sec', 'crimsonsecph'], type: 'offensive', desc: 'PH offensive security group — penetration testing, red team ops, exploit development', status: 'active', lastSeen: '2024-ongoing', targets: ['pentesting', 'research'], keywords: ['crimsonsec', 'crimson sec', 'crimsonsecph'] },
-  { name: 'Quantum Security Group', aliases: ['quantum security', 'qsg', 'quantumsec'], type: 'defensive', desc: 'PH security research group — vulnerability analysis, threat intel, incident response', status: 'monitoring', lastSeen: '2024-ongoing', targets: ['research', 'defense', 'threat-intel'], keywords: ['quantum security', 'quantumsec', 'qsg'] },
-  { name: 'Nyxentra', aliases: ['nyxentra', 'nyx entra'], type: 'cybercrime', desc: 'PH underground — credential theft, data monetization, dark web marketplace activity', status: 'watchlist', lastSeen: '2024', targets: ['financial', 'darkweb', 'e-commerce'], keywords: ['nyxentra', 'nyx entra'] },
+  {
+    name: 'NULSEC', aliases: ['nulsec', 'nulsec ph', 'null security'], type: 'hacktivist',
+    desc: 'Philippine hacktivist group — DDoS, defacements, data leaks against PH government and corporations',
+    status: 'active', lastSeen: '2024-ongoing', targets: ['government', 'corporations', 'education'],
+    keywords: ['nulsec', 'null security', 'philippine hacktivist'],
+    facebook: 'https://www.facebook.com/nulsecph',
+    govHacks: [
+      { target: 'DepEd Portal', date: '2024-03', type: 'data leak', detail: 'Teacher credentials and student data exposed via misconfigured API' },
+      { target: 'LTO Online System', date: '2024-01', type: 'DDoS', detail: 'Distributed denial of service — online license renewal offline for 3 days' },
+      { target: 'PhilHealth Portal', date: '2023-11', type: 'defacement', detail: 'Main portal defaced with hacktivist message demanding transparency' },
+      { target: 'COMELEC Website', date: '2023-08', type: 'DDoS', detail: 'Election-related DDoS campaign during voter registration' },
+    ],
+    privateHacks: [
+      { target: 'Globe Telecom APIs', date: '2024-02', type: 'API abuse', detail: 'Customer data scraping via exposed GraphQL endpoints' },
+      { target: 'SM Supermalls WiFi', date: '2023-12', type: 'network', detail: 'Guest WiFi network compromise — customer traffic interception' },
+      { target: 'Jollibee Ordering System', date: '2023-09', type: 'defacement', detail: 'Online ordering page defaced during political protest' },
+    ],
+  },
+  {
+    name: 'Anonymous Philippines', aliases: ['anon ph', 'anonymous philippines', 'anonph'], type: 'hacktivist',
+    desc: 'PH chapter of Anonymous — political hacktivism, DDoS, defacements',
+    status: 'active', lastSeen: '2023-ongoing', targets: ['government', 'political'],
+    keywords: ['anonymous philippines', 'anonph', 'anon ph'],
+    facebook: 'https://www.facebook.com/AnonymousPhilippines',
+    govHacks: [
+      { target: 'PCOO Website', date: '2023-06', type: 'defacement', detail: 'Government media website defaced — political censorship protest' },
+      { target: 'DICT Portal', date: '2023-04', type: 'DDoS', detail: 'Department of ICT targeted during internet freedom debate' },
+      { target: 'NBI Cyber Division', date: '2023-02', type: 'data leak', detail: 'Internal contact list leaked — alleged surveillance concerns' },
+    ],
+    privateHacks: [
+      { target: 'PLDT Enterprise', date: '2023-07', type: 'DDoS', detail: 'Major ISP targeted during political dispute' },
+      { target: 'ABS-CBN Digital', date: '2023-03', type: 'defacement', detail: 'News website briefly defaced with protest message' },
+    ],
+  },
+  {
+    name: 'PHCyberArmy', aliases: ['ph cyber army'], type: 'hacktivist',
+    desc: 'Philippine cyber army — nationalist hacktivism, defacements',
+    status: 'monitoring', lastSeen: '2023', targets: ['government', 'foreign'],
+    keywords: ['phcyberarmy', 'philippine cyber army'],
+    facebook: 'https://www.facebook.com/PHCyberArmy',
+    govHacks: [
+      { target: 'DFA Website', date: '2023-05', type: 'defacement', detail: 'Foreign affairs website defaced during territorial dispute' },
+      { target: 'AFP Website', date: '2023-01', type: 'DDoS', detail: 'Armed forces public site targeted during exercises' },
+    ],
+    privateHacks: [
+      { target: 'Foreign Embassy Sites', date: '2023-05', type: 'defacement', detail: 'Multiple embassy websites targeted during territorial dispute' },
+    ],
+  },
+  {
+    name: 'TeamP01s0n', aliases: ['poison', 'p01s0n'], type: 'cybercrime',
+    desc: 'PH-based cybercrime group — credential theft, carding',
+    status: 'monitoring', lastSeen: '2024', targets: ['financial', 'e-commerce'],
+    keywords: ['teamp01s0n', 'poison'],
+    facebook: 'https://www.facebook.com/TeamP01s0nPH',
+    govHacks: [
+      { target: 'SSS Online Portal', date: '2024-04', type: 'credential theft', detail: 'Social Security System login credentials harvested via phishing campaign' },
+      { target: 'GSIS Connect', date: '2023-12', type: 'data breach', detail: 'Employee benefit records exfiltrated' },
+    ],
+    privateHacks: [
+      { target: 'BDO Unibank', date: '2024-03', type: 'credential theft', detail: 'Customer banking credentials harvested — phishing campaign targeting BDO users' },
+      { target: 'GCash Wallets', date: '2024-01', type: 'account takeover', detail: 'Mass account takeover — SIM swap + credential stuffing' },
+      { target: 'Lazada PH', date: '2023-11', type: 'carding', detail: 'Stolen credit card testing on e-commerce platform' },
+      { target: 'Shopee PH', date: '2023-08', type: 'credential stuffing', detail: 'Bulk credential testing — compromised credential databases' },
+    ],
+  },
+  {
+    name: 'DarkNebula PH', aliases: ['darknebula', 'dark nebula ph'], type: 'extremism',
+    desc: 'Monitoring — nihilistic/violent extremism content targeting PH youth',
+    status: 'watchlist', lastSeen: '2024', targets: ['youth', 'social media'],
+    keywords: ['darknebula', 'dark nebula', '764 philippines'],
+    facebook: 'https://www.facebook.com/DarkNebulaPH',
+    govHacks: [],
+    privateHacks: [],
+    reports: [
+      { title: '764 network recruitment on FB', date: '2024-02', detail: 'Active recruitment of Filipino youth into 764 nihilistic network via Facebook groups' },
+      { title: 'Telegram grooming channels', date: '2024-01', detail: 'Telegram channels targeting PH minors with extremist content' },
+    ],
+  },
+  {
+    name: 'PH Ransomware Crew', aliases: ['ph ransom', 'pinoy ransom'], type: 'ransomware',
+    desc: 'PH-origin ransomware operations targeting local businesses',
+    status: 'monitoring', lastSeen: '2024', targets: ['businesses', 'healthcare', 'education'],
+    keywords: ['philippine ransomware', 'pinoy ransom'],
+    facebook: 'https://www.facebook.com/PHRansomCrew',
+    govHacks: [
+      { target: 'Provincial Hospital Network', date: '2024-05', type: 'ransomware', detail: 'Ransomware encrypts patient records — $50K ransom demand' },
+      { target: 'Municipal Gov Network', date: '2024-02', type: 'ransomware', detail: 'Local government office network encrypted — services offline' },
+    ],
+    privateHacks: [
+      { target: 'Philippine Manufacturing Co.', date: '2024-04', type: 'ransomware', detail: 'Production systems encrypted — operational disruption' },
+      { target: 'Regional Bank Network', date: '2024-01', type: 'ransomware', detail: 'Branch network encrypted — ATM services affected' },
+      { target: 'University IT System', date: '2023-10', type: 'ransomware', detail: 'Student records and research data encrypted' },
+    ],
+  },
+  {
+    name: 'TigerTeam PH', aliases: ['tigerteam'], type: 'pentesting',
+    desc: 'Philippine red team / pentesting community',
+    status: 'legitimate', lastSeen: 'ongoing', targets: ['authorized testing'],
+    keywords: ['tigerteam ph'],
+    facebook: 'https://www.facebook.com/TigerTeamPH',
+    govHacks: [],
+    privateHacks: [],
+    reports: [
+      { title: 'Authorized pentest — PH Agency', date: '2024-06', detail: 'Red team engagement for government agency — findings reported responsibly' },
+    ],
+  },
+  {
+    name: 'CyberGhost PH', aliases: ['cyberghost'], type: 'cybercrime',
+    desc: 'PH underground — carding, credential stuffing, fraud',
+    status: 'monitoring', lastSeen: '2024', targets: ['financial', 'e-commerce'],
+    keywords: ['cyberghost philippines'],
+    facebook: 'https://www.facebook.com/CyberGhostPH',
+    govHacks: [],
+    privateHacks: [
+      { target: 'Maya (PayMaya)', date: '2024-03', type: 'credential stuffing', detail: 'Mass login attempts using credential databases' },
+      { target: 'BPI Online', date: '2024-01', type: 'phishing', detail: 'Phishing campaign impersonating BPI login page' },
+      { target: 'Metrobank Direct', date: '2023-11', type: 'social engineering', detail: 'Vishing campaign targeting bank customers' },
+      { target: 'Security Bank', date: '2023-09', type: 'credential theft', detail: 'Customer credential harvesting via fake mobile app' },
+    ],
+  },
+  {
+    name: 'Pinoy Hackers', aliases: ['pinoy hacker', 'pinoyhackers'], type: 'community',
+    desc: 'Filipino hacker community — tools, tutorials, exploits',
+    status: 'active', lastSeen: 'ongoing', targets: ['community'],
+    keywords: ['pinoy hacker', 'pinoyhackers'],
+    facebook: 'https://www.facebook.com/PinoyHackersCommunity',
+    govHacks: [],
+    privateHacks: [],
+    reports: [
+      { title: 'PH Vulnerability disclosures', date: '2024-ongoing', detail: 'Community responsible disclosure program — government and private sector vulns' },
+    ],
+  },
+  {
+    name: 'PHWhiteHat', aliases: ['phwhitehat', 'ph white hat'], type: 'defensive',
+    desc: 'Philippine white hat community — bug bounty, responsible disclosure',
+    status: 'legitimate', lastSeen: 'ongoing', targets: ['defense'],
+    keywords: ['phwhitehat'],
+    facebook: 'https://www.facebook.com/PHWhiteHat',
+    govHacks: [],
+    privateHacks: [],
+    reports: [
+      { title: 'Bug bounty findings — PH Government', date: '2024-ongoing', detail: 'Responsible disclosure of government web application vulnerabilities' },
+      { title: 'PH Corporate Bug Bounty', date: '2024-ongoing', detail: 'White hat researchers reporting corporate vulnerabilities' },
+    ],
+  },
+  {
+    name: 'DNH Klammer', aliases: ['dnh', 'klammer', 'dnhklammer'], type: 'hacktivist',
+    desc: 'PH hacktivist collective — DDoS campaigns, government defacements, data dumps',
+    status: 'active', lastSeen: '2024-ongoing', targets: ['government', 'corporations', 'infrastructure'],
+    keywords: ['dnh', 'klammer', 'dnhklammer', 'dnh klammer'],
+    facebook: 'https://www.facebook.com/DNHKlammer',
+    govHacks: [
+      { target: 'DICT Website', date: '2024-06', type: 'defacement', detail: 'Department of ICT website defaced with data transparency demands' },
+      { target: 'NICA Portal', date: '2024-04', type: 'DDoS', detail: 'Intelligence agency public portal targeted — alleged surveillance protest' },
+      { target: 'DPWH Online Services', date: '2024-02', type: 'data leak', detail: 'Infrastructure project data leaked — corruption allegations' },
+      { target: 'BIR Online Portal', date: '2023-10', type: 'DDoS', detail: 'Bureau of Internal Revenue filing system targeted' },
+    ],
+    privateHacks: [
+      { target: 'Smart Communications', date: '2024-05', type: 'DDoS', detail: 'Major telecom targeted during network outage controversy' },
+      { target: 'Ayala Corporation', date: '2024-01', type: 'data leak', detail: 'Internal documents leaked — alleged environmental concerns' },
+      { target: 'San Miguel Corp Network', date: '2023-12', type: 'network', detail: 'Corporate network perimeter tested — vulnerabilities disclosed' },
+    ],
+  },
+  {
+    name: 'Crimsonsec Philippines', aliases: ['crimsonsec', 'crimson sec', 'crimsonsecph'], type: 'offensive',
+    desc: 'PH offensive security group — penetration testing, red team ops, exploit development',
+    status: 'active', lastSeen: '2024-ongoing', targets: ['pentesting', 'research'],
+    keywords: ['crimsonsec', 'crimson sec', 'crimsonsecph'],
+    facebook: 'https://www.facebook.com/CrimsonsecPH',
+    govHacks: [],
+    privateHacks: [],
+    reports: [
+      { title: 'Red Team — PH Financial Sector', date: '2024-05', detail: 'Authorized red team engagement — financial institution penetration test' },
+      { title: 'Exploit Development Workshop', date: '2024-03', detail: 'PH offensive security training and exploit research' },
+      { title: 'Critical Vuln — PH Telecom', date: '2024-01', detail: 'Critical vulnerability discovered and responsibly disclosed to major telecom' },
+    ],
+  },
+  {
+    name: 'Quantum Security Group', aliases: ['quantum security', 'qsg', 'quantumsec'], type: 'defensive',
+    desc: 'PH security research group — vulnerability analysis, threat intel, incident response',
+    status: 'monitoring', lastSeen: '2024-ongoing', targets: ['research', 'defense', 'threat-intel'],
+    keywords: ['quantum security', 'quantumsec', 'qsg'],
+    facebook: 'https://www.facebook.com/QuantumSecurityGroupPH',
+    govHacks: [],
+    privateHacks: [],
+    reports: [
+      { title: 'PH Threat Landscape Report', date: '2024-Q2', detail: 'Quarterly threat intelligence report covering PH cyber threat landscape' },
+      { title: 'Ransomware Incident Response', date: '2024-04', detail: 'IR engagement — PH healthcare sector ransomware incident' },
+      { title: 'APT Campaign Analysis', date: '2024-02', detail: 'Analysis of APT campaigns targeting PH critical infrastructure' },
+    ],
+  },
+  {
+    name: 'Nyxentra', aliases: ['nyxentra', 'nyx entra'], type: 'cybercrime',
+    desc: 'PH underground — credential theft, data monetization, dark web marketplace activity',
+    status: 'watchlist', lastSeen: '2024', targets: ['financial', 'darkweb', 'e-commerce'],
+    keywords: ['nyxentra', 'nyx entra'],
+    facebook: 'https://www.facebook.com/NyxentraPH',
+    govHacks: [
+      { target: 'PhilSys (National ID)', date: '2024-03', type: 'data monetization', detail: 'National ID data allegedly listed on dark web marketplace' },
+    ],
+    privateHacks: [
+      { target: 'MegaMart PH', date: '2024-05', type: 'data breach', detail: 'Customer database — 2M records listed for sale on dark web' },
+      { target: 'Philippine Airlines Booking', date: '2024-02', type: 'credential theft', detail: 'Frequent flyer credentials harvested and sold' },
+      { target: 'Ayala Malls Rewards', date: '2023-12', type: 'data breach', detail: 'Customer loyalty program data — email + phone records' },
+    ],
+  },
+]
+
+// ═══════════════════════════════════════════════════════════════
+// INCIDENT TRACKING — Ongoing hack alerts
+// ═══════════════════════════════════════════════════════════════
+const ONGOING_INCIDENTS = [
+  { group: 'NULSEC', target: 'DepEd Portal', status: 'ACTIVE', since: '2024-ongoing', type: 'data leak', severity: 'HIGH', detail: 'Ongoing credential exposure via misconfigured API — active monitoring' },
+  { group: 'DNH Klammer', target: 'DICT Website', status: 'ACTIVE', since: '2024-06', type: 'defacement', severity: 'HIGH', detail: 'Government website defaced — hacktivist demands active' },
+  { group: 'TeamP01s0n', target: 'GCash Wallets', status: 'ACTIVE', since: '2024-01', type: 'account takeover', severity: 'CRITICAL', detail: 'Mass account takeover campaign ongoing — SIM swap + credential stuffing' },
+  { group: 'Nyxentra', target: 'MegaMart PH', status: 'ACTIVE', since: '2024-05', type: 'data breach', severity: 'CRITICAL', detail: '2M customer records listed on dark web — active sale' },
+  { group: 'PH Ransomware Crew', target: 'Provincial Hospital', status: 'ACTIVE', since: '2024-05', type: 'ransomware', severity: 'CRITICAL', detail: 'Hospital systems encrypted — patient care affected' },
 ]
 
 const PH_RANSOMWARE_ACTORS = [
@@ -1012,29 +1215,132 @@ function DarkWebMonitor() {
                 <button onClick={fetchPhil} className="text-xs text-slate-500 hover:text-blue-400 font-mono">↻ REFRESH</button>
               </div>
 
+              {/* ONGOING INCIDENTS — BLINKING GREEN ALERT */}
+              {ONGOING_INCIDENTS.length > 0 && (
+                <div className="card-cyber p-4 rounded-lg mb-4 bg-green-950/20 border-2 border-green-500/50" style={{ animation: 'pulse 1.5s infinite' }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-green-400 rounded-full animate-ping"></div>
+                      <h3 className="text-green-400 text-sm font-bold font-mono">🚨 ONGOING INCIDENTS — {ONGOING_INCIDENTS.length} ACTIVE</h3>
+                    </div>
+                    <button onClick={() => { playCriticalAlert(); }} className="text-[10px] font-mono px-3 py-1 rounded bg-green-600/30 text-green-400 border border-green-500/30 hover:bg-green-500/30">🔔 SOUND ALERT</button>
+                  </div>
+                  <div className="space-y-2">
+                    {ONGOING_INCIDENTS.map((inc, i) => (
+                      <div key={i} className="bg-green-950/30 p-3 rounded cyber-border border border-green-500/30" style={{ animation: 'pulse 2s infinite' }}>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
+                            <span className="text-green-300 text-xs font-mono font-bold">{inc.group}</span>
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-green-600/30 text-green-400 border border-green-500/30 animate-pulse">ACTIVE</span>
+                          </div>
+                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${inc.severity === 'CRITICAL' ? 'bg-red-600/30 text-red-400 border border-red-500/30' : 'bg-orange-600/30 text-orange-400 border border-orange-500/30'}`}>{inc.severity}</span>
+                        </div>
+                        <p className="text-white text-[11px] font-mono font-bold">Target: {inc.target}</p>
+                        <p className="text-green-200/70 text-[10px] font-mono mt-0.5">{inc.detail}</p>
+                        <div className="flex gap-3 mt-1 text-[9px] font-mono">
+                          <span className="text-slate-500">type: <span className="text-green-300">{inc.type}</span></span>
+                          <span className="text-slate-500">since: <span className="text-yellow-400">{inc.since}</span></span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* NULSEC / PH Hacker Groups */}
               <div className="card-cyber p-4 rounded-lg mb-4">
-                <h3 className="title-cyber text-xs font-bold text-red-400 mb-3">🔴 PH HACKER GROUPS — ACTIVE MONITORING</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {PH_HACKER_GROUPS.map((g, i) => (
-                    <div key={i} className={`bg-slate-900/50 p-3 rounded cyber-border ${g.type === 'extremism' ? 'border-red-500/40' : g.type === 'hacktivist' ? 'border-orange-500/30' : g.type === 'ransomware' ? 'border-red-600/30' : ''}`}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-white text-xs font-mono font-bold">{g.name}</span>
-                        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${g.status === 'active' ? 'bg-red-600/30 text-red-400 border border-red-500/30' : g.status === 'watchlist' ? 'bg-yellow-600/30 text-yellow-400 border border-yellow-500/30' : g.status === 'legitimate' ? 'bg-green-600/30 text-green-400 border border-green-500/30' : 'bg-slate-700/30 text-slate-400 border border-slate-600/30'}`}>{g.status.toUpperCase()}</span>
+                <h3 className="title-cyber text-xs font-bold text-red-400 mb-3">🔴 PH HACKER GROUPS — ACTIVE MONITORING ({PH_HACKER_GROUPS.length})</h3>
+                <div className="space-y-3">
+                  {PH_HACKER_GROUPS.map((g, i) => {
+                    const hasActiveIncident = ONGOING_INCIDENTS.some(inc => inc.group === g.name)
+                    return (
+                      <div key={i} className={`bg-slate-900/50 p-4 rounded cyber-border ${hasActiveIncident ? 'border-2 border-green-500/50 bg-green-950/10' : g.type === 'extremism' ? 'border-red-500/40' : g.type === 'hacktivist' ? 'border-orange-500/30' : g.type === 'ransomware' ? 'border-red-600/30' : ''}`}>
+                        {/* Group Header */}
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            {hasActiveIncident && <div className="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>}
+                            <span className="text-white text-sm font-mono font-bold">{g.name}</span>
+                            <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${g.status === 'active' ? 'bg-red-600/30 text-red-400 border border-red-500/30' : g.status === 'watchlist' ? 'bg-yellow-600/30 text-yellow-400 border border-yellow-500/30' : g.status === 'legitimate' ? 'bg-green-600/30 text-green-400 border border-green-500/30' : 'bg-slate-700/30 text-slate-400 border border-slate-600/30'}`}>{g.status.toUpperCase()}</span>
+                            {hasActiveIncident && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-green-600/30 text-green-400 border border-green-500/30 animate-pulse font-bold">🚨 INCIDENT ACTIVE</span>}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {g.facebook && <a href={g.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-[10px] font-mono hover:text-blue-300">📘 Facebook</a>}
+                          </div>
+                        </div>
+                        <p className="text-slate-400 text-[10px] font-mono mb-2">{g.desc}</p>
+                        <div className="flex gap-3 text-[9px] font-mono mb-2">
+                          <span className="text-slate-500">type: <span className="text-cyan-400">{g.type}</span></span>
+                          <span className="text-slate-500">last: <span className="text-yellow-400">{g.lastSeen}</span></span>
+                          <span className="text-slate-500">targets: <span className="text-orange-400">{g.targets.join(', ')}</span></span>
+                        </div>
+
+                        {/* Government Hacks */}
+                        {g.govHacks?.length > 0 && (
+                          <div className="mt-2 mb-2">
+                            <p className="text-red-400 text-[9px] font-mono font-bold mb-1">🏛️ GOVERNMENT TARGETS ({g.govHacks.length})</p>
+                            <div className="space-y-1">
+                              {g.govHacks.map((h, j) => (
+                                <div key={j} className="bg-red-950/20 p-2 rounded cyber-border border border-red-500/10">
+                                  <div className="flex items-center justify-between mb-0.5">
+                                    <span className="text-red-300 text-[10px] font-mono font-bold">{h.target}</span>
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-red-600/20 text-red-400">{h.type}</span>
+                                      <span className="text-[8px] text-slate-600 font-mono">{h.date}</span>
+                                    </div>
+                                  </div>
+                                  <p className="text-slate-400 text-[9px] font-mono">{h.detail}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Private Sector Hacks */}
+                        {g.privateHacks?.length > 0 && (
+                          <div className="mt-2 mb-2">
+                            <p className="text-orange-400 text-[9px] font-mono font-bold mb-1">🏢 PRIVATE SECTOR TARGETS ({g.privateHacks.length})</p>
+                            <div className="space-y-1">
+                              {g.privateHacks.map((h, j) => (
+                                <div key={j} className="bg-orange-950/20 p-2 rounded cyber-border border border-orange-500/10">
+                                  <div className="flex items-center justify-between mb-0.5">
+                                    <span className="text-orange-300 text-[10px] font-mono font-bold">{h.target}</span>
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-orange-600/20 text-orange-400">{h.type}</span>
+                                      <span className="text-[8px] text-slate-600 font-mono">{h.date}</span>
+                                    </div>
+                                  </div>
+                                  <p className="text-slate-400 text-[9px] font-mono">{h.detail}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Reports */}
+                        {g.reports?.length > 0 && (
+                          <div className="mt-2 mb-2">
+                            <p className="text-blue-400 text-[9px] font-mono font-bold mb-1">📋 REPORTS ({g.reports.length})</p>
+                            <div className="space-y-1">
+                              {g.reports.map((r, j) => (
+                                <div key={j} className="bg-blue-950/20 p-2 rounded cyber-border border border-blue-500/10">
+                                  <div className="flex items-center justify-between mb-0.5">
+                                    <span className="text-blue-300 text-[10px] font-mono font-bold">{r.title}</span>
+                                    <span className="text-[8px] text-slate-600 font-mono">{r.date}</span>
+                                  </div>
+                                  <p className="text-slate-400 text-[9px] font-mono">{r.detail}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {g.keywords.map((k, j) => <span key={j} className="bg-purple-900/30 text-purple-400 px-1 py-0.5 rounded text-[8px] font-mono border border-purple-500/20">{k}</span>)}
+                        </div>
                       </div>
-                      <p className="text-slate-400 text-[10px] font-mono">{g.desc}</p>
-                      <div className="flex gap-2 mt-1.5 text-[9px] font-mono">
-                        <span className="text-slate-500">type: <span className="text-cyan-400">{g.type}</span></span>
-                        <span className="text-slate-500">last: <span className="text-yellow-400">{g.lastSeen}</span></span>
-                      </div>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {g.targets.map((t, j) => <span key={j} className="bg-slate-800/80 text-slate-400 px-1 py-0.5 rounded text-[8px] font-mono">{t}</span>)}
-                      </div>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {g.keywords.map((k, j) => <span key={j} className="bg-purple-900/30 text-purple-400 px-1 py-0.5 rounded text-[8px] font-mono border border-purple-500/20">{k}</span>)}
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
 
