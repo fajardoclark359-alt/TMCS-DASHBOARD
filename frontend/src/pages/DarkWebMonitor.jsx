@@ -91,6 +91,84 @@ const PH_DATA_BREACH_KEYWORDS = [
   'philippine voter data', 'COMELEC breach', 'lto breach',
 ]
 
+// ═══════════════════════════════════════════════════════════════
+// OSAEC — Online Sexual Abuse & Exploitation of Children (PH)
+// ═══════════════════════════════════════════════════════════════
+
+const OSAEC_KEYWORDS = [
+  'OSAEC', 'online sexual abuse', 'online sexual exploitation',
+  'child sexual abuse', 'CSAM', 'child exploitation material', 'CEM',
+  'sextortion philippines', 'child sex trafficking', 'online enticement',
+  'grooming philippines', 'child pornography philippines', 'livestream abuse',
+  'webcam exploitation child', 'pay-per-view abuse', 'live abuse',
+  'child trafficking philippines', 'online exploitation of children',
+  'sexual exploitation of minors', 'CSAEM', 'digital exploitation',
+  'entrapment livestream', 'video sex scandal minor', 'child abuse material',
+]
+
+const OSAEC_TELEGRAM_CHANNELS = [
+  { name: 'PNP-ACG Alerts', channel: '@PNPACG', desc: 'Philippine National Police Anti-Cybercrime Group', type: 'law-enforcement', verified: true },
+  { name: 'DICT PH Cyberwatch', channel: '@DICTCyberwatch', desc: 'Dept of Information and Communications Technology alerts', type: 'government', verified: true },
+  { name: 'INHOPE Network', channel: '@INHOPE', desc: 'International Association of Internet Hotlines — CSAM reporting', type: 'intl-org', verified: true },
+  { name: 'ICMEC Alerts', channel: '@ICMECorg', desc: 'International Centre for Missing & Exploited Children', type: 'intl-org', verified: true },
+  { name: 'NCMEC CyberTipline', channel: '@NCMEC', desc: 'National Center for Missing & Exploited Children', type: 'law-enforcement', verified: true },
+  { name: 'IWF UK', channel: '@IWF_hotline', desc: 'Internet Watch Foundation — CSAM detection & blocking', type: 'intl-org', verified: true },
+  { name: 'Thorn Digital Defenders', channel: '@ABORTTHORN', desc: 'Thorn — tech tools to fight child sexual abuse', type: 'ngo', verified: true },
+  { name: 'EndViolence Against Children', channel: '@ENDViolence', desc: 'Global partnership to end violence against children', type: 'ngo', verified: true },
+  { name: 'WeProtect Global Alliance', channel: '@WeProtect', desc: 'Global movement to end child sexual exploitation online', type: 'intl-org', verified: true },
+  { name: 'PhilSaferWatch', channel: '@PhilSaferWatch', desc: 'PH civil society — child safety monitoring', type: 'civil-society', verified: false },
+  { name: 'SAFER Internet PH', channel: '@SaferInternetPH', desc: 'Philippine internet safety and child protection', type: 'civil-society', verified: false },
+  { name: 'OSAEC Watch PH', channel: '@OSAECWatchPH', desc: 'Dedicated OSAEC monitoring in the Philippines', type: 'monitoring', verified: false },
+  { name: 'CyberTipLine PH', channel: '@CyberTipPH', desc: 'PH reporting channel for online child exploitation', type: 'reporting', verified: false },
+]
+
+const OSAEC_DARK_WEB_MONITORING = [
+  { name: 'Ahmia.fi — OSAEC Search', query: 'OSAEC Philippines', source: 'ahmia', desc: 'Search dark web for OSAEC Philippines content' },
+  { name: 'Ahmia.fi — CSAM Keywords', query: 'child exploitation philippines', source: 'ahmia', desc: 'Search for child exploitation keywords on .onion' },
+  { name: 'Ahmia.fi — Trafficking', query: 'child trafficking philippines', source: 'ahmia', desc: 'Search for trafficking operations' },
+  { name: 'Ahmia.fi — Sextortion', query: 'sextortion philippines', source: 'ahmia', desc: 'Search for sextortion operations' },
+  { name: 'Ahmia.fi — Grooming', query: 'grooming philippines', source: 'ahmia', desc: 'Search for grooming networks' },
+  { name: 'Ahmia.fi — Livestream', query: 'livestream abuse children', source: 'ahmia', desc: 'Search for live abuse streams' },
+  { name: 'URLhaus — CSAM domains', query: 'csam', source: 'urlhaus', desc: 'URLhaus scan for CSAM hosting domains' },
+  { name: 'URLhaus — PH Exploit domains', query: 'philippines', source: 'urlhaus', desc: 'URLhaus scan for PH child exploitation domains' },
+]
+
+const OSAEC_FORUM_MONITORING = [
+  { name: 'BreachForums — OSAEC section', forum: 'BreachForums', onion: 'breached.to', cat: 'osaec', desc: 'Monitor for leaked OSAEC databases, victim data' },
+  { name: 'Verified — Trafficking', forum: 'Verified', onion: 'verified', cat: 'osaec', desc: 'Monitor for trafficking-related activity' },
+  { name: 'Mazafaka — Exploitation', forum: 'Mazafaka', onion: 'mazafaka', cat: 'osaec', desc: 'Monitor for exploitation-related content' },
+  { name: 'Omerta — Child Exploitation', forum: 'Omerta', onion: 'omerta', cat: 'osaec', desc: 'Monitor for exploitation networks' },
+  { name: 'XSS.is — CSAM hosting', forum: 'XSS.is', onion: 'xss.is', cat: 'osaec', desc: 'Monitor for CSAM hosting discussions' },
+  { name: 'Exploit.in — Trafficking', forum: 'Exploit.in', onion: 'exploit.in', cat: 'osaec', desc: 'Monitor for trafficking operations' },
+]
+
+const OSAEC_PH_ORGS = [
+  { name: 'PNP Anti-Cybercrime Group (ACG)', desc: 'Primary Philippine law enforcement for cyber crimes including OSAEC', url: 'https://www.pnp.gov.ph', type: 'law-enforcement' },
+  { name: 'NBI Cybercrime Division', desc: 'National Bureau of Investigation — cyber crimes and child exploitation', url: 'https://www.nbi.gov.ph', type: 'law-enforcement' },
+  { name: 'DICT — Cybersecurity Bureau', desc: 'Dept of Information and Communications Technology', url: 'https://dict.gov.ph', type: 'government' },
+  { name: 'PPSC — Philippine Posts and Telecoms', desc: 'Regulatory body for telecoms — blocks CSAM domains', url: '', type: 'government' },
+  { name: 'ICAC — Inter-Agency Council Against Trafficking', desc: 'Multi-agency council against trafficking in persons', url: '', type: 'government' },
+  { name: 'Child Protection Network Foundation', desc: 'PH NGO — child abuse investigation and support', url: '', type: 'ngo' },
+  { name: 'ECPAT Philippines', desc: 'End Child Prostitution and Trafficking — PH chapter', url: '', type: 'ngo' },
+  { name: 'UNICEF Philippines', desc: 'Child protection and advocacy in the Philippines', url: '', type: 'intl-org' },
+  { name: 'WePROTECT PH', desc: 'Philippine implementation of WePROTECT Global Alliance', url: '', type: 'intl-org' },
+]
+
+const OSAEC_ALERT_SOURCES = [
+  { name: 'PNP-ACG Press Releases', url: 'https://www.pnp.gov.ph/index.php/press-release', type: 'rss', desc: 'Official PNP-ACG arrest and operation reports' },
+  { name: 'NBI Press Releases', url: 'https://www.nbi.gov.ph/index.php/press-releases', type: 'rss', desc: 'NBI cybercrime operation reports' },
+  { name: 'DICT Advisories', url: 'https://dict.gov.ph/feed', type: 'rss', desc: 'DICT cybersecurity advisories' },
+  { name: 'Rappler Crime', url: 'https://www.rappler.com/nation/feed/', type: 'rss', desc: 'Philippine crime and justice news' },
+  { name: 'Inquirer News', url: 'https://newsinfo.inquirer.net/feed', type: 'rss', desc: 'Philippine Inquirer news feed' },
+  { name: 'PhilStar News', url: 'https://www.philstar.com/rss/headlines', type: 'rss', desc: 'Philippine Star headlines' },
+  { name: 'ABS-CBN News', url: 'https://news.abs-cbn.com/feed', type: 'rss', desc: 'ABS-CBN news' },
+  { name: 'GMA News', url: 'https://www.gmanetwork.com/rss/news/nation/feed', type: 'rss', desc: 'GMA News nation feed' },
+  { name: 'Manila Times', url: 'https://www.manilatimes.net/feed', type: 'rss', desc: 'Manila Times news' },
+  { name: 'IWF Reports', url: 'https://www.iwf.org.uk/news-media/feed/', type: 'rss', desc: 'Internet Watch Foundation reports' },
+  { name: 'NCMEC Reports', url: 'https://www.missingkids.org/blog/feed', type: 'rss', desc: 'NCMEC CyberTipline reports' },
+  { name: 'Thorn Blog', url: 'https://www.thorn.org/feed/', type: 'rss', desc: 'Thorn — digital efforts to fight child sexual abuse' },
+]
+
 const FORUM_CATS = {
   'data-breach': { label: 'DATA BREACH', color: 'text-red-400 bg-red-900/30 border-red-500/30' },
   'hacking': { label: 'HACKING', color: 'text-orange-400 bg-orange-900/30 border-orange-500/30' },
@@ -126,8 +204,61 @@ function DarkWebMonitor() {
   const [philFilter, setPhilFilter] = useState('all')
   const [philGroups, setPhilGroups] = useState([])
   const [philBreaches, setPhilBreaches] = useState([])
+  const [osaecPosts, setOsaecPosts] = useState([])
+  const [osaecLoading, setOsaecLoading] = useState(false)
+  const [osaecAlerts, setOsaecAlerts] = useState([])
+  const [osaecTelegram, setOsaecTelegram] = useState([])
+  const [osaecDarkWeb, setOsaecDarkWeb] = useState([])
+  const [osaecForums, setOsaecForums] = useState([])
+  const [osaecAlertCount, setOsaecAlertCount] = useState(0)
+  const [soundEnabled, setSoundEnabled] = useState(false)
+  const [osaecFilter, setOsaecFilter] = useState('all')
+  const [lastOsaecScan, setLastOsaecScan] = useState(null)
 
-  useEffect(() => { fetchFeeds(); fetchAlerts(); fetchTrends(); fetchForums(); fetchSocial(); fetchPhil() }, [])
+  // ═══ SOUND ALERT SYSTEM ═══
+  const playAlertSound = () => {
+    if (!soundEnabled) return
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)()
+      // Triple-beep urgent alert
+      const frequencies = [880, 1100, 880]
+      frequencies.forEach((freq, i) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.frequency.value = freq
+        osc.type = 'sine'
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.15)
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 0.14)
+        osc.start(ctx.currentTime + i * 0.15)
+        osc.stop(ctx.currentTime + i * 0.15 + 0.15)
+      })
+    } catch {}
+  }
+
+  const playCriticalAlert = () => {
+    if (!soundEnabled) return
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)()
+      // Urgent siren pattern
+      const freqs = [600, 900, 600, 900, 600, 1200]
+      freqs.forEach((freq, i) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.frequency.value = freq
+        osc.type = 'square'
+        gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.1)
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.09)
+        osc.start(ctx.currentTime + i * 0.1)
+        osc.stop(ctx.currentTime + i * 0.1 + 0.1)
+      })
+    } catch {}
+  }
+
+  useEffect(() => { fetchFeeds(); fetchAlerts(); fetchTrends(); fetchForums(); fetchSocial(); fetchPhil(); fetchOsaec() }, [])
 
   // ═══ FEEDS ═══
   const fetchFeeds = async () => {
@@ -283,6 +414,177 @@ function DarkWebMonitor() {
     setPhilLoading(false)
   }
 
+  // ═══ OSAEC MONITORING ═══
+  const fetchOsaec = async () => {
+    setOsaecLoading(true)
+    const posts = []
+    const alerts = []
+    let newAlertCount = 0
+
+    // 1. Search Ahmia.fi for OSAEC keywords
+    for (const kw of OSAEC_DARK_WEB_MONITORING.filter(m => m.source === 'ahmia')) {
+      try {
+        const x = await fetch(`https://ahmia.fi/api/v1/search/?q=${encodeURIComponent(kw.query)}`, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          const items = d.items || d.results || []
+          for (const i of items.slice(0, 5)) {
+            const text = `${i.title || ''} ${i.description || ''}`.toLowerCase()
+            const severity = ['csam', 'child abuse', 'exploitation', 'trafficking', 'sextortion', 'livestream'].some(k => text.includes(k)) ? 'CRITICAL' : 'HIGH'
+            posts.push({
+              title: `[DARK WEB] ${i.title || kw.query}`,
+              source: 'Ahmia.fi',
+              description: (i.description || '').slice(0, 400),
+              published: '',
+              link: i.onion_url || i.url || '',
+              categories: [kw.query],
+              type: 'darkweb',
+              severity,
+              monitoringQuery: kw.query,
+            })
+            if (severity === 'CRITICAL') {
+              alerts.push({ id: `ahmia-${Date.now()}-${Math.random().toString(36).slice(2)}`, title: `CRITICAL: Dark web OSAEC result — ${i.title || kw.query}`, severity: 'CRITICAL', source: 'Ahmia.fi', created: new Date().toISOString(), tags: [kw.query], link: i.onion_url || i.url || '' })
+              newAlertCount++
+            }
+          }
+        }
+      } catch {}
+    }
+
+    // 2. Search URLhaus for CSAM/exploitation domains
+    for (const kw of OSAEC_DARK_WEB_MONITORING.filter(m => m.source === 'urlhaus')) {
+      try {
+        const x = await fetch('https://urlhaus-api.abuse.ch/v1/urls/recent/', { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          for (const e of (d.urls || []).slice(0, 200)) {
+            const tags = (e.tags || []).join(' ').toLowerCase()
+            const url = (e.url || '').toLowerCase()
+            const threat = (e.threat || '').toLowerCase()
+            if (tags.includes(kw.query) || url.includes(kw.query) || threat.includes(kw.query)) {
+              posts.push({
+                title: `[URLHAUS] ${e.url_status || 'unknown'} — ${kw.query}`,
+                source: 'URLhaus',
+                description: `URL: ${e.url} | Threat: ${e.threat || 'unknown'} | Tags: ${(e.tags || []).join(', ')}`,
+                published: e.dateadded || '',
+                link: e.url,
+                categories: [kw.query],
+                type: 'urlhaus',
+                severity: 'HIGH',
+                monitoringQuery: kw.query,
+              })
+              newAlertCount++
+              alerts.push({ id: `urlhaus-${e.id || Date.now()}`, title: `URLhaus CSAM domain: ${(e.url || '').slice(0, 60)}`, severity: 'HIGH', source: 'URLhaus', created: e.dateadded || '', tags: e.tags || [], link: e.url })
+            }
+          }
+        }
+      } catch {}
+    }
+
+    // 3. Search PH news feeds for OSAEC content
+    const phNewsFeeds = [
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.rappler.com/nation/feed/',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://newsinfo.inquirer.net/feed',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.philstar.com/rss/headlines',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://news.abs-cbn.com/feed',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.gmanetwork.com/rss/news/nation/feed',
+    ]
+    for (const feedUrl of phNewsFeeds) {
+      try {
+        const x = await fetch(feedUrl, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          for (const item of (d.items || []).slice(0, 15)) {
+            const text = `${item.title} ${item.description || ''}`.toLowerCase()
+            if (OSAEC_KEYWORDS.some(kw => text.includes(kw.toLowerCase()))) {
+              const isCritical = ['csam', 'child abuse material', 'trafficking', 'sextortion', 'exploitation of minor', 'livestream abuse'].some(k => text.includes(k))
+              posts.push({
+                title: `[PH NEWS] ${item.title}`,
+                source: d.feed?.title || 'PH News',
+                description: (item.description || '').replace(/<[^>]+>/g, '').slice(0, 400),
+                published: item.pubDate || item.pub_date || '',
+                link: item.link,
+                categories: ['OSAEC', 'PH News'],
+                type: 'news',
+                severity: isCritical ? 'CRITICAL' : 'HIGH',
+              })
+              if (isCritical) {
+                alerts.push({ id: `news-${Date.now()}-${Math.random().toString(36).slice(2)}`, title: `CRITICAL: ${item.title}`, severity: 'CRITICAL', source: d.feed?.title || 'PH News', created: item.pubDate || '', tags: ['OSAEC'], link: item.link })
+                newAlertCount++
+              }
+            }
+          }
+        }
+      } catch {}
+    }
+
+    // 4. Search NCMEC/IWF feeds
+    const intlFeeds = [
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.missingkids.org/blog/feed',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.iwf.org.uk/news-media/feed/',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.thorn.org/feed/',
+    ]
+    for (const feedUrl of intlFeeds) {
+      try {
+        const x = await fetch(feedUrl, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          for (const item of (d.items || []).slice(0, 10)) {
+            const text = `${item.title} ${item.description || ''}`.toLowerCase()
+            if (OSAEC_KEYWORDS.some(kw => text.includes(kw.toLowerCase())) || ['child', 'exploitation', 'csam', 'abuse', 'trafficking'].some(k => text.includes(k))) {
+              posts.push({
+                title: `[INTL] ${item.title}`,
+                source: d.feed?.title || 'Intl Org',
+                description: (item.description || '').replace(/<[^>]+>/g, '').slice(0, 400),
+                published: item.pubDate || item.pub_date || '',
+                link: item.link,
+                categories: ['OSAEC', 'International'],
+                type: 'intl',
+                severity: 'HIGH',
+              })
+            }
+          }
+        }
+      } catch {}
+    }
+
+    // 5. Check dark web forums for OSAEC mentions via Ahmia
+    for (const fm of OSAEC_FORUM_MONITORING) {
+      try {
+        const x = await fetch(`https://ahmia.fi/api/v1/search/?q=${encodeURIComponent(fm.forum + ' child exploitation')}`, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          for (const i of (d.items || d.results || []).slice(0, 2)) {
+            posts.push({
+              title: `[FORUM] ${fm.forum} — OSAEC mention`,
+              source: fm.forum,
+              description: (i.description || '').slice(0, 400),
+              published: '',
+              link: i.onion_url || i.url || '',
+              categories: ['OSAEC', 'Forum'],
+              type: 'forum',
+              severity: 'HIGH',
+            })
+          }
+        }
+      } catch {}
+    }
+
+    posts.sort((a, b) => (b.published || '').localeCompare(a.published || ''))
+    setOsaecPosts(posts)
+    setOsaecAlerts(alerts)
+    setOsaecTelegram(OSAEC_TELEGRAM_CHANNELS)
+    setOsaecDarkWeb(OSAEC_DARK_WEB_MONITORING)
+    setOsaecForums(OSAEC_FORUM_MONITORING)
+    setOsaecAlertCount(prev => {
+      const total = prev + newAlertCount
+      if (newAlertCount > 0) playCriticalAlert()
+      return total
+    })
+    setLastOsaecScan(new Date().toISOString())
+    setOsaecLoading(false)
+  }
+
   // ═══ SEARCH ═══
   const handleSearch = async (e) => {
     e.preventDefault()
@@ -320,6 +622,7 @@ function DarkWebMonitor() {
     { id: 'forums', label: 'FORUMS', icon: FiMessageCircle },
     { id: 'social', label: 'SOCIAL / NEWS', icon: FiGlobe },
     { id: 'philippines', label: '🇵🇭 PHILIPPINES', icon: FiShield },
+    { id: 'osaec', label: '🔴 OSAEC ALERT', icon: FiAlertTriangle },
     { id: 'search', label: 'DARK WEB SEARCH', icon: FiSearch },
     { id: 'iocs', label: 'IOCs', icon: FiLock },
     { id: 'keywords', label: 'KEYWORDS', icon: FiTag },
@@ -588,6 +891,190 @@ function DarkWebMonitor() {
             </div>
           )}
 
+          {/* ═══ OSAEC ALERT TAB ═══ */}
+          {activeTab === 'osaec' && (
+            <div>
+              {/* CRITICAL ALERT BANNER */}
+              {osaecAlerts.length > 0 && (
+                <div className="card-cyber p-4 rounded-lg mb-4 bg-red-950/30 border-2 border-red-500/50 animate-pulse">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="text-red-400 text-2xl">🚨</div>
+                      <div>
+                        <h3 className="text-red-400 text-sm font-bold font-mono">OSAEC ALERT — {osaecAlerts.length} CRITICAL FINDINGS</h3>
+                        <p className="text-red-300/70 text-[10px] font-mono mt-0.5">Sound alerts: {soundEnabled ? '🔔 ENABLED' : '🔇 DISABLED'} | {osaecAlertCount} total alerts this session</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setSoundEnabled(!soundEnabled)} className={`text-[10px] font-mono px-3 py-1.5 rounded ${soundEnabled ? 'bg-green-600/30 text-green-400 border border-green-500/30' : 'bg-slate-700/30 text-slate-400 border border-slate-600'}`}>
+                        {soundEnabled ? '🔔 SOUND ON' : '🔇 SOUND OFF'}
+                      </button>
+                      <button onClick={() => { playAlertSound() }} className="text-[10px] font-mono px-3 py-1.5 rounded bg-red-600/30 text-red-400 border border-red-500/30 hover:bg-red-500/30">🔔 TEST ALERT</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="title-cyber text-sm font-bold text-red-400">🔴 OSAEC — ONLINE SEXUAL ABUSE & EXPLOITATION OF CHILDREN</h2>
+                <div className="flex items-center gap-2">
+                  {soundEnabled && <span className="text-green-400 text-[10px] font-mono animate-pulse">● LIVE AUDIO</span>}
+                  <button onClick={fetchOsaec} className="text-xs text-slate-500 hover:text-red-400 font-mono">↻ FULL SCAN</button>
+                </div>
+              </div>
+
+              {/* Sound Control Bar */}
+              <div className="card-cyber p-3 rounded-lg mb-4 bg-slate-900/50 border border-slate-700/30">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-slate-400 text-xs font-mono">🔊 ALERT SOUND:</span>
+                    <button onClick={() => setSoundEnabled(!soundEnabled)} className={`text-xs font-mono px-3 py-1 rounded ${soundEnabled ? 'bg-green-600/30 text-green-400 border border-green-500/30' : 'bg-slate-700/30 text-slate-400 border border-slate-600'}`}>
+                      {soundEnabled ? '✅ ENABLED' : '❌ DISABLED'}
+                    </button>
+                    <button onClick={() => playAlertSound()} className="text-[10px] font-mono px-2 py-1 rounded bg-slate-700/50 text-slate-400 border border-slate-600 hover:text-white">🔊 TEST</button>
+                    <button onClick={() => playCriticalAlert()} className="text-[10px] font-mono px-2 py-1 rounded bg-red-600/30 text-red-400 border border-red-500/30 hover:bg-red-500/30">🚨 CRITICAL TEST</button>
+                  </div>
+                  <div className="text-[9px] text-slate-600 font-mono">
+                    {lastOsaecScan ? `Last scan: ${lastOsaecScan.slice(11, 19)}` : 'Not scanned yet'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats Bar */}
+              <div className="grid grid-cols-4 gap-3 mb-4">
+                <div className="card-cyber p-3 rounded-lg text-center">
+                  <p className="text-red-400 text-lg font-bold font-mono">{osaecPosts.filter(p => p.severity === 'CRITICAL').length}</p>
+                  <p className="text-[9px] text-slate-500 font-mono">CRITICAL</p>
+                </div>
+                <div className="card-cyber p-3 rounded-lg text-center">
+                  <p className="text-orange-400 text-lg font-bold font-mono">{osaecPosts.filter(p => p.severity === 'HIGH').length}</p>
+                  <p className="text-[9px] text-slate-500 font-mono">HIGH</p>
+                </div>
+                <div className="card-cyber p-3 rounded-lg text-center">
+                  <p className="text-purple-400 text-lg font-bold font-mono">{osaecAlerts.length}</p>
+                  <p className="text-[9px] text-slate-500 font-mono">ALERTS</p>
+                </div>
+                <div className="card-cyber p-3 rounded-lg text-center">
+                  <p className="text-blue-400 text-lg font-bold font-mono">{osaecPosts.length}</p>
+                  <p className="text-[9px] text-slate-500 font-mono">TOTAL</p>
+                </div>
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="flex gap-2 mb-4 flex-wrap">
+                {[
+                  { id: 'all', label: `ALL (${osaecPosts.length})` },
+                  { id: 'critical', label: `🚨 CRITICAL (${osaecPosts.filter(p => p.severity === 'CRITICAL').length})` },
+                  { id: 'darkweb', label: `🌐 DARK WEB (${osaecPosts.filter(p => p.type === 'darkweb').length})` },
+                  { id: 'news', label: `📰 PH NEWS (${osaecPosts.filter(p => p.type === 'news').length})` },
+                  { id: 'urlhaus', label: `🔗 URLHAUS (${osaecPosts.filter(p => p.type === 'urlhaus').length})` },
+                  { id: 'intl', label: `🌍 INTL (${osaecPosts.filter(p => p.type === 'intl').length})` },
+                  { id: 'forum', label: `💬 FORUMS (${osaecPosts.filter(p => p.type === 'forum').length})` },
+                ].map(f => (
+                  <button key={f.id} onClick={() => setOsaecFilter(f.id)} className={`text-[10px] font-mono px-3 py-1 rounded ${osaecFilter === f.id ? 'bg-red-900/30 text-red-400 border border-red-500/30' : 'bg-slate-900/50 text-slate-500 border border-slate-700'}`}>{f.label}</button>
+                ))}
+              </div>
+
+              {osaecLoading && <p className="text-slate-500 font-mono text-sm mb-3">🚨 Scanning dark web, forums, PH news, Telegram channels for OSAEC content...</p>}
+
+              {/* OSAEC Findings */}
+              <div className="space-y-3">
+                {osaecPosts.filter(p => {
+                  if (osaecFilter === 'all') return true
+                  if (osaecFilter === 'critical') return p.severity === 'CRITICAL'
+                  return p.type === osaecFilter
+                }).map((p, i) => (
+                  <div key={i} className={`card-cyber p-4 rounded-lg ${p.severity === 'CRITICAL' ? 'border-2 border-red-500/50 bg-red-950/20' : 'border border-red-500/20 bg-red-950/10'}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${p.severity === 'CRITICAL' ? 'bg-red-600/40 text-red-300 border border-red-500/50 font-bold' : 'bg-orange-600/30 text-orange-400 border border-orange-500/30'}`}>
+                          {p.severity === 'CRITICAL' ? '🚨 CRITICAL' : '⚠️ HIGH'}
+                        </span>
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${p.source.includes('Ahmia') ? 'text-purple-400 bg-purple-900/30 border border-purple-500/30' : p.source.includes('URLhaus') ? 'text-red-400 bg-red-900/30 border border-red-500/30' : 'text-blue-400 bg-blue-900/30 border border-blue-500/30'}`}>{p.source}</span>
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800/50 text-slate-500 border border-slate-700">{p.type?.toUpperCase()}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-600 font-mono">{p.published?.slice(0, 16)}</span>
+                    </div>
+                    <h3 className={`text-sm font-bold font-mono mb-1 ${p.severity === 'CRITICAL' ? 'text-red-300' : 'text-white'}`}>{p.title}</h3>
+                    <p className="text-slate-400 text-xs font-mono line-clamp-3">{p.description}</p>
+                    {p.categories?.length > 0 && <div className="flex flex-wrap gap-1 mt-2">{p.categories.map((c, j) => <span key={j} className="bg-red-900/20 text-red-400/70 px-1.5 py-0.5 rounded text-[9px] font-mono border border-red-500/10">{c}</span>)}</div>}
+                    {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-red-400 text-[10px] font-mono mt-2 inline-flex items-center gap-1 hover:text-red-300"><FiExternalLink size={10} /> VIEW EVIDENCE</a>}
+                  </div>
+                ))}
+                {osaecPosts.length === 0 && !osaecLoading && <p className="text-slate-500 font-mono text-sm">No OSAEC data loaded. Click FULL SCAN to monitor.</p>}
+              </div>
+
+              {/* Telegram Channels for Monitoring */}
+              <div className="card-cyber p-4 rounded-lg mt-5">
+                <h3 className="title-cyber text-xs font-bold text-blue-400 mb-3">📱 TELEGRAM CHANNELS — OSAEC MONITORING</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {OSAEC_TELEGRAM_CHANNELS.map((ch, i) => (
+                    <div key={i} className="bg-slate-900/50 p-3 rounded cyber-border">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-white text-xs font-mono font-bold">{ch.name}</span>
+                        <div className="flex items-center gap-1">
+                          {ch.verified && <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-green-600/30 text-green-400 border border-green-500/30">✓ VERIFIED</span>}
+                          <span className={`text-[8px] font-mono px-1 py-0.5 rounded ${ch.type === 'law-enforcement' ? 'bg-blue-600/30 text-blue-400' : ch.type === 'government' ? 'bg-cyan-600/30 text-cyan-400' : ch.type === 'intl-org' ? 'bg-purple-600/30 text-purple-400' : ch.type === 'ngo' ? 'bg-green-600/30 text-green-400' : 'bg-slate-700/30 text-slate-400'}`}>{ch.type.toUpperCase()}</span>
+                        </div>
+                      </div>
+                      <p className="text-slate-400 text-[10px] font-mono">{ch.desc}</p>
+                      <a href={`https://t.me/${ch.channel.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-[10px] font-mono mt-1 inline-flex items-center gap-1 hover:text-blue-300"><FiExternalLink size={10} /> {ch.channel}</a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dark Web Monitoring Queries */}
+              <div className="card-cyber p-4 rounded-lg mt-5 bg-purple-950/10 border border-purple-500/20">
+                <h3 className="title-cyber text-xs font-bold text-purple-400 mb-3">🌐 DARK WEB MONITORING QUERIES</h3>
+                <div className="space-y-2">
+                  {OSAEC_DARK_WEB_MONITORING.map((m, i) => (
+                    <div key={i} className="bg-slate-900/50 p-2 rounded cyber-border flex items-center justify-between">
+                      <div>
+                        <span className="text-white text-[11px] font-mono font-bold">{m.name}</span>
+                        <p className="text-slate-500 text-[9px] font-mono">{m.desc}</p>
+                      </div>
+                      <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-purple-600/20 text-purple-400">AUTO-SCAN</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Forum Monitoring */}
+              <div className="card-cyber p-4 rounded-lg mt-5 bg-orange-950/10 border border-orange-500/20">
+                <h3 className="title-cyber text-xs font-bold text-orange-400 mb-3">💬 FORUM MONITORING — OSAEC SECTIONS</h3>
+                <div className="space-y-2">
+                  {OSAEC_FORUM_MONITORING.map((fm, i) => (
+                    <div key={i} className="bg-slate-900/50 p-2 rounded cyber-border flex items-center justify-between">
+                      <div>
+                        <span className="text-white text-[11px] font-mono font-bold">{fm.name}</span>
+                        <p className="text-slate-500 text-[9px] font-mono">{fm.desc}</p>
+                      </div>
+                      <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-orange-600/20 text-orange-400">{fm.forum}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* PH Organizations */}
+              <div className="card-cyber p-4 rounded-lg mt-5">
+                <h3 className="title-cyber text-xs font-bold text-cyan-400 mb-3">🏛️ PH OSAEC REPORTING ORGANIZATIONS</h3>
+                <div className="space-y-2">
+                  {OSAEC_PH_ORGS.map((org, i) => (
+                    <div key={i} className="bg-slate-900/50 p-2 rounded cyber-border">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-white text-[11px] font-mono font-bold">{org.name}</span>
+                        <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${org.type === 'law-enforcement' ? 'bg-blue-600/30 text-blue-400' : org.type === 'government' ? 'bg-cyan-600/30 text-cyan-400' : org.type === 'ngo' ? 'bg-green-600/30 text-green-400' : 'bg-purple-600/30 text-purple-400'}`}>{org.type.toUpperCase()}</span>
+                      </div>
+                      <p className="text-slate-500 text-[9px] font-mono">{org.desc}</p>
+                      {org.url && <a href={org.url} target="_blank" rel="noopener noreferrer" className="text-cyan-400 text-[9px] font-mono mt-0.5 inline-flex items-center gap-1 hover:text-cyan-300"><FiExternalLink size={9} /> {org.url}</a>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ═══ SEARCH TAB ═══ */}
           {activeTab === 'search' && (
             <div>
@@ -682,6 +1169,32 @@ function DarkWebMonitor() {
                   {a.tags?.length > 0 && <div className="flex flex-wrap gap-1 mt-1">{a.tags.slice(0, 3).map((t, j) => <span key={j} className="bg-slate-800 text-slate-500 px-1 rounded text-[8px] font-mono">{t}</span>)}</div>}
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* OSAEC ALERT PANEL */}
+          <div className="card-cyber p-4 rounded-lg bg-red-950/20 border border-red-500/30">
+            <h2 className="title-cyber text-sm font-bold mb-3 flex items-center gap-2 text-red-400">
+              <FiAlertTriangle /> OSAEC ALERTS
+              {soundEnabled && <span className="text-green-400 text-[9px] animate-pulse">● LIVE</span>}
+            </h2>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-red-300 text-xs font-mono">{osaecAlerts.length} alerts | {osaecPosts.length} findings</span>
+              <button onClick={() => setSoundEnabled(!soundEnabled)} className={`text-[9px] font-mono px-2 py-0.5 rounded ${soundEnabled ? 'bg-green-600/30 text-green-400' : 'bg-slate-700/30 text-slate-400'}`}>
+                {soundEnabled ? '🔊' : '🔇'}
+              </button>
+            </div>
+            <div className="space-y-1 max-h-48 overflow-y-auto">
+              {osaecAlerts.slice(0, 8).map((a, i) => (
+                <a key={i} href={a.link || '#'} target="_blank" rel="noopener noreferrer" className="block bg-slate-900/50 p-2 rounded cyber-border hover:bg-red-950/20">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className={`text-[8px] font-mono px-1 py-0.5 rounded ${a.severity === 'CRITICAL' ? 'bg-red-600/40 text-red-300' : 'bg-orange-600/30 text-orange-400'}`}>{a.severity}</span>
+                    <span className="text-[8px] text-slate-600 font-mono">{a.source}</span>
+                  </div>
+                  <p className="text-[10px] font-mono text-red-300 truncate">{a.title}</p>
+                </a>
+              ))}
+              {osaecAlerts.length === 0 && <p className="text-slate-600 text-[10px] font-mono">No alerts yet — click FULL SCAN</p>}
             </div>
           </div>
 
