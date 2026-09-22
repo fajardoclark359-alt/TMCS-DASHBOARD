@@ -169,6 +169,67 @@ const OSAEC_ALERT_SOURCES = [
   { name: 'Thorn Blog', url: 'https://www.thorn.org/feed/', type: 'rss', desc: 'Thorn — digital efforts to fight child sexual abuse' },
 ]
 
+// ═══════════════════════════════════════════════════════════════
+// SCHOOL SHOOTING / VIOLENCE MONITORING — PHILIPPINES
+// ═══════════════════════════════════════════════════════════════
+
+const SCHOOL_SHOOTING_KEYWORDS = [
+  'school shooting philippines', 'school shooting threat', 'school violence philippines',
+  'campus shooting', 'gunman school', 'armed student philippines',
+  'school attack philippines', 'mass shooting school', 'school hostage',
+  'school bomb threat', 'IED school philippines', 'school threat',
+  'active shooter school', 'school safety threat', 'campus violence',
+  'shooting incident school', 'gun violence school', 'school lockdown',
+  'deped shooting', 'teacher shooting', 'student shooting',
+  'school stabbing', 'school arson', 'school terrorism',
+  'bomb threat school', 'explosive device school', 'mass casualty school',
+  'school massacre', 'school-targeted violence', 'targeted school attack',
+]
+
+const SCHOOL_SHOOTING_FEEDS = [
+  { name: 'PNP Press Releases', url: 'https://www.pnp.gov.ph/index.php/press-release', type: 'rss', desc: 'Philippine National Police — crime reports and incidents' },
+  { name: 'PNP News', url: 'https://www.pnp.gov.ph/index.php/news', type: 'rss', desc: 'PNP general news and advisories' },
+  { name: 'DILG Advisories', url: 'https://www.dilg.gov.ph/feed', type: 'rss', desc: 'Dept of Interior and Local Government — peace and order' },
+  { name: 'DepEd News', url: 'https://www.deped.gov.ph/feed/', type: 'rss', desc: 'Department of Education — school safety advisories' },
+  { name: 'Rappler Nation', url: 'https://www.rappler.com/nation/feed/', type: 'rss', desc: 'Rappler — Philippine national news' },
+  { name: 'Inquirer Nation', url: 'https://newsinfo.inquirer.net/feed', type: 'rss', desc: 'Inquirer — national news' },
+  { name: 'PhilStar News', url: 'https://www.philstar.com/rss/headlines', type: 'rss', desc: 'Philippine Star headlines' },
+  { name: 'ABS-CBN News', url: 'https://news.abs-cbn.com/feed', type: 'rss', desc: 'ABS-CBN news' },
+  { name: 'GMA News Nation', url: 'https://www.gmanetwork.com/rss/news/nation/feed', type: 'rss', desc: 'GMA News nation feed' },
+  { name: 'Manila Bulletin', url: 'https://www.manilatimes.net/feed', type: 'rss', desc: 'Manila Times news' },
+  { name: 'CNN Philippines', url: 'https://www.cnnphilippines.com/rss/nation/', type: 'rss', desc: 'CNN Philippines — nation section' },
+  { name: 'OneNewsPH', url: 'https://www.onenews.ph/feed', type: 'rss', desc: 'OneNews PH — breaking news' },
+]
+
+const SCHOOL_SAFETY_ORGS = [
+  { name: 'PNP — Safety and Security', desc: 'Philippine National Police — campus safety division', url: 'https://www.pnp.gov.ph', type: 'law-enforcement' },
+  { name: 'DepEd — Child Protection Unit', desc: 'Department of Education — school safety and child protection', url: 'https://www.deped.gov.ph', type: 'government' },
+  { name: 'DILG — Peace and Order', desc: 'Dept of Interior and Local Government — LGU peace and order councils', url: 'https://www.dilg.gov.ph', type: 'government' },
+  { name: 'NICA — National Intelligence Coordinating Agency', desc: 'Threat intelligence and national security', url: '', type: 'government' },
+  { name: 'AFP — Civil-Military Operations', desc: 'Armed Forces of the Philippines — threat assessment', url: '', type: 'military' },
+  { name: 'NTF-ELCAC', desc: 'National Task Force to End Local Communist Armed Conflict — insurgency monitoring', url: '', type: 'government' },
+  { name: 'Philippine Red Cross', desc: 'Emergency response and incident reporting', url: 'https://www.redcross.org.ph', type: 'ngo' },
+  { name: 'Save the Children Philippines', desc: 'Child protection and school safety advocacy', url: '', type: 'ngo' },
+  { name: 'UNICEF Philippines — Education', desc: 'Safe schools and education protection', url: '', type: 'intl-org' },
+]
+
+const SCHOOL_SHOOTING_DARK_WEB = [
+  { name: 'Ahmia.fi — School Violence PH', query: 'school shooting philippines', source: 'ahmia', desc: 'Dark web search for PH school violence content' },
+  { name: 'Ahmia.fi — Threats PH Schools', query: 'school threat philippines', source: 'ahmia', desc: 'Search for threats against PH schools' },
+  { name: 'Ahmia.fi — Weapons PH', query: 'weapons philippines school', source: 'ahmia', desc: 'Search for weapon sales targeting schools' },
+  { name: 'Ahmia.fi — Extremism School', query: 'extremist attack school philippines', source: 'ahmia', desc: 'Search for extremist school attack plans' },
+  { name: 'Ahmia.fi — Bomb Threat', query: 'bomb threat school philippines', source: 'ahmia', desc: 'Search for bomb threats against PH schools' },
+  { name: 'URLhaus — PH School domains', query: 'philippines', source: 'urlhaus', desc: 'URLhaus scan for PH school-targeted malware' },
+]
+
+const SCHOOL_SHOOTING_FORUMS = [
+  { name: 'BreachForubs — Weapons', forum: 'BreachForubs', onion: 'breached.to', desc: 'Monitor for weapon sales targeting PH schools' },
+  { name: 'Exploit.in — PH Threats', forum: 'Exploit.in', onion: 'exploit.in', desc: 'Monitor for PH school threat discussions' },
+  { name: 'XSS.is — Weapons PH', forum: 'XSS.is', onion: 'xss.is', desc: 'Monitor for weapon/attack planning' },
+  { name: 'Verified — Firearms', forum: 'Verified', onion: 'verified', desc: 'Monitor for illegal firearms marketplace' },
+  { name: 'Torum — PH Threats', forum: 'Torum', onion: 'torum', desc: 'Monitor for PH-targeted threat activity' },
+]
+
 const FORUM_CATS = {
   'data-breach': { label: 'DATA BREACH', color: 'text-red-400 bg-red-900/30 border-red-500/30' },
   'hacking': { label: 'HACKING', color: 'text-orange-400 bg-orange-900/30 border-orange-500/30' },
@@ -214,6 +275,13 @@ function DarkWebMonitor() {
   const [soundEnabled, setSoundEnabled] = useState(false)
   const [osaecFilter, setOsaecFilter] = useState('all')
   const [lastOsaecScan, setLastOsaecScan] = useState(null)
+  const [schoolPosts, setSchoolPosts] = useState([])
+  const [schoolLoading, setSchoolLoading] = useState(false)
+  const [schoolAlerts, setSchoolAlerts] = useState([])
+  const [schoolFilter, setSchoolFilter] = useState('all')
+  const [schoolAlertCount, setSchoolAlertCount] = useState(0)
+  const [schoolDarkWeb, setSchoolDarkWeb] = useState([])
+  const [schoolForums, setSchoolForums] = useState([])
 
   // ═══ SOUND ALERT SYSTEM ═══
   const playAlertSound = () => {
@@ -258,7 +326,7 @@ function DarkWebMonitor() {
     } catch {}
   }
 
-  useEffect(() => { fetchFeeds(); fetchAlerts(); fetchTrends(); fetchForums(); fetchSocial(); fetchPhil(); fetchOsaec() }, [])
+  useEffect(() => { fetchFeeds(); fetchAlerts(); fetchTrends(); fetchForums(); fetchSocial(); fetchPhil(); fetchOsaec(); fetchSchool() }, [])
 
   // ═══ FEEDS ═══
   const fetchFeeds = async () => {
@@ -585,6 +653,154 @@ function DarkWebMonitor() {
     setOsaecLoading(false)
   }
 
+  // ═══ SCHOOL SHOOTING / VIOLENCE MONITORING ═══
+  const fetchSchool = async () => {
+    setSchoolLoading(true)
+    const posts = []
+    const alerts = []
+    let newAlertCount = 0
+
+    // 1. Search PH news feeds for school violence
+    for (const feed of SCHOOL_SHOOTING_FEEDS) {
+      try {
+        const x = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          for (const item of (d.items || []).slice(0, 15)) {
+            const text = `${item.title} ${item.description || ''}`.toLowerCase()
+            if (SCHOOL_SHOOTING_KEYWORDS.some(kw => text.includes(kw.toLowerCase()))) {
+              const isCritical = ['shooting', 'gunman', 'armed', 'hostage', 'bomb', 'IED', 'mass casualty', 'massacre', 'active shooter', 'explosive'].some(k => text.includes(k))
+              const isHigh = ['threat', 'lockdown', 'stabbing', 'arson', 'attack', 'violence', 'safety'].some(k => text.includes(k))
+              posts.push({
+                title: `[SCHOOL] ${item.title}`,
+                source: feed.name,
+                description: (item.description || '').replace(/<[^>]+>/g, '').slice(0, 400),
+                published: item.pubDate || item.pub_date || '',
+                link: item.link,
+                categories: ['School Safety', 'Philippines'],
+                type: 'news',
+                severity: isCritical ? 'CRITICAL' : isHigh ? 'HIGH' : 'MEDIUM',
+              })
+              if (isCritical) {
+                alerts.push({ id: `school-${Date.now()}-${Math.random().toString(36).slice(2)}`, title: `🚨 CRITICAL: ${item.title}`, severity: 'CRITICAL', source: feed.name, created: item.pubDate || '', tags: ['School Violence'], link: item.link })
+                newAlertCount++
+              } else if (isHigh) {
+                alerts.push({ id: `school-${Date.now()}-${Math.random().toString(36).slice(2)}`, title: `⚠️ HIGH: ${item.title}`, severity: 'HIGH', source: feed.name, created: item.pubDate || '', tags: ['School Safety'], link: item.link })
+                newAlertCount++
+              }
+            }
+          }
+        }
+      } catch {}
+    }
+
+    // 2. Search Ahmia.fi for school violence dark web content
+    for (const dw of SCHOOL_SHOOTING_DARK_WEB.filter(m => m.source === 'ahmia')) {
+      try {
+        const x = await fetch(`https://ahmia.fi/api/v1/search/?q=${encodeURIComponent(dw.query)}`, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          for (const i of (d.items || d.results || []).slice(0, 3)) {
+            posts.push({
+              title: `[DARK WEB] ${i.title || dw.query}`,
+              source: 'Ahmia.fi',
+              description: (i.description || '').slice(0, 400),
+              published: '',
+              link: i.onion_url || i.url || '',
+              categories: ['School Violence', 'Dark Web'],
+              type: 'darkweb',
+              severity: 'CRITICAL',
+            })
+            newAlertCount++
+            alerts.push({ id: `dw-school-${Date.now()}`, title: `🚨 DARK WEB: School violence content — ${dw.query}`, severity: 'CRITICAL', source: 'Ahmia.fi', created: new Date().toISOString(), tags: ['Dark Web', 'School'], link: i.onion_url || i.url || '' })
+          }
+        }
+      } catch {}
+    }
+
+    // 3. Search URLhaus for school-targeted domains
+    try {
+      const x = await fetch('https://urlhaus-api.abuse.ch/v1/urls/recent/', { mode: 'cors' })
+      if (x.ok) {
+        const d = await x.json()
+        for (const e of (d.urls || []).slice(0, 200)) {
+          const tags = (e.tags || []).join(' ').toLowerCase()
+          const url = (e.url || '').toLowerCase()
+          const threat = (e.threat || '').toLowerCase()
+          if (tags.includes('school') || url.includes('school') || threat.includes('school')) {
+            posts.push({
+              title: `[URLHAUS] School-targeted: ${e.url_status || 'unknown'}`,
+              source: 'URLhaus',
+              description: `URL: ${e.url} | Threat: ${e.threat || 'unknown'} | Tags: ${(e.tags || []).join(', ')}`,
+              published: e.dateadded || '',
+              link: e.url,
+              categories: ['School Safety', 'URLhaus'],
+              type: 'urlhaus',
+              severity: 'HIGH',
+            })
+            newAlertCount++
+          }
+        }
+      }
+    } catch {}
+
+    // 4. Search dark web forums for school violence
+    for (const fm of SCHOOL_SHOOTING_FORUMS) {
+      try {
+        const x = await fetch(`https://ahmia.fi/api/v1/search/?q=${encodeURIComponent(fm.forum + ' school attack')}`, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          for (const i of (d.items || d.results || []).slice(0, 2)) {
+            posts.push({
+              title: `[FORUM] ${fm.forum} — School violence mention`,
+              source: fm.forum,
+              description: (i.description || '').slice(0, 400),
+              published: '',
+              link: i.onion_url || i.url || '',
+              categories: ['School Violence', 'Forum'],
+              type: 'forum',
+              severity: 'HIGH',
+            })
+          }
+        }
+      } catch {}
+    }
+
+    // 5. Search for PH school threats on social media keywords
+    try {
+      const x = await fetch('https://ahmia.fi/api/v1/search/?q=school+threat+philippines', { mode: 'cors' })
+      if (x.ok) {
+        const d = await x.json()
+        for (const i of (d.items || d.results || []).slice(0, 5)) {
+          posts.push({
+            title: `[THREAT] ${i.title || 'School threat — PH'}`,
+            source: 'Ahmia.fi',
+            description: (i.description || '').slice(0, 400),
+            published: '',
+            link: i.onion_url || i.url || '',
+            categories: ['School Threat', 'Philippines'],
+            type: 'darkweb',
+            severity: 'CRITICAL',
+          })
+          newAlertCount++
+          alerts.push({ id: `threat-${Date.now()}-${Math.random().toString(36).slice(2)}`, title: `🚨 SCHOOL THREAT: ${i.title || 'PH school threat'}`, severity: 'CRITICAL', source: 'Ahmia.fi', created: new Date().toISOString(), tags: ['School Threat', 'PH'], link: i.onion_url || i.url || '' })
+        }
+      }
+    } catch {}
+
+    posts.sort((a, b) => (b.published || '').localeCompare(a.published || ''))
+    setSchoolPosts(posts)
+    setSchoolAlerts(alerts)
+    setSchoolDarkWeb(SCHOOL_SHOOTING_DARK_WEB)
+    setSchoolForums(SCHOOL_SHOOTING_FORUMS)
+    setSchoolAlertCount(prev => {
+      const total = prev + newAlertCount
+      if (newAlertCount > 0) playCriticalAlert()
+      return total
+    })
+    setSchoolLoading(false)
+  }
+
   // ═══ SEARCH ═══
   const handleSearch = async (e) => {
     e.preventDefault()
@@ -623,6 +839,7 @@ function DarkWebMonitor() {
     { id: 'social', label: 'SOCIAL / NEWS', icon: FiGlobe },
     { id: 'philippines', label: '🇵🇭 PHILIPPINES', icon: FiShield },
     { id: 'osaec', label: '🔴 OSAEC ALERT', icon: FiAlertTriangle },
+    { id: 'school', label: '🏫 SCHOOL SAFETY', icon: FiServer },
     { id: 'search', label: 'DARK WEB SEARCH', icon: FiSearch },
     { id: 'iocs', label: 'IOCs', icon: FiLock },
     { id: 'keywords', label: 'KEYWORDS', icon: FiTag },
@@ -1075,6 +1292,167 @@ function DarkWebMonitor() {
             </div>
           )}
 
+          {/* ═══ SCHOOL SAFETY / SHOOTING ALERT TAB ═══ */}
+          {activeTab === 'school' && (
+            <div>
+              {/* CRITICAL ALERT BANNER */}
+              {schoolAlerts.length > 0 && (
+                <div className="card-cyber p-4 rounded-lg mb-4 bg-red-950/30 border-2 border-red-500/50 animate-pulse">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="text-red-400 text-2xl">🏫🚨</div>
+                      <div>
+                        <h3 className="text-red-400 text-sm font-bold font-mono">SCHOOL SAFETY ALERT — {schoolAlerts.length} THREATS DETECTED</h3>
+                        <p className="text-red-300/70 text-[10px] font-mono mt-0.5">Sound alerts: {soundEnabled ? '🔔 ENABLED' : '🔇 DISABLED'} | {schoolAlertCount} total alerts this session</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setSoundEnabled(!soundEnabled)} className={`text-[10px] font-mono px-3 py-1.5 rounded ${soundEnabled ? 'bg-green-600/30 text-green-400 border border-green-500/30' : 'bg-slate-700/30 text-slate-400 border border-slate-600'}`}>
+                        {soundEnabled ? '🔔 SOUND ON' : '🔇 SOUND OFF'}
+                      </button>
+                      <button onClick={() => playCriticalAlert()} className="text-[10px] font-mono px-3 py-1.5 rounded bg-red-600/30 text-red-400 border border-red-500/30 hover:bg-red-500/30">🔔 TEST ALERT</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="title-cyber text-sm font-bold text-red-400">🏫 SCHOOL SAFETY — SHOOTING & VIOLENCE MONITORING</h2>
+                <div className="flex items-center gap-2">
+                  {soundEnabled && <span className="text-green-400 text-[10px] font-mono animate-pulse">● LIVE AUDIO</span>}
+                  <button onClick={fetchSchool} className="text-xs text-slate-500 hover:text-red-400 font-mono">↻ FULL SCAN</button>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-5 gap-2 mb-4">
+                <div className="card-cyber p-2 rounded-lg text-center">
+                  <p className="text-red-400 text-lg font-bold font-mono">{schoolPosts.filter(p => p.severity === 'CRITICAL').length}</p>
+                  <p className="text-[8px] text-slate-500 font-mono">CRITICAL</p>
+                </div>
+                <div className="card-cyber p-2 rounded-lg text-center">
+                  <p className="text-orange-400 text-lg font-bold font-mono">{schoolPosts.filter(p => p.severity === 'HIGH').length}</p>
+                  <p className="text-[8px] text-slate-500 font-mono">HIGH</p>
+                </div>
+                <div className="card-cyber p-2 rounded-lg text-center">
+                  <p className="text-yellow-400 text-lg font-bold font-mono">{schoolPosts.filter(p => p.severity === 'MEDIUM').length}</p>
+                  <p className="text-[8px] text-slate-500 font-mono">MEDIUM</p>
+                </div>
+                <div className="card-cyber p-2 rounded-lg text-center">
+                  <p className="text-purple-400 text-lg font-bold font-mono">{schoolAlerts.length}</p>
+                  <p className="text-[8px] text-slate-500 font-mono">ALERTS</p>
+                </div>
+                <div className="card-cyber p-2 rounded-lg text-center">
+                  <p className="text-blue-400 text-lg font-bold font-mono">{schoolPosts.length}</p>
+                  <p className="text-[8px] text-slate-500 font-mono">TOTAL</p>
+                </div>
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="flex gap-2 mb-4 flex-wrap">
+                {[
+                  { id: 'all', label: `ALL (${schoolPosts.length})` },
+                  { id: 'critical', label: `🚨 CRITICAL (${schoolPosts.filter(p => p.severity === 'CRITICAL').length})` },
+                  { id: 'news', label: `📰 PH NEWS (${schoolPosts.filter(p => p.type === 'news').length})` },
+                  { id: 'darkweb', label: `🌐 DARK WEB (${schoolPosts.filter(p => p.type === 'darkweb').length})` },
+                  { id: 'urlhaus', label: `🔗 URLHAUS (${schoolPosts.filter(p => p.type === 'urlhaus').length})` },
+                  { id: 'forum', label: `💬 FORUMS (${schoolPosts.filter(p => p.type === 'forum').length})` },
+                ].map(f => (
+                  <button key={f.id} onClick={() => setSchoolFilter(f.id)} className={`text-[10px] font-mono px-3 py-1 rounded ${schoolFilter === f.id ? 'bg-red-900/30 text-red-400 border border-red-500/30' : 'bg-slate-900/50 text-slate-500 border border-slate-700'}`}>{f.label}</button>
+                ))}
+              </div>
+
+              {schoolLoading && <p className="text-slate-500 font-mono text-sm mb-3">🏫 Scanning PH news, dark web, forums for school safety threats...</p>}
+
+              {/* Keywords Tracked */}
+              <div className="card-cyber p-3 rounded-lg mb-4 bg-red-950/10 border border-red-500/20">
+                <p className="text-red-400 text-[10px] font-mono font-bold mb-2">🚨 KEYWORDS MONITORED:</p>
+                <div className="flex flex-wrap gap-1">
+                  {SCHOOL_SHOOTING_KEYWORDS.slice(0, 20).map((kw, i) => {
+                    const count = schoolPosts.filter(p => `${p.title} ${p.description}`.toLowerCase().includes(kw.toLowerCase())).length
+                    return <span key={i} className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${count > 0 ? 'bg-red-600/30 text-red-400 border border-red-500/30' : 'bg-slate-800/50 text-slate-500 border border-slate-700'}`}>{kw} {count > 0 ? `(${count})` : ''}</span>
+                  })}
+                </div>
+              </div>
+
+              {/* Findings */}
+              <div className="space-y-3">
+                {schoolPosts.filter(p => {
+                  if (schoolFilter === 'all') return true
+                  if (schoolFilter === 'critical') return p.severity === 'CRITICAL'
+                  return p.type === schoolFilter
+                }).map((p, i) => (
+                  <div key={i} className={`card-cyber p-4 rounded-lg ${p.severity === 'CRITICAL' ? 'border-2 border-red-500/50 bg-red-950/20' : p.severity === 'HIGH' ? 'border border-orange-500/30 bg-orange-950/10' : 'border border-slate-700/30'}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${p.severity === 'CRITICAL' ? 'bg-red-600/40 text-red-300 border border-red-500/50 font-bold' : p.severity === 'HIGH' ? 'bg-orange-600/30 text-orange-400 border border-orange-500/30' : 'bg-yellow-600/30 text-yellow-400 border border-yellow-500/30'}`}>
+                          {p.severity === 'CRITICAL' ? '🚨 CRITICAL' : p.severity === 'HIGH' ? '⚠️ HIGH' : '⚡ MEDIUM'}
+                        </span>
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${p.source.includes('Ahmia') ? 'text-purple-400 bg-purple-900/30 border border-purple-500/30' : p.source.includes('URLhaus') ? 'text-red-400 bg-red-900/30 border border-red-500/30' : 'text-blue-400 bg-blue-900/30 border border-blue-500/30'}`}>{p.source}</span>
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800/50 text-slate-500 border border-slate-700">{p.type?.toUpperCase()}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-600 font-mono">{p.published?.slice(0, 16)}</span>
+                    </div>
+                    <h3 className={`text-sm font-bold font-mono mb-1 ${p.severity === 'CRITICAL' ? 'text-red-300' : 'text-white'}`}>{p.title}</h3>
+                    <p className="text-slate-400 text-xs font-mono line-clamp-3">{p.description}</p>
+                    {p.categories?.length > 0 && <div className="flex flex-wrap gap-1 mt-2">{p.categories.map((c, j) => <span key={j} className="bg-red-900/20 text-red-400/70 px-1.5 py-0.5 rounded text-[9px] font-mono border border-red-500/10">{c}</span>)}</div>}
+                    {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-red-400 text-[10px] font-mono mt-2 inline-flex items-center gap-1 hover:text-red-300"><FiExternalLink size={10} /> VIEW SOURCE</a>}
+                  </div>
+                ))}
+                {schoolPosts.length === 0 && !schoolLoading && <p className="text-slate-500 font-mono text-sm">No school safety threats detected. Click FULL SCAN to monitor.</p>}
+              </div>
+
+              {/* Dark Web Monitoring */}
+              <div className="card-cyber p-4 rounded-lg mt-5 bg-purple-950/10 border border-purple-500/20">
+                <h3 className="title-cyber text-xs font-bold text-purple-400 mb-3">🌐 DARK WEB — SCHOOL VIOLENCE QUERIES</h3>
+                <div className="space-y-2">
+                  {SCHOOL_SHOOTING_DARK_WEB.map((m, i) => (
+                    <div key={i} className="bg-slate-900/50 p-2 rounded cyber-border flex items-center justify-between">
+                      <div>
+                        <span className="text-white text-[11px] font-mono font-bold">{m.name}</span>
+                        <p className="text-slate-500 text-[9px] font-mono">{m.desc}</p>
+                      </div>
+                      <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-purple-600/20 text-purple-400">AUTO-SCAN</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Forum Monitoring */}
+              <div className="card-cyber p-4 rounded-lg mt-5 bg-orange-950/10 border border-orange-500/20">
+                <h3 className="title-cyber text-xs font-bold text-orange-400 mb-3">💬 FORUMS — WEAPON & THREAT MONITORING</h3>
+                <div className="space-y-2">
+                  {SCHOOL_SHOOTING_FORUMS.map((fm, i) => (
+                    <div key={i} className="bg-slate-900/50 p-2 rounded cyber-border flex items-center justify-between">
+                      <div>
+                        <span className="text-white text-[11px] font-mono font-bold">{fm.name}</span>
+                        <p className="text-slate-500 text-[9px] font-mono">{fm.desc}</p>
+                      </div>
+                      <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-orange-600/20 text-orange-400">{fm.forum}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Reporting Organizations */}
+              <div className="card-cyber p-4 rounded-lg mt-5">
+                <h3 className="title-cyber text-xs font-bold text-cyan-400 mb-3">🏛️ PH SCHOOL SAFETY ORGANIZATIONS</h3>
+                <div className="space-y-2">
+                  {SCHOOL_SAFETY_ORGS.map((org, i) => (
+                    <div key={i} className="bg-slate-900/50 p-2 rounded cyber-border">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-white text-[11px] font-mono font-bold">{org.name}</span>
+                        <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${org.type === 'law-enforcement' ? 'bg-blue-600/30 text-blue-400' : org.type === 'government' ? 'bg-cyan-600/30 text-cyan-400' : org.type === 'military' ? 'bg-red-600/30 text-red-400' : org.type === 'ngo' ? 'bg-green-600/30 text-green-400' : 'bg-purple-600/30 text-purple-400'}`}>{org.type.toUpperCase()}</span>
+                      </div>
+                      <p className="text-slate-500 text-[9px] font-mono">{org.desc}</p>
+                      {org.url && <a href={org.url} target="_blank" rel="noopener noreferrer" className="text-cyan-400 text-[9px] font-mono mt-0.5 inline-flex items-center gap-1 hover:text-cyan-300"><FiExternalLink size={9} /> {org.url}</a>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ═══ SEARCH TAB ═══ */}
           {activeTab === 'search' && (
             <div>
@@ -1195,6 +1573,32 @@ function DarkWebMonitor() {
                 </a>
               ))}
               {osaecAlerts.length === 0 && <p className="text-slate-600 text-[10px] font-mono">No alerts yet — click FULL SCAN</p>}
+            </div>
+          </div>
+
+          {/* SCHOOL SAFETY ALERT PANEL */}
+          <div className="card-cyber p-4 rounded-lg bg-red-950/20 border border-red-500/30">
+            <h2 className="title-cyber text-sm font-bold mb-3 flex items-center gap-2 text-red-400">
+              🏫 SCHOOL SAFETY
+              {soundEnabled && <span className="text-green-400 text-[9px] animate-pulse">● LIVE</span>}
+            </h2>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-red-300 text-xs font-mono">{schoolAlerts.length} alerts | {schoolPosts.length} findings</span>
+              <button onClick={() => setSoundEnabled(!soundEnabled)} className={`text-[9px] font-mono px-2 py-0.5 rounded ${soundEnabled ? 'bg-green-600/30 text-green-400' : 'bg-slate-700/30 text-slate-400'}`}>
+                {soundEnabled ? '🔊' : '🔇'}
+              </button>
+            </div>
+            <div className="space-y-1 max-h-48 overflow-y-auto">
+              {schoolAlerts.slice(0, 8).map((a, i) => (
+                <a key={i} href={a.link || '#'} target="_blank" rel="noopener noreferrer" className="block bg-slate-900/50 p-2 rounded cyber-border hover:bg-red-950/20">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className={`text-[8px] font-mono px-1 py-0.5 rounded ${a.severity === 'CRITICAL' ? 'bg-red-600/40 text-red-300' : 'bg-orange-600/30 text-orange-400'}`}>{a.severity}</span>
+                    <span className="text-[8px] text-slate-600 font-mono">{a.source}</span>
+                  </div>
+                  <p className="text-[10px] font-mono text-red-300 truncate">{a.title}</p>
+                </a>
+              ))}
+              {schoolAlerts.length === 0 && <p className="text-slate-600 text-[10px] font-mono">No alerts yet — click FULL SCAN</p>}
             </div>
           </div>
 
