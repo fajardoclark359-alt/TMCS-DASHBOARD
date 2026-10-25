@@ -12,7 +12,7 @@ from app.auth import verify_api_key
 from app import config
 from app.tasks.evidence_tasks import capture_evidence_task, list_evidence_task, get_evidence_task, delete_evidence_task
 
-router = APIRouter(prefix="/api/evidence", tags=["Evidence"])
+router = APIRouter(tags=["Evidence"])
 
 # Auth dependency
 auth_dep = [Depends(verify_api_key)] if config.API_KEY else []

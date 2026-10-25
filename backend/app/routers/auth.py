@@ -13,7 +13,7 @@ from app.models import User, UserRole, APIKey
 from app.auth import verify_api_key
 from app import config
 
-router = APIRouter(prefix="/api/auth", tags=["Auth"])
+router = APIRouter(tags=["Auth"])
 
 auth_dep = [Depends(verify_api_key)] if config.API_KEY else []
 
@@ -113,7 +113,7 @@ async def get_current_user(token: str = Depends(verify_api_key)) -> User:
     except JWTError:
         raise credentials_exception
     
-    async with get_db() as db:
+    async for db in get_db():
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.username == username))
         user = result.scalar_one_or_none()
@@ -125,7 +125,7 @@ async def get_current_user(token: str = Depends(verify_api_key)) -> User:
 @router.post("/login", response_model=TokenResponse)
 async def login(request: TokenRequest):
     """Authenticate user and return JWT token."""
-    async with get_db() as db:
+    async for db in get_db():
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.username == request.username))
         user = result.scalar_one_or_none()
@@ -154,7 +154,7 @@ async def login(request: TokenRequest):
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(request: UserCreate):
     """Register a new user (admin only in production)."""
-    async with get_db() as db:
+    async for db in get_db():
         from sqlalchemy import select
         # Check existing
         existing = await db.execute(select(User).where(
@@ -181,7 +181,7 @@ async def list_users(
     _: None = Depends(verify_api_key) if config.API_KEY else None,
 ):
     """List all users."""
-    async with get_db() as db:
+    async for db in get_db():
         from sqlalchemy import select
         result = await db.execute(select(User).offset(skip).limit(limit))
         users = result.scalars().all()
@@ -194,7 +194,7 @@ async def get_user(
     _: None = Depends(verify_api_key) if config.API_KEY else None,
 ):
     """Get a specific user."""
-    async with get_db() as db:
+    async for db in get_db():
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()
@@ -210,7 +210,7 @@ async def update_user(
     _: None = Depends(verify_api_key) if config.API_KEY else None,
 ):
     """Update a user."""
-    async with get_db() as db:
+    async for db in get_db():
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()
@@ -233,7 +233,7 @@ async def update_user(
 @router.delete("/users/{user_id}", dependencies=auth_dep)
 async def delete_user(user_id: int):
     """Delete a user."""
-    async with get_db() as db:
+    async for db in get_db():
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()
@@ -246,7 +246,7 @@ async def delete_user(user_id: int):
 @router.post("/api-keys", response_model=APIKeyResponse, status_code=status.HTTP_201_CREATED, dependencies=auth_dep)
 async def create_api_key(request: APIKeyCreate):
     """Create a new API key for the current user."""
-    async with get_db() as db:
+    async for db in get_db():
         # For now, use a default user (in production, get from auth)
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.role == UserRole.ADMIN))
@@ -291,7 +291,7 @@ async def list_api_keys(
     _: None = Depends(verify_api_key) if config.API_KEY else None,
 ):
     """List API keys."""
-    async with get_db() as db:
+    async for db in get_db():
         from sqlalchemy import select
         query = select(APIKey)
         if user_id:
@@ -304,7 +304,7 @@ async def list_api_keys(
 @router.delete("/api-keys/{key_id}", dependencies=auth_dep)
 async def revoke_api_key(key_id: str):
     """Revoke an API key."""
-    async with get_db() as db:
+    async for db in get_db():
         from sqlalchemy import select
         result = await db.execute(select(APIKey).where(APIKey.key_id == key_id))
         api_key = result.scalar_one_or_none()

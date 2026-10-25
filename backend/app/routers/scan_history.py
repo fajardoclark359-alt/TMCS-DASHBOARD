@@ -10,7 +10,7 @@ from app.models import ScanHistory, ScanType, ScanStatus
 from app.auth import verify_api_key
 from app import config
 
-router = APIRouter(prefix="/api/scans", tags=["Scan History"])
+router = APIRouter(tags=["Scan History"])
 
 auth_dep = [Depends(verify_api_key)] if config.API_KEY else []
 
@@ -72,7 +72,7 @@ async def list_scans(
 ):
     """List scan history records."""
     from sqlalchemy import select, func
-    async with get_db() as db:
+    async for db in get_db():
         query = select(ScanHistory)
         count_query = select(func.count(ScanHistory.id))
         
@@ -108,7 +108,7 @@ async def get_scan(
 ):
     """Get a specific scan record."""
     from sqlalchemy import select
-    async with get_db() as db:
+    async for db in get_db():
         result = await db.execute(select(ScanHistory).where(ScanHistory.scan_id == scan_id))
         record = result.scalar_one_or_none()
         if not record:
@@ -122,7 +122,7 @@ async def get_scan_stats(
 ):
     """Get scan statistics summary."""
     from sqlalchemy import select, func
-    async with get_db() as db:
+    async for db in get_db():
         # Total scans
         total_scans = await db.execute(select(func.count(ScanHistory.id)))
         
@@ -161,7 +161,7 @@ async def get_scan_stats(
 async def delete_scan(scan_id: str):
     """Delete a scan record."""
     from sqlalchemy import select
-    async with get_db() as db:
+    async for db in get_db():
         result = await db.execute(select(ScanHistory).where(ScanHistory.scan_id == scan_id))
         record = result.scalar_one_or_none()
         if not record:

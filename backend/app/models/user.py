@@ -5,7 +5,7 @@ import hashlib
 import secrets
 from typing import Optional
 from datetime import datetime, timezone
-from sqlalchemy import String, Text, Index, JSON, Enum as SQLEnum, Boolean, DateTime
+from sqlalchemy import String, Text, Index, JSON, Enum as SQLEnum, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin
@@ -56,7 +56,7 @@ class APIKey(Base, TimestampMixin):
     key_id: Mapped[str] = mapped_column(String(32), unique=True, nullable=False, index=True)
     key_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    user_id: Mapped[int] = mapped_column(nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
