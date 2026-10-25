@@ -6,6 +6,7 @@ records and the UI.
 """
 
 import os
+import secrets
 from pathlib import Path
 
 APP_NAME = "Advance Ultimate OSINT Tools"
@@ -51,3 +52,26 @@ RATE_LIMIT_SEARCH = os.getenv("RATE_LIMIT_SEARCH", "10/minute")
 
 # Breach alert store
 BREACH_ALERT_DIR = Path(os.getenv("BREACH_ALERT_DIR", str(BACKEND_DIR / "breach_alerts"))).resolve()
+
+# Database
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite+aiosqlite:///{BACKEND_DIR / 'auosint.db'}")
+DATABASE_ECHO = os.getenv("DATABASE_ECHO", "").lower() in {"1", "true", "yes"}
+
+# Celery / Redis
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
+
+# JWT Secret (for future auth)
+JWT_SECRET = os.getenv("JWT_SECRET", secrets.token_hex(32))
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "60"))
+
+# External API Keys (optional)
+SHODAN_API_KEY = os.getenv("SHODAN_API_KEY", "")
+CENSYS_API_ID = os.getenv("CENSYS_API_ID", "")
+CENSYS_API_SECRET = os.getenv("CENSYS_API_SECRET", "")
+VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY", "")
+ABUSEIPDB_API_KEY = os.getenv("ABUSEIPDB_API_KEY", "")
+GREYNOISE_API_KEY = os.getenv("GREYNOISE_API_KEY", "")
+OTX_API_KEY = os.getenv("OTX_API_KEY", "")
+HIBP_API_KEY = os.getenv("HIBP_API_KEY", "")

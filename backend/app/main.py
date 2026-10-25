@@ -6,10 +6,14 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from app import config
-from app.routers import breach_alerts, darkweb, domain, email, media, phone, url, username
+from app.routers import (
+    breach_alerts, darkweb, domain, email, media, phone, url, username,
+    evidence, scan_history, auth as auth_router,
+)
 from app.services import evidence_store
 from app.services.breach_alerts import init_breach_alert_store
 from app.auth import verify_api_key
+from app.database import init_db, close_db
 
 # Rate limiter with default limits
 limiter = Limiter(key_func=get_remote_address, default_limits=[config.RATE_LIMIT_DEFAULT])
@@ -21,9 +25,13 @@ API_KEY = config.API_KEY  # Set in .env to enable auth
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup/shutdown lifecycle."""
-    # Initialize breach alert store
+    # Initialize database
+    await init_db()
+    # Initialize breach alert store (legacy file-based)
     await init_breach_alert_store()
     yield
+    # Cleanup
+    await close_db()
 
 
 app = FastAPI(
@@ -47,6 +55,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# API Routers
 app.include_router(username.router, prefix="/api/username", tags=["Username"])
 app.include_router(email.router, prefix="/api/email", tags=["Email"])
 app.include_router(phone.router, prefix="/api/phone", tags=["Phone"])
@@ -55,6 +64,9 @@ app.include_router(url.router, prefix="/api/url", tags=["URL"])
 app.include_router(media.router, prefix="/api/media", tags=["Media"])
 app.include_router(darkweb.router)
 app.include_router(breach_alerts.router)
+app.include_router(evidence.router, prefix="/api/evidence", tags=["Evidence"])
+app.include_router(scan_history.router, prefix="/api/scans", tags=["Scan History"])
+app.include_router(auth_router.router, prefix="/api/auth", tags=["Auth"])
 
 
 @app.get("/")
@@ -86,13 +98,13 @@ def meta():
 
 @app.get("/api/evidence/{evidence_id}")
 def get_any_evidence(evidence_id: str):
-    """Fetch any evidence record regardless of investigation type."""
+    """Fetch any evidence record regardless of investigation type (legacy file-based)."""
     return evidence_store.load(evidence_id)
 
 
 @app.get("/api/evidence/{evidence_id}/verify")
 def verify_evidence(evidence_id: str):
-    """Recompute the chain-of-custody hash and report whether it still matches."""
+    """Recompute the chain-of-custody hash and report whether it still matches (legacy)."""
     document = evidence_store.load(evidence_id)
     stored = document.get("metadata", {}).get("chain_of_custody", {}).get("hash")
     if not stored:
