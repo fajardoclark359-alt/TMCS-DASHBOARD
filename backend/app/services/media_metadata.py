@@ -218,7 +218,6 @@ def _assess_risk(exif: Dict[str, Any], gps: Optional[Dict[str, Any]],
     if gps:
         flags.append("GPS coordinates embedded — exact location disclosed")
         score += 45
-    flat_keys = set(exif.keys()) | set(tags.keys())
     device_bits = [str(exif.get(k, "")) for k in ("Make", "Model", "Software", "LensModel") if exif.get(k)]
     device_bits += [str(v) for k, v in tags.items() if any(s in k.lower() for s in ("make", "model", "encoder", "software", "tool"))]
     if any(device_bits):

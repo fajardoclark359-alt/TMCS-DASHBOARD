@@ -24,8 +24,14 @@
     "evidence_type": "media_metadata",
     "chain_of_custody": {
       "created_at": "2026-09-19T16:18:33.100412",
-      "hash": "bba386b8a72cc4d776e0fc2478d3be74f43da4f8fd10aa39c9653aee930ac1d0",
-      "verified": true
+      "hash": "c92e20a5f3208ae36609410ae95d84a361b4c30dbdec998003a738c0b83f94eb",
+      "verified": true,
+      "previous_hashes": [
+        "bba386b8a72cc4d776e0fc2478d3be74f43da4f8fd10aa39c9653aee930ac1d0"
+      ],
+      "resealed_reason": "legacy hash scheme, not reproducible under sha256 canonical form",
+      "algorithm": "sha256",
+      "sealed_at": "2026-10-25T15:43:55.136558+00:00"
     }
   }
 }

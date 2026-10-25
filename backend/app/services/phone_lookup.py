@@ -1,7 +1,6 @@
 import httpx
 import re
-import hashlib
-from typing import Optional, Dict, Any, List
+from typing import Dict, Any, List
 import phonenumbers
 from phonenumbers import carrier, timezone, geocoder
 

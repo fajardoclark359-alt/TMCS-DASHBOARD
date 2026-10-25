@@ -51,8 +51,10 @@
     "evidence_type": "phone_investigation",
     "chain_of_custody": {
       "created_at": "2026-09-19T16:19:23.083659",
-      "hash": null,
-      "verified": true
+      "hash": "e85e103a16521579888a2219367aecf1a78b435f7d08ce542fc3712d7eb1878d",
+      "verified": true,
+      "algorithm": "sha256",
+      "sealed_at": "2026-10-25T15:43:24.544772+00:00"
     }
   }
 }

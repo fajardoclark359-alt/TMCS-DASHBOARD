@@ -26,3 +26,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Test / lint caches
+.pytest_cache/
+.ruff_cache/

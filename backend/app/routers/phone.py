@@ -1,19 +1,20 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict
+
+from app import config
+from app.services import evidence_store
 from app.services.phone_lookup import phone_service
-from datetime import datetime
-import json
-import os
 
 router = APIRouter()
 
-EVIDENCE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "evidence")
-os.makedirs(EVIDENCE_DIR, exist_ok=True)
+PREFIX = "EVD-PHONE"
+
 
 class PhoneRequest(BaseModel):
     phone_number: str
     country_code: Optional[str] = "US"
+
 
 class EvidenceRequest(BaseModel):
     phone_number: str
@@ -26,126 +27,81 @@ class EvidenceRequest(BaseModel):
     priority: Optional[str] = "medium"
     case_id: Optional[str] = ""
 
+
 @router.post("/lookup")
 async def lookup_phone(request: PhoneRequest):
     return await phone_service.lookup_phone(request.phone_number, request.country_code)
 
+
 @router.post("/validate")
-async def validate_phone(phone_number: str, country_code: str = "US"):
-    return await phone_service.lookup_phone(phone_number, country_code)
+async def validate_phone(request: PhoneRequest):
+    return await phone_service.lookup_phone(request.phone_number, request.country_code)
+
 
 @router.post("/evidence/capture")
 async def capture_evidence(request: EvidenceRequest):
     result = await phone_service.lookup_phone(request.phone_number, request.country_code)
-    
-    evidence = {
-        "evidence_id": f"EVD-{datetime.now().strftime('%Y%m%d%H%M%S')}",
-        "timestamp": datetime.now().isoformat(),
-        "investigation_type": request.investigation_type,
-        "target": request.phone_number,
-        "country_code": request.country_code,
-        "notes": request.notes,
-        "tags": request.tags,
-        "priority": request.priority,
-        "case_id": request.case_id,
-        "data": result,
-        "metadata": {
-            "investigator": "OSINT TMC/CLARK",
-            "tool_version": "2.0.0",
-            "evidence_type": "phone_investigation",
-            "chain_of_custody": {
-                "created_at": datetime.now().isoformat(),
-                "hash": None,
-                "verified": True
-            }
-        }
-    }
-    
-    evidence_str = json.dumps(evidence, indent=2, default=str)
-    evidence_hash = hash(evidence_str)
-    evidence["metadata"]["chain_of_custody"]["hash"] = str(evidence_hash)
-    
-    filename = f"{EVIDENCE_DIR}/{evidence['evidence_id']}.json"
-    with open(filename, "w") as f:
-        f.write(evidence_str)
-    
+
+    document = evidence_store.record(
+        prefix=PREFIX,
+        investigation_type=request.investigation_type or "phone_lookup",
+        evidence_type="phone_investigation",
+        target=request.phone_number,
+        data=result,
+        notes=request.notes,
+        tags=request.tags,
+        priority=request.priority,
+        case_id=request.case_id,
+        extra={"country_code": request.country_code},
+    )
     return {
-        "evidence_id": evidence["evidence_id"],
-        "filename": filename,
-        "evidence_hash": evidence_hash,
-        "data": evidence
+        "evidence_id": document["evidence_id"],
+        "filename": document.pop("_path", ""),
+        "evidence_hash": document["metadata"]["chain_of_custody"]["hash"],
+        "data": document,
     }
+
 
 @router.get("/evidence/list")
 async def list_evidence():
-    files = [f for f in os.listdir(EVIDENCE_DIR) if f.endswith('.json')]
-    evidence_list = []
-    for f in sorted(files, reverse=True):
-        with open(os.path.join(EVIDENCE_DIR, f), 'r') as file:
-            data = json.load(file)
-            evidence_list.append({
-                "evidence_id": data.get("evidence_id"),
-                "timestamp": data.get("timestamp"),
-                "target": data.get("target"),
-                "investigation_type": data.get("investigation_type"),
-                "notes": data.get("notes"),
-                "tags": data.get("tags"),
-                "priority": data.get("priority"),
-                "evidence_hash": data.get("metadata", {}).get("chain_of_custody", {}).get("hash")
-            })
-    return evidence_list
+    # Legacy ids ("EVD-<timestamp>") predate the EVD-PHONE prefix.
+    return evidence_store.list_records([PREFIX], include_legacy_phone=True)
+
 
 @router.get("/evidence/{evidence_id}")
 async def get_evidence(evidence_id: str):
-    filename = f"{EVIDENCE_DIR}/{evidence_id}.json"
-    if os.path.exists(filename):
-        with open(filename, 'r') as f:
-            return json.load(f)
-    return {"error": "Evidence not found"}
+    return evidence_store.load(evidence_id)
+
 
 @router.delete("/evidence/{evidence_id}")
 async def delete_evidence(evidence_id: str):
-    filename = f"{EVIDENCE_DIR}/{evidence_id}.json"
-    if os.path.exists(filename):
-        os.remove(filename)
-        return {"message": "Evidence deleted", "evidence_id": evidence_id}
-    return {"error": "Evidence not found"}
+    evidence_store.delete(evidence_id)
+    return {"message": "Evidence deleted", "evidence_id": evidence_id}
+
 
 @router.post("/evidence/export")
 async def export_evidence(request: EvidenceRequest):
     result = await phone_service.lookup_phone(request.phone_number, request.country_code)
-    
+
     export_data = {
         "case_info": {
-            "case_id": request.case_id or f"CASE-{datetime.now().strftime('%Y%m%d')}",
+            "case_id": request.case_id or evidence_store.new_evidence_id("CASE"),
             "investigation_type": request.investigation_type,
             "priority": request.priority,
-            "created_at": datetime.now().isoformat(),
-            "investigator": "OSINT TMC/CLARK v2.0.0"
+            "created_at": evidence_store.utcnow_iso(),
+            "investigator": f"{config.DEVELOPER} / {config.APP_NAME}",
         },
-        "target": {
-            "phone_number": request.phone_number,
-            "country_code": request.country_code
-        },
+        "target": {"phone_number": request.phone_number, "country_code": request.country_code},
         "findings": result,
         "notes": request.notes,
         "tags": request.tags,
         "attachments": request.attachments,
         "screenshots": request.screenshots,
-        "export_timestamp": datetime.now().isoformat(),
+        "export_timestamp": evidence_store.utcnow_iso(),
         "chain_of_custody": {
-            "evidence_hash": str(hash(json.dumps(result, default=str))),
+            "evidence_hash": evidence_store.compute_hash({"findings": result}),
             "verification_status": "PENDING",
-            "export_format": "JSON"
-        }
+            "export_format": "JSON",
+        },
     }
-    
-    filename = f"{EVIDENCE_DIR}/EXPORT-{export_data['case_info']['case_id']}.json"
-    with open(filename, "w") as f:
-        json.dump(export_data, f, indent=2, default=str)
-    
-    return {
-        "export_id": export_data['case_info']['case_id'],
-        "filename": filename,
-        "data": export_data
-    }
+    return export_data

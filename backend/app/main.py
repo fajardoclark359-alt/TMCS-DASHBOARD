@@ -1,24 +1,19 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import username, email, phone, domain, url, media, darkweb
+
+from app import config
+from app.routers import darkweb, domain, email, media, phone, url, username
+from app.services import evidence_store
 
 app = FastAPI(
-    title="OSINT TMC/CLARK",
-    description="Cyber Intelligence Platform - Open Source Intelligence gathering tool for security research",
-    version="2.1.0"
+    title=config.APP_NAME,
+    description=f"{config.APP_DESCRIPTION} Maintained by {config.DEVELOPER}.",
+    version=config.VERSION,
 )
-
-import os
-
-ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "https://fajardoclark359-alt.github.io",
-]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=config.ALLOWED_ORIGINS,
     allow_origin_regex=r"https://.*\.onrender\.com$",
     allow_credentials=True,
     allow_methods=["*"],
@@ -33,10 +28,51 @@ app.include_router(url.router, prefix="/api/url", tags=["URL"])
 app.include_router(media.router, prefix="/api/media", tags=["Media"])
 app.include_router(darkweb.router)
 
+
 @app.get("/")
 def root():
-    return {"message": "OSINT TMC/CLARK - Cyber Intelligence Platform", "version": "2.1.0"}
+    return {
+        "message": config.APP_NAME,
+        "description": config.APP_DESCRIPTION,
+        "developer": config.DEVELOPER,
+        "version": config.VERSION,
+        "docs": "/docs",
+    }
+
 
 @app.get("/health")
 def health():
-    return {"status": "healthy"}
+    return {"status": "healthy", "version": config.VERSION}
+
+
+@app.get("/api/meta")
+def meta():
+    """Identity of the running platform, used by clients and dashboards."""
+    return {
+        "name": config.APP_NAME,
+        "short_name": config.APP_SHORT_NAME,
+        "developer": config.DEVELOPER,
+        "version": config.VERSION,
+    }
+
+
+@app.get("/api/evidence/{evidence_id}")
+def get_any_evidence(evidence_id: str):
+    """Fetch any evidence record regardless of investigation type."""
+    return evidence_store.load(evidence_id)
+
+
+@app.get("/api/evidence/{evidence_id}/verify")
+def verify_evidence(evidence_id: str):
+    """Recompute the chain-of-custody hash and report whether it still matches."""
+    document = evidence_store.load(evidence_id)
+    stored = document.get("metadata", {}).get("chain_of_custody", {}).get("hash")
+    if not stored:
+        raise HTTPException(status_code=409, detail="Evidence has no chain-of-custody hash")
+    return {
+        "evidence_id": evidence_id,
+        "algorithm": evidence_store.HASH_ALGORITHM,
+        "stored_hash": stored,
+        "computed_hash": evidence_store.compute_hash(document),
+        "verified": evidence_store.verify_hash(document),
+    }

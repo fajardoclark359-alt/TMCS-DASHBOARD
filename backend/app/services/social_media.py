@@ -1,7 +1,8 @@
+import asyncio
 import httpx
 import hashlib
 import re
-from typing import Optional, Dict, Any, List
+from typing import Dict, Any, List
 
 class SocialMediaService:
     def __init__(self):
@@ -61,16 +62,28 @@ class SocialMediaService:
         }
 
     async def search_all(self, username: str) -> Dict[str, Any]:
-        results = []
+        # Platforms are queried concurrently (bounded) instead of one after the
+        # other: 50+ sequential requests with a 6s timeout could take minutes.
+        semaphore = asyncio.Semaphore(8)
+
         async with httpx.AsyncClient(follow_redirects=True, timeout=6.0) as client:
-            for platform, checker in self.platforms.items():
-                try:
-                    result = await checker(client, username)
-                    if result:
-                        result["platform"] = platform
-                        results.append(result)
-                except Exception:
-                    continue
+            async def run(platform: str, checker):
+                async with semaphore:
+                    try:
+                        result = await checker(client, username)
+                    except Exception:
+                        return None
+                    if not result:
+                        return None
+                    result["platform"] = platform
+                    return result
+
+            gathered = await asyncio.gather(
+                *(run(platform, checker) for platform, checker in self.platforms.items())
+            )
+
+        results = [r for r in gathered if r]
+        results.sort(key=lambda r: r.get("platform", ""))
 
         evidence = self._build_evidence(results, username)
 
@@ -439,7 +452,6 @@ class SocialMediaService:
         return None
 
     async def _check_gravatar(self, client, username):
-        import hashlib
         h = hashlib.md5(username.encode()).hexdigest()
         try:
             resp = await client.get(f"https://www.gravatar.com/avatar/{h}?d=404")

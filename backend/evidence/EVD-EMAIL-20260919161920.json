@@ -114,8 +114,10 @@
     "evidence_type": "email_investigation",
     "chain_of_custody": {
       "created_at": "2026-09-19T16:19:20.040085",
-      "hash": null,
-      "verified": true
+      "hash": "809e3017abdfa16fa424998e387bd54e18deb40330f05d8b3746c16cc367bfac",
+      "verified": true,
+      "algorithm": "sha256",
+      "sealed_at": "2026-10-25T15:43:24.552657+00:00"
     }
   }
 }

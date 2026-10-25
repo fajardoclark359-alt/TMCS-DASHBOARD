@@ -1,10 +1,12 @@
 services:
   - type: web
-    name: cyber-intel-backend
+    name: advance-ultimate-osint-api
     runtime: python
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
-        value: "3.11"
+        value: "3.12"
+      - key: ALLOWED_ORIGINS
+        value: https://fajardoclark359-alt.github.io

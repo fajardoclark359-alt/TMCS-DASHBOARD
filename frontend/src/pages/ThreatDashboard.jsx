@@ -440,7 +440,7 @@ export default function ThreatDashboard() {
       <div className="text-center py-4">
         <div className="h-px mb-3" style={{ background: 'linear-gradient(90deg, transparent, #30363d, transparent)' }}></div>
         <p className="text-[10px]" style={{ color: '#8b949e', fontFamily: 'JetBrains Mono, monospace' }}>
-          TMCS v1.0 — Threat Monitoring Center System | Clark Fajardo | Philippine Cyber Intelligence Platform
+          TMCS v1.0 — Threat Monitoring Center System | Advance Ultimate OSINT Tools | Clark Fajardo
         </p>
       </div>
 

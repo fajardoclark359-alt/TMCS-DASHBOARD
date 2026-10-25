@@ -446,11 +446,16 @@ function MediaForensics() {
                 <div className="flex gap-2 mt-2">
                   <button onClick={() => handleViewSaved(ev.evidence_id)} className="text-blue-400 hover:text-blue-300 text-[10px] flex items-center gap-1"><FiEye /> VIEW</button>
                   <button onClick={async () => {
-                    const data = await getMediaEvidence(ev.evidence_id)
-                    if (data.data) downloadFile(`${ev.evidence_id}.json`, JSON.stringify(data, null, 2), 'application/json')
+                    try {
+                      const data = await getMediaEvidence(ev.evidence_id)
+                      downloadFile(`${ev.evidence_id}.json`, JSON.stringify(data, null, 2), 'application/json')
+                    } catch { alert('Evidence not found') }
                   }} className="text-slate-400 hover:text-slate-200 text-[10px] flex items-center gap-1"><FiDownload /> JSON</button>
                   <button onClick={() => window.open(mediaExportUrl(ev.evidence_id, 'html'), '_blank')} className="text-slate-400 hover:text-slate-200 text-[10px] flex items-center gap-1"><FiDownload /> HTML</button>
-                  <button onClick={async () => { await deleteMediaEvidence(ev.evidence_id); fetchEvidenceList() }} className="text-red-400 hover:text-red-300 text-[10px] flex items-center gap-1"><FiTrash2 /> DELETE</button>
+                  <button onClick={async () => {
+                    try { await deleteMediaEvidence(ev.evidence_id); fetchEvidenceList() }
+                    catch { alert('Could not delete evidence') }
+                  }} className="text-red-400 hover:text-red-300 text-[10px] flex items-center gap-1"><FiTrash2 /> DELETE</button>
                 </div>
                 <div className="text-[9px] text-slate-600 mt-1">HASH: {ev.evidence_hash}</div>
               </div>

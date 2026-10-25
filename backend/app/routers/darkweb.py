@@ -4,7 +4,6 @@ Aggregates open-source threat intelligence from legal, public feeds.
 """
 import asyncio
 import hashlib
-import json
 import re
 from datetime import datetime, timezone
 from typing import Optional
@@ -119,7 +118,6 @@ def compute_risk_score(indicators: dict) -> dict:
 async def get_threat_feeds(limit: int = Query(20, ge=1, le=100)):
     """Aggregate threat intelligence from multiple open-source feeds."""
     tasks = []
-    feed_results = {}
 
     # Fetch RSS feeds concurrently
     for name, url in RSS_FEEDS.items():

@@ -1,6 +1,7 @@
 {
-  "name": "osint-tool-frontend",
+  "name": "advance-ultimate-osint-tools",
   "private": true,
+  "description": "Advance Ultimate OSINT Tools — Cyber Intelligence Platform by Clark Fajardo",
   "version": "1.0.0",
   "type": "module",
   "scripts": {

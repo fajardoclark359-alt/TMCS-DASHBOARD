@@ -86,8 +86,10 @@
     "evidence_type": "domain_investigation",
     "chain_of_custody": {
       "created_at": "2026-09-19T16:19:11.179864",
-      "hash": null,
-      "verified": true
+      "hash": "8cfbb21d902b937da7a1433b7809e176e9d9349877f2c5b7422d2485956793f1",
+      "verified": true,
+      "algorithm": "sha256",
+      "sealed_at": "2026-10-25T15:43:24.549035+00:00"
     }
   }
 }

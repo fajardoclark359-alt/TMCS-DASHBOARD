@@ -257,8 +257,10 @@
     "evidence_type": "username_investigation",
     "chain_of_custody": {
       "created_at": "2026-09-19T16:20:32.795718",
-      "hash": null,
-      "verified": true
+      "hash": "e1dfb30e0626201285816022aa708cf525a165d377b142256c32959102feb2b2",
+      "verified": true,
+      "algorithm": "sha256",
+      "sealed_at": "2026-10-25T15:43:24.570288+00:00"
     }
   }
 }

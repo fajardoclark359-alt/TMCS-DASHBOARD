@@ -1,20 +1,24 @@
+import asyncio
 import httpx
 import socket
 import ssl
 import dns.resolver
 import whois
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 from urllib.parse import urlparse
 
 class URLInvestigationService:
     async def investigate_url(self, url: str) -> Dict[str, Any]:
-        if not url.startswith(('http://', 'https://')):
-            url = 'http://' + url
+        if "://" not in url:
+            url = "http://" + url
 
         parsed = urlparse(url)
-        domain = parsed.hostname
+        domain = (parsed.hostname or "").lower()
+        if not domain:
+            raise ValueError("URL is missing a host")
+
         scheme = parsed.scheme
         path = parsed.path
 
@@ -24,8 +28,8 @@ class URLInvestigationService:
             "scheme": scheme,
             "path": path,
             "ip_addresses": await self._resolve_ip(domain),
-            "whois": self._whois_lookup(domain),
-            "dns": self._dns_lookup(domain),
+            "whois": await asyncio.to_thread(self._whois_lookup, domain),
+            "dns": await asyncio.to_thread(self._dns_lookup, domain),
             "ssl": await self._ssl_check(domain),
             "http_headers": await self._http_headers(url),
             "domain_status": await self._check_domain_status(domain),
@@ -96,6 +100,9 @@ class URLInvestigationService:
         return records
 
     async def _ssl_check(self, domain: str) -> Dict[str, Any]:
+        return await asyncio.to_thread(self._ssl_check_sync, domain)
+
+    def _ssl_check_sync(self, domain: str) -> Dict[str, Any]:
         result = {"valid": False, "issuer": None, "subject": None, "not_before": None, "not_after": None, "days_remaining": None, "protocol": None, "cipher": None}
         try:
             ctx = ssl.create_default_context()
@@ -114,8 +121,8 @@ class URLInvestigationService:
                 result["not_after"] = na
                 if na:
                     try:
-                        na_dt = datetime.strptime(na, "%b %d %H:%M:%S %Y %Z")
-                        result["days_remaining"] = (na_dt - datetime.utcnow()).days
+                        na_dt = datetime.strptime(na, "%b %d %H:%M:%S %Y %Z").replace(tzinfo=timezone.utc)
+                        result["days_remaining"] = (na_dt - datetime.now(timezone.utc)).days
                     except Exception:
                         pass
                 result["protocol"] = s.version()
@@ -154,7 +161,7 @@ class URLInvestigationService:
             try:
                 start = datetime.now()
                 async with httpx.AsyncClient(follow_redirects=True, timeout=10.0) as client:
-                    resp = await client.get(f"{scheme}://{domain}")
+                    await client.get(f"{scheme}://{domain}")
                     elapsed = (datetime.now() - start).total_seconds() * 1000
                     if scheme == "https":
                         result["https_reachable"] = True
@@ -186,6 +193,7 @@ class URLInvestigationService:
         return redirects
 
     async def _security_checks(self, url: str, domain: str) -> Dict[str, Any]:
+        domain = domain or ""
         checks = {
             "is_https": url.startswith("https"),
             "has_redirects": False,
@@ -233,19 +241,27 @@ class URLInvestigationService:
                 checks["flags"].append(f"Free hosting: {fh}")
                 break
 
-        try:
-            w = whois.whois(domain)
-            cd = w.creation_date
-            if isinstance(cd, list): cd = cd[0]
-            if isinstance(cd, datetime):
-                days_old = (datetime.now() - cd).days
-                if days_old < 30:
-                    checks["recently_registered"] = True
-                    checks["flags"].append(f"Recently registered: {days_old} days ago")
-        except Exception:
-            pass
+        days_old = await asyncio.to_thread(self._domain_age_days, domain)
+        if days_old is not None and days_old < 30:
+            checks["recently_registered"] = True
+            checks["flags"].append(f"Recently registered: {days_old} days ago")
 
         return checks
+
+    @staticmethod
+    def _domain_age_days(domain: str) -> Optional[int]:
+        try:
+            w = whois.whois(domain)
+            created = w.creation_date
+            if isinstance(created, list):
+                created = created[0]
+            if isinstance(created, datetime):
+                if created.tzinfo is None:
+                    created = created.replace(tzinfo=timezone.utc)
+                return (datetime.now(timezone.utc) - created).days
+        except Exception:
+            pass
+        return None
 
     async def _detect_tech(self, url: str) -> Dict[str, Any]:
         tech = {"cms": None, "framework": None, "language": None, "analytics": [], "cdn": None}

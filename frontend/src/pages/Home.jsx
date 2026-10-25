@@ -1,5 +1,6 @@
 import { FiUser, FiMail, FiPhone, FiGlobe, FiShield, FiLink, FiTerminal, FiLock, FiDatabase, FiSearch, FiCamera, FiEye } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
+import { APP_NAME, DEVELOPER, VERSION } from '../config'
 
 function Home() {
   const tools = [
@@ -24,9 +25,10 @@ function Home() {
       <div className="text-center mb-10">
         <div className="flex items-center justify-center gap-3 mb-3">
           <FiTerminal className="text-blue-400 text-3xl" />
-          <h1 className="title-cyber text-4xl font-bold text-blue-400 glow-text">ADVANCE OSINT Tools Developer Clark Fajardo</h1>
+          <h1 className="title-cyber text-4xl font-bold text-blue-400 glow-text">{APP_NAME}</h1>
         </div>
-        <p className="text-slate-500 text-sm mb-4">CYBER INTELLIGENCE PLATFORM v2.0</p>
+        <p className="text-slate-500 text-sm mb-1">CYBER INTELLIGENCE PLATFORM v{VERSION}</p>
+        <p className="text-blue-400/70 text-xs font-mono mb-4">DEVELOPED BY {DEVELOPER}</p>
         <p className="text-slate-400 max-w-2xl mx-auto text-sm leading-relaxed">
           Advanced Open Source Intelligence gathering platform for cybersecurity professionals.
           Enumerate usernames, emails, phone numbers, domains, and URLs with deep forensic analysis.
@@ -109,7 +111,7 @@ function Home() {
       <div className="mt-8 text-center">
         <div className="h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent mb-4"></div>
         <p className="text-slate-600 text-xs font-mono">
-          ADVANCE OSINT Tools Developer Clark Fajardo v2.0 | Built for Cybersecurity Professionals | Use Responsibly
+          {APP_NAME} v{VERSION} | Developed by {DEVELOPER} | Built for Cybersecurity Professionals | Use Responsibly
         </p>
       </div>
     </div>

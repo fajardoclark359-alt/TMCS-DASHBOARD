@@ -10,6 +10,7 @@ import DarkWebMonitor from './pages/DarkWebMonitor'
 import GovMonitor from './pages/GovMonitor'
 import ThreatDashboard from './pages/ThreatDashboard'
 import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal, FiCamera, FiEye, FiServer, FiAlertTriangle } from 'react-icons/fi'
+import { APP_NAME, DEVELOPER, VERSION } from './config'
 
 function App() {
   return (
@@ -19,9 +20,9 @@ function App() {
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-1">
               <FiTerminal className="text-blue-400 text-xl" />
-              <h1 className="title-cyber text-xl font-bold text-blue-400 glow-text">ADVANCE OSINT Tools Developer Clark Fajardo</h1>
+              <h1 className="title-cyber text-xl font-bold text-blue-400 glow-text">{APP_NAME}</h1>
             </div>
-            <p className="text-xs text-slate-500 ml-7">CYBER INTELLIGENCE PLATFORM</p>
+            <p className="text-xs text-slate-500 ml-7">DEVELOPER: {DEVELOPER}</p>
           </div>
 
           <ul className="space-y-1">
@@ -86,7 +87,7 @@ function App() {
           </div>
 
           <div className="mt-4 text-center">
-            <p className="text-[10px] text-slate-600 font-mono">v2.0.0 | Clark Fajardo</p>
+            <p className="text-[10px] text-slate-600 font-mono">v{VERSION} | {DEVELOPER}</p>
           </div>
         </nav>
 

@@ -169,8 +169,10 @@
     "evidence_type": "url_investigation",
     "chain_of_custody": {
       "created_at": "2026-09-19T16:19:33.459226",
-      "hash": null,
-      "verified": true
+      "hash": "296b2ad1a3ecee89173c8d167bbc219bdd100008c36467a467c354b29120f189",
+      "verified": true,
+      "algorithm": "sha256",
+      "sealed_at": "2026-10-25T15:43:24.557182+00:00"
     }
   }
 }
