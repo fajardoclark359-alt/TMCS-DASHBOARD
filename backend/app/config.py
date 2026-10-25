@@ -41,3 +41,13 @@ ALLOWED_ORIGINS = _origins_from_env() or DEFAULT_ORIGINS
 ALLOW_PRIVATE_TARGETS = os.getenv("ALLOW_PRIVATE_TARGETS", "").lower() in {"1", "true", "yes"}
 
 MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(25 * 1024 * 1024)))
+
+# Optional API key for authentication (set to enable)
+API_KEY = os.getenv("API_KEY", "")
+
+# Rate limiting
+RATE_LIMIT_DEFAULT = os.getenv("RATE_LIMIT_DEFAULT", "30/minute")
+RATE_LIMIT_SEARCH = os.getenv("RATE_LIMIT_SEARCH", "10/minute")
+
+# Breach alert store
+BREACH_ALERT_DIR = Path(os.getenv("BREACH_ALERT_DIR", str(BACKEND_DIR / "breach_alerts"))).resolve()

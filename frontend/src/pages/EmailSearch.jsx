@@ -245,18 +245,40 @@ function EmailSearch() {
           )}
 
           {results.breaches.social_accounts && Object.keys(results.breaches.social_accounts).length > 0 && (
-            <div className="card-cyber p-4 rounded-lg">
-              <h2 className="title-cyber text-sm font-bold mb-2 flex items-center gap-2 text-blue-400"><FiLink /> LINKED SOCIAL ACCOUNTS</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="card-cyber p-5 rounded-lg mb-6 border border-blue-500/30 bg-blue-900/20">
+              <div className="flex items-center gap-2 mb-4">
+                <FiLink className="text-blue-400 text-lg" />
+                <h2 className="title-cyber text-lg font-bold text-blue-400">&#9656; CONNECTED ACCOUNTS — NAKA KONEK</h2>
+              </div>
+              <p className="text-slate-500 text-[11px] font-mono mb-4">Social platforms linked to this email address — click to open each profile:</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {Object.entries(results.breaches.social_accounts).map(([platform, info]) => (
-                  <div key={platform} className="bg-slate-900/50 p-2 rounded cyber-border flex items-center justify-between">
-                    <div>
+                  <div key={platform} className="p-3 rounded-lg cyber-border bg-slate-900/50 hover:bg-slate-800/50 transition flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
                       <span className="font-bold text-blue-400 uppercase text-xs font-mono">[{platform}]</span>
-                      {info.username && <span className="text-slate-300 ml-2 text-xs">{info.username}</span>}
-                      {info.reputation && <span className="text-slate-500 ml-2 text-xs">rep:{info.reputation}</span>}
+                      {info.url && (
+                        <a href={info.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-[10px] flex items-center gap-1">
+                          &#9656; OPEN
+                        </a>
+                      )}
                     </div>
-                    {info.url && (
-                      <a href={info.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs">&#9656; VIEW</a>
+                    {info.username && (
+                      <div className="mb-1">
+                        <span className="text-slate-500 text-[9px] font-mono block">username:</span>
+                        <span className="text-white text-xs font-mono">{info.username}</span>
+                      </div>
+                    )}
+                    {info.source && (
+                      <div className="mb-1">
+                        <span className="text-slate-500 text-[9px] font-mono block">source:</span>
+                        <span className="text-slate-400 text-[10px] font-mono">{info.source}</span>
+                      </div>
+                    )}
+                    {info.reputation && (
+                      <div className="mb-1">
+                        <span className="text-slate-500 text-[9px] font-mono block">rep:</span>
+                        <span className="text-slate-400 text-[10px] font-mono">{info.reputation}</span>
+                      </div>
                     )}
                   </div>
                 ))}

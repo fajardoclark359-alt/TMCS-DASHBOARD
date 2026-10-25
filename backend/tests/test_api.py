@@ -11,6 +11,9 @@ from app.services import evidence_store
 @pytest.fixture()
 def client(tmp_path, monkeypatch):
     monkeypatch.setattr(evidence_store, "EVIDENCE_DIR", tmp_path)
+    # Also patch breach alert directory
+    from app.services import breach_alerts
+    monkeypatch.setattr(breach_alerts, "BREACH_ALERT_DIR", tmp_path / "breach_alerts")
     return TestClient(app)
 
 
@@ -109,3 +112,118 @@ def test_unknown_evidence_returns_404(client):
     assert client.get("/api/media/evidence/EVD-NOPE").status_code == 404
     assert client.get("/api/evidence/EVD-NOPE/verify").status_code == 404
     assert client.delete("/api/media/evidence/EVD-NOPE").status_code == 404
+
+
+# ═══ BREACH ALERT TESTS ═══
+
+def test_breach_alerts_list_empty(client):
+    response = client.get("/api/breach-alerts/")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["alerts"] == []
+    assert data["total"] == 0
+
+
+def test_breach_alerts_stats(client):
+    response = client.get("/api/breach-alerts/stats")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 0
+    assert "by_severity" in data
+    assert data["tracked_targets"] == 80
+
+
+def test_breach_alerts_targets(client):
+    response = client.get("/api/breach-alerts/targets")
+    assert response.status_code == 200
+    data = response.json()
+    assert "targets" in data
+    assert data["count"] == 80
+    assert "categories" in data
+    assert "DepEd" in data["targets"]
+    assert "PhilHealth" in data["targets"]
+
+
+def test_breach_alert_create_and_list(client):
+    payload = {
+        "title": "TEST: PH Data Breach - DepEd",
+        "target": "DepEd",
+        "severity": "CRITICAL",
+        "source": "Test Source",
+        "description": "Test breach alert for DepEd portal",
+        "alert_type": "news",
+        "tags": ["test"],
+    }
+    created = client.post("/api/breach-alerts/", json=payload)
+    assert created.status_code == 201
+    body = created.json()
+    assert "alert_id" in body
+    assert body["alert_id"].startswith("ALRT-PH-")
+
+    # List should now include the new alert
+    listed = client.get("/api/breach-alerts/")
+    assert listed.status_code == 200
+    data = listed.json()
+    assert data["total"] == 1
+    assert len(data["alerts"]) == 1
+    assert data["alerts"][0]["target"] == "DepEd"
+    assert data["alerts"][0]["severity"] == "CRITICAL"
+
+    # Stats should reflect the new alert
+    stats = client.get("/api/breach-alerts/stats")
+    assert stats.json()["total"] == 1
+    assert stats.json()["by_severity"]["CRITICAL"] == 1
+
+
+def test_breach_alert_get_by_id(client):
+    payload = {
+        "title": "TEST: PH Data Breach - BDO",
+        "target": "BDO",
+        "severity": "HIGH",
+        "source": "Test Source",
+        "description": "Test breach alert for BDO",
+        "alert_type": "darkweb",
+    }
+    created = client.post("/api/breach-alerts/", json=payload)
+    alert_id = created.json()["alert_id"]
+
+    fetched = client.get(f"/api/breach-alerts/{alert_id}")
+    assert fetched.status_code == 200
+    data = fetched.json()
+    assert data["alert_id"] == alert_id
+    assert data["target"] == "BDO"
+
+
+def test_breach_alert_delete(client):
+    payload = {
+        "title": "TEST: PH Data Breach - Globe",
+        "target": "Globe",
+        "severity": "MEDIUM",
+        "source": "Test Source",
+        "description": "Test breach alert for Globe",
+        "alert_type": "urlhaus",
+    }
+    created = client.post("/api/breach-alerts/", json=payload)
+    alert_id = created.json()["alert_id"]
+
+    deleted = client.delete(f"/api/breach-alerts/{alert_id}")
+    assert deleted.status_code == 200
+
+    # Should now be 404
+    assert client.get(f"/api/breach-alerts/{alert_id}").status_code == 404
+
+
+def test_breach_alert_validation(client):
+    # Missing required fields
+    response = client.post("/api/breach-alerts/", json={"title": "Test"})
+    assert response.status_code == 422
+
+    # Invalid severity
+    response = client.post("/api/breach-alerts/", json={
+        "title": "Test",
+        "target": "DepEd",
+        "severity": "INVALID",
+        "source": "Test",
+        "description": "Test description",
+    })
+    assert response.status_code == 422

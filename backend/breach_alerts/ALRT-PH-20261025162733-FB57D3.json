@@ -1,0 +1,21 @@
+{
+  "alert_id": "ALRT-PH-20261025162733-FB57D3",
+  "created": "2026-10-25T16:27:33.931139+00:00",
+  "title": "TEST: PH Data Breach - DepEd",
+  "target": "DepEd",
+  "severity": "CRITICAL",
+  "source": "Test Source",
+  "description": "Test breach alert for DepEd portal",
+  "link": null,
+  "type": "news",
+  "tags": [
+    "test"
+  ],
+  "metadata": {
+    "app": "Advance Ultimate OSINT Tools",
+    "version": "2.2.0",
+    "developer": "Clark Fajardo",
+    "detection_method": "automated"
+  },
+  "hash": "319e8be93d6d07660c6fc3cfa14fcc486c698ef9d9c7b75fc9871269c2e7030d"
+}

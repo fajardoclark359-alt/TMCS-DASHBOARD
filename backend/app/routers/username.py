@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional, List
 
+from app import config
 from app.services import evidence_store
 from app.services.social_media import social_media_service
 from app.services.validators import validate_username

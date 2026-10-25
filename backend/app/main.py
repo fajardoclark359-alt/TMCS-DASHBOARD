@@ -1,15 +1,42 @@
-from fastapi import FastAPI, HTTPException
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from app import config
-from app.routers import darkweb, domain, email, media, phone, url, username
+from app.routers import breach_alerts, darkweb, domain, email, media, phone, url, username
 from app.services import evidence_store
+from app.services.breach_alerts import init_breach_alert_store
+from app.auth import verify_api_key
+
+# Rate limiter with default limits
+limiter = Limiter(key_func=get_remote_address, default_limits=[config.RATE_LIMIT_DEFAULT])
+
+# API Key auth (optional - can be enabled via env)
+API_KEY = config.API_KEY  # Set in .env to enable auth
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup/shutdown lifecycle."""
+    # Initialize breach alert store
+    await init_breach_alert_store()
+    yield
+
 
 app = FastAPI(
     title=config.APP_NAME,
     description=f"{config.APP_DESCRIPTION} Maintained by {config.DEVELOPER}.",
     version=config.VERSION,
+    lifespan=lifespan,
+    dependencies=[Depends(verify_api_key)] if API_KEY else None,
 )
+
+# Rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,6 +54,7 @@ app.include_router(domain.router, prefix="/api/domain", tags=["Domain"])
 app.include_router(url.router, prefix="/api/url", tags=["URL"])
 app.include_router(media.router, prefix="/api/media", tags=["Media"])
 app.include_router(darkweb.router)
+app.include_router(breach_alerts.router)
 
 
 @app.get("/")

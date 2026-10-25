@@ -269,12 +269,18 @@ class SocialMediaService:
         return None
 
     async def _check_facebook(self, client, username):
-        try:
-            resp = await client.get(f"https://www.facebook.com/{username}")
-            if resp.status_code == 200 and ('"userID"' in resp.text or 'page_action_section' in resp.text):
-                return {"url": f"https://www.facebook.com/{username}"}
-        except Exception:
-            pass
+        # Facebook often blocks unauthenticated scraping on www; try mobile subdomain too.
+        for url in (f"https://m.facebook.com/{username}", f"https://www.facebook.com/{username}"):
+            try:
+                resp = await client.get(url, headers={"User-Agent": "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36"})
+                if resp.status_code == 200:
+                    text = resp.text
+                    if ('"userID"' in text or 'page_action_section' in text
+                            or f'/{username}' in text and 'login' not in text.lower()
+                            or 'Facebook' in text and 'log in' not in text.lower()[:200]):
+                        return {"url": f"https://www.facebook.com/{username}"}
+            except Exception:
+                continue
         return None
 
     async def _check_steam(self, client, username):

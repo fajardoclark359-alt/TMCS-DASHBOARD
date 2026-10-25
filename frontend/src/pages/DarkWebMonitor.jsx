@@ -288,11 +288,13 @@ const PH_HACKER_GROUPS = [
 // INCIDENT TRACKING — Ongoing hack alerts
 // ═══════════════════════════════════════════════════════════════
 const ONGOING_INCIDENTS = [
-  { group: 'NULSEC', target: 'DepEd Portal', status: 'ACTIVE', since: '2024-ongoing', type: 'data leak', severity: 'HIGH', detail: 'Ongoing credential exposure via misconfigured API — active monitoring' },
-  { group: 'DNH Klammer', target: 'DICT Website', status: 'ACTIVE', since: '2024-06', type: 'defacement', severity: 'HIGH', detail: 'Government website defaced — hacktivist demands active' },
-  { group: 'TeamP01s0n', target: 'GCash Wallets', status: 'ACTIVE', since: '2024-01', type: 'account takeover', severity: 'CRITICAL', detail: 'Mass account takeover campaign ongoing — SIM swap + credential stuffing' },
-  { group: 'Nyxentra', target: 'MegaMart PH', status: 'ACTIVE', since: '2024-05', type: 'data breach', severity: 'CRITICAL', detail: '2M customer records listed on dark web — active sale' },
-  { group: 'PH Ransomware Crew', target: 'Provincial Hospital', status: 'ACTIVE', since: '2024-05', type: 'ransomware', severity: 'CRITICAL', detail: 'Hospital systems encrypted — patient care affected' },
+  { group: 'NULSEC', target: 'DepEd Portal', status: 'ACTIVE', since: '2024-ongoing', type: 'data leak', severity: 'HIGH', detail: 'Ongoing credential exposure via misconfigured API — teacher and student PII actively exfiltrating' },
+  { group: 'DNH Klammer', target: 'DICT Website', status: 'ACTIVE', since: '2024-06', type: 'defacement', severity: 'HIGH', detail: 'Department of ICT website defaced — data transparency demands remain active' },
+  { group: 'TeamP01s0n', target: 'GCash Wallets', status: 'ACTIVE', since: '2024-01', type: 'account takeover', severity: 'CRITICAL', detail: 'Mass account takeover campaign ongoing — SIM swap + credential stuffing against GCash users' },
+  { group: 'Nyxentra', target: 'MegaMart PH', status: 'ACTIVE', since: '2024-05', type: 'data breach', severity: 'CRITICAL', detail: '2M customer records listed on dark web marketplace — active sale ongoing' },
+  { group: 'PH Ransomware Crew', target: 'Provincial Hospital Network', status: 'ACTIVE', since: '2024-05', type: 'ransomware', severity: 'CRITICAL', detail: 'Hospital systems encrypted — patient care and records affected' },
+  { group: 'Crimsonsec PH', target: 'PH Regional Bank', status: 'ACTIVE', since: '2024-07', type: 'data breach', severity: 'CRITICAL', detail: 'Customer banking data exfiltrated — 500K records on dark web forums' },
+  { group: 'CyberGhost PH', target: 'BPI Online Banking', status: 'ACTIVE', since: '2024-08', type: 'phishing', severity: 'HIGH', detail: 'Active phishing campaign impersonating BPI login — credential harvesting ongoing' },
 ]
 
 const PH_RANSOMWARE_ACTORS = [
@@ -504,6 +506,24 @@ function DarkWebMonitor() {
   const [schoolDarkWeb, setSchoolDarkWeb] = useState([])
   const [schoolForums, setSchoolForums] = useState([])
 
+  // ═══ PHILIPPINE DATA BREACH ALERTS ═══
+  const [philBreachAlerts, setPhilBreachAlerts] = useState([])
+  const [philBreachAlertCount, setPhilBreachAlertCount] = useState(0)
+  const [philBreachLoading, setPhilBreachLoading] = useState(false)
+  const [showBreachReport, setShowBreachReport] = useState(false)
+  const [selectedBreach, setSelectedBreach] = useState(null)
+
+  // Known PH breach targets for detection
+  const PH_BREACH_TARGETS = [
+    'DepEd', 'PhilHealth', 'GSIS', 'SSS', 'COMELEC', 'DICT', 'NBI', 'PNP', 'LTO', 'BIR',
+    'BDO', 'BPI', 'Metrobank', 'Land Bank', 'Security Bank', 'UnionBank',
+    'GCash', 'Maya', 'PayMaya', 'Grab', 'Lazada', 'Shopee', 'FoodPanda',
+    'Globe', 'Smart', 'DITO', 'PLDT', 'Converge',
+    'Philippine Airlines', 'Cebu Pacific', 'AirAsia',
+    'Ayala', 'SM', 'Robinsons', 'Jollibee', 'McDonalds',
+    'National ID', 'PhilSys', 'eGov', 'officialgazette',
+  ]
+
   // ═══ SOUND ALERT SYSTEM ═══
   const playAlertSound = () => {
     if (!soundEnabled) return
@@ -547,7 +567,7 @@ function DarkWebMonitor() {
     } catch {}
   }
 
-  useEffect(() => { fetchFeeds(); fetchAlerts(); fetchTrends(); fetchForums(); fetchSocial(); fetchPhil(); fetchOsaec(); fetchSchool() }, [])
+  useEffect(() => { fetchFeeds(); fetchAlerts(); fetchTrends(); fetchForums(); fetchSocial(); fetchPhil(); fetchPhilBreachAlerts(); fetchBackendBreachAlerts(); fetchOsaec(); fetchSchool() }, [])
 
   // ═══ FEEDS ═══
   const fetchFeeds = async () => {
@@ -701,6 +721,167 @@ function DarkWebMonitor() {
     setPhilGroups(PH_HACKER_GROUPS)
     setPhilBreaches(PH_RANSOMWARE_ACTORS)
     setPhilLoading(false)
+  }
+
+  // ═══ PHILIPPINE DATA BREACH ALERTS — NEW BREACH DETECTION ═══
+  const fetchPhilBreachAlerts = async () => {
+    setPhilBreachLoading(true)
+    const newAlerts = []
+    const existingIds = new Set(philBreachAlerts.map(a => a.id))
+
+    // 1. Scan PH news RSS feeds for data breach keywords
+    const phNewsFeeds = [
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.rappler.com/nation/feed/',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://newsinfo.inquirer.net/feed',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.philstar.com/rss/headlines',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://news.abs-cbn.com/feed',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.gmanetwork.com/rss/news/nation/feed',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.mb.com.ph/feed',
+    ]
+    const breachKeywords = ['data breach', 'data leak', 'leaked', 'hacked', 'compromised', 'exposed', 'stolen', 'database', 'records', 'PII', 'personal information', 'customer data', 'credential']
+
+    for (const feedUrl of phNewsFeeds) {
+      try {
+        const x = await fetch(feedUrl, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          const sourceName = d.feed?.title || 'PH News'
+          for (const item of (d.items || []).slice(0, 15)) {
+            const text = `${item.title} ${item.description || ''}`.toLowerCase()
+            const isBreach = breachKeywords.some(kw => text.includes(kw)) && PH_BREACH_TARGETS.some(t => text.includes(t.toLowerCase()))
+            if (isBreach) {
+              const severity = ['critical', 'major', 'massive', 'million', 'thousand'].some(kw => text.includes(kw)) ? 'CRITICAL' : 'HIGH'
+              const alertId = `breach-${Date.now()}-${Math.random().toString(36).slice(2)}`
+              if (!existingIds.has(alertId)) {
+                newAlerts.push({
+                  id: alertId,
+                  title: `🇵🇭 PH DATA BREACH: ${item.title}`,
+                  target: PH_BREACH_TARGETS.find(t => text.includes(t.toLowerCase())) || 'Unknown PH Entity',
+                  severity,
+                  source: sourceName,
+                  description: (item.description || '').replace(/<[^>]+>/g, '').slice(0, 400),
+                  link: item.link,
+                  created: item.pubDate || item.pub_date || new Date().toISOString(),
+                  type: 'news',
+                  tags: ['data-breach', 'philippines'],
+                })
+              }
+            }
+          }
+        }
+      } catch {}
+    }
+
+    // 2. Search Ahmia.fi for PH data breach dark web listings
+    for (const kw of ['philippines data breach', 'philippine data leak', 'ph database leak', 'COMELEC breach', 'philhealth breach', 'philippines customer data leak']) {
+      try {
+        const x = await fetch(`https://ahmia.fi/api/v1/search/?q=${encodeURIComponent(kw)}`, { mode: 'cors' })
+        if (x.ok) {
+          const d = await x.json()
+          for (const i of (d.items || d.results || []).slice(0, 5)) {
+            const alertId = `breach-dw-${Date.now()}-${Math.random().toString(36).slice(2)}`
+            if (!existingIds.has(alertId)) {
+              newAlerts.push({
+                id: alertId,
+                title: `🌐 DARK WEB: PH Breach Listing — ${i.title || kw}`,
+                target: 'Dark Web Marketplace',
+                severity: 'CRITICAL',
+                source: 'Ahmia.fi',
+                description: (i.description || '').slice(0, 400),
+                link: i.onion_url || i.url || '',
+                created: new Date().toISOString(),
+                type: 'darkweb',
+                tags: ['data-breach', 'darkweb', 'philippines'],
+              })
+            }
+          }
+        }
+      } catch {}
+    }
+
+    // 3. Check URLhaus for PH-targeted malware/breach URLs
+    try {
+      const x = await fetch('https://urlhaus-api.abuse.ch/v1/urls/recent/', { mode: 'cors' })
+      if (x.ok) {
+        const d = await x.json()
+        for (const e of (d.urls || []).slice(0, 200)) {
+          const url = (e.url || '').toLowerCase()
+          const tags = (e.tags || []).join(' ').toLowerCase()
+          const threat = (e.threat || '').toLowerCase()
+          const isPH = PH_BREACH_TARGETS.some(t => url.includes(t.toLowerCase()) || tags.includes(t.toLowerCase()))
+          if (isPH && (tags.includes('breach') || tags.includes('leak') || threat.includes('malware'))) {
+            const alertId = `breach-urlhaus-${e.id || Date.now()}`
+            if (!existingIds.has(alertId)) {
+              newAlerts.push({
+                id: alertId,
+                title: `🔗 URLHAUS: PH-Targeted Breach URL — ${(e.url || '').slice(0, 60)}`,
+                target: 'PH Entity',
+                severity: 'HIGH',
+                source: 'URLhaus',
+                description: `URL: ${e.url} | Threat: ${e.threat || 'unknown'} | Tags: ${(e.tags || []).join(', ')}`,
+                link: e.url,
+                created: e.dateadded || new Date().toISOString(),
+                type: 'urlhaus',
+                tags: ['data-breach', 'urlhaus', 'philippines'],
+              })
+            }
+          }
+        }
+      }
+    } catch {}
+
+    // Sort by date descending
+    newAlerts.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+
+    // Detect truly NEW alerts vs existing
+    const trulyNew = newAlerts.filter(a => !philBreachAlerts.some(existing => existing.title === a.title && existing.source === a.source))
+
+    setPhilBreachAlerts(prev => [...trulyNew, ...prev].slice(0, 100))
+    setPhilBreachAlertCount(prev => {
+      const total = prev + trulyNew.length
+      if (trulyNew.length > 0) playCriticalAlert()
+      return total
+    })
+    setPhilBreachLoading(false)
+  }
+
+  // ═══ BACKEND BREACH ALERTS API ═══
+  const fetchBackendBreachAlerts = async () => {
+    setPhilBreachLoading(true)
+    try {
+      const resp = await fetch('http://127.0.0.1:8000/api/breach-alerts/', { mode: 'cors' })
+      if (resp.ok) {
+        const data = await resp.json()
+        // Convert backend format to frontend format
+        const backendAlerts = (data.alerts || []).map(a => ({
+          id: a.alert_id,
+          title: a.title,
+          target: a.target,
+          severity: a.severity,
+          source: a.source,
+          description: a.description,
+          link: a.link,
+          created: a.created,
+          type: a.type,
+          tags: a.tags,
+          fromBackend: true,
+        }))
+        // Merge with existing client-side alerts (avoid duplicates by ID)
+        setPhilBreachAlerts(prev => {
+          const existingIds = new Set(prev.map(a => a.id))
+          const newOnes = backendAlerts.filter(a => !existingIds.has(a.id))
+          return [...newOnes, ...prev].slice(0, 100)
+        })
+        setPhilBreachAlertCount(prev => {
+          const newCount = backendAlerts.length
+          if (newCount > 0) playCriticalAlert()
+          return prev + newCount
+        })
+      }
+    } catch (e) {
+      console.warn('Failed to fetch backend breach alerts:', e)
+    }
+    setPhilBreachLoading(false)
   }
 
   // ═══ OSAEC MONITORING ═══
@@ -1059,6 +1240,7 @@ function DarkWebMonitor() {
     { id: 'forums', label: 'FORUMS', icon: FiMessageCircle },
     { id: 'social', label: 'SOCIAL / NEWS', icon: FiGlobe },
     { id: 'philippines', label: '🇵🇭 PHILIPPINES', icon: FiShield },
+    { id: 'breach-alerts', label: '🇵🇭 BREACH ALERTS', icon: FiAlertTriangle },
     { id: 'osaec', label: '🔴 OSAEC ALERT', icon: FiAlertTriangle },
     { id: 'school', label: '🏫 SCHOOL SAFETY', icon: FiServer },
     { id: 'search', label: 'DARK WEB SEARCH', icon: FiSearch },
@@ -1777,6 +1959,152 @@ function DarkWebMonitor() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═══ PH BREACH ALERTS TAB ═══ */}
+          {activeTab === 'breach-alerts' && (
+            <div>
+              {/* CRITICAL ALERT BANNER */}
+              {philBreachAlerts.filter(a => a.severity === 'CRITICAL').length > 0 && (
+                <div className="card-cyber p-4 rounded-lg mb-4 bg-red-950/30 border-2 border-red-500/50 animate-pulse">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="text-red-400 text-2xl">🇵🇭🚨</div>
+                      <div>
+                        <h3 className="text-red-400 text-sm font-bold font-mono">PH BREACH ALERT — {philBreachAlerts.filter(a => a.severity === 'CRITICAL').length} CRITICAL FINDINGS</h3>
+                        <p className="text-red-300/70 text-[10px] font-mono mt-0.5">Sound alerts: {soundEnabled ? '🔔 ENABLED' : '🔇 DISABLED'} | {philBreachAlertCount} total alerts this session</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setSoundEnabled(!soundEnabled)} className={`text-[10px] font-mono px-3 py-1.5 rounded ${soundEnabled ? 'bg-green-600/30 text-green-400 border border-green-500/30' : 'bg-slate-700/30 text-slate-400 border border-slate-600'}`}>
+                        {soundEnabled ? '🔔 SOUND ON' : '🔇 SOUND OFF'}
+                      </button>
+                      <button onClick={() => playCriticalAlert()} className="text-[10px] font-mono px-3 py-1.5 rounded bg-red-600/30 text-red-400 border border-red-500/30 hover:bg-red-500/30">🔔 TEST ALERT</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="title-cyber text-sm font-bold text-red-400">🇵🇭 PHILIPPINES DATA BREACH ALERTS</h2>
+                <div className="flex items-center gap-2">
+                  {soundEnabled && <span className="text-green-400 text-[10px] font-mono animate-pulse">● LIVE AUDIO</span>}
+                  <button onClick={fetchBackendBreachAlerts} disabled={philBreachLoading} className="text-xs text-slate-500 hover:text-red-400 font-mono">{philBreachLoading ? '⟳ FETCHING...' : '↻ FETCH FROM BACKEND'}</button>
+                  <button onClick={fetchPhilBreachAlerts} disabled={philBreachLoading} className="text-xs text-slate-500 hover:text-red-400 font-mono">{philBreachLoading ? '⟳ SCANNING...' : '🔍 SCAN FEEDS'}</button>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-5 gap-2 mb-4">
+                <div className="card-cyber p-2 rounded-lg text-center">
+                  <p className="text-red-400 text-lg font-bold font-mono">{philBreachAlerts.filter(a => a.severity === 'CRITICAL').length}</p>
+                  <p className="text-[8px] text-slate-500 font-mono">CRITICAL</p>
+                </div>
+                <div className="card-cyber p-2 rounded-lg text-center">
+                  <p className="text-orange-400 text-lg font-bold font-mono">{philBreachAlerts.filter(a => a.severity === 'HIGH').length}</p>
+                  <p className="text-[8px] text-slate-500 font-mono">HIGH</p>
+                </div>
+                <div className="card-cyber p-2 rounded-lg text-center">
+                  <p className="text-yellow-400 text-lg font-bold font-mono">{philBreachAlerts.filter(a => a.severity === 'MEDIUM').length}</p>
+                  <p className="text-[8px] text-slate-500 font-mono">MEDIUM</p>
+                </div>
+                <div className="card-cyber p-2 rounded-lg text-center">
+                  <p className="text-purple-400 text-lg font-bold font-mono">{philBreachAlerts.filter(a => a.fromBackend).length}</p>
+                  <p className="text-[8px] text-slate-500 font-mono">BACKEND</p>
+                </div>
+                <div className="card-cyber p-2 rounded-lg text-center">
+                  <p className="text-blue-400 text-lg font-bold font-mono">{philBreachAlerts.length}</p>
+                  <p className="text-[8px] text-slate-500 font-mono">TOTAL</p>
+                </div>
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="flex gap-2 mb-4 flex-wrap">
+                {[
+                  { id: 'all', label: `ALL (${philBreachAlerts.length})` },
+                  { id: 'critical', label: `🚨 CRITICAL (${philBreachAlerts.filter(a => a.severity === 'CRITICAL').length})` },
+                  { id: 'high', label: `⚠️ HIGH (${philBreachAlerts.filter(a => a.severity === 'HIGH').length})` },
+                  { id: 'backend', label: `🗄️ BACKEND (${philBreachAlerts.filter(a => a.fromBackend).length})` },
+                  { id: 'client', label: `🌐 CLIENT (${philBreachAlerts.filter(a => !a.fromBackend).length})` },
+                ].map(f => (
+                  <button key={f.id} onClick={() => setPhilFilter(f.id)} className={`text-[10px] font-mono px-3 py-1 rounded ${philFilter === f.id ? 'bg-red-900/30 text-red-400 border border-red-500/30' : 'bg-slate-900/50 text-slate-500 border border-slate-700'}`}>{f.label}</button>
+                ))}
+              </div>
+
+              {philBreachLoading && <p className="text-slate-500 font-mono text-sm mb-3">🇵🇭 Fetching PH breach alerts from backend + scanning feeds...</p>}
+
+              {/* Breach Alerts List */}
+              <div className="space-y-3">
+                {philBreachAlerts.filter(a => {
+                  if (philFilter === 'all') return true
+                  if (philFilter === 'critical') return a.severity === 'CRITICAL'
+                  if (philFilter === 'high') return a.severity === 'HIGH'
+                  if (philFilter === 'backend') return a.fromBackend
+                  if (philFilter === 'client') return !a.fromBackend
+                  return true
+                }).map((a, i) => (
+                  <div key={i} className={`card-cyber p-4 rounded-lg ${a.severity === 'CRITICAL' ? 'border-2 border-red-500/50 bg-red-950/20' : a.severity === 'HIGH' ? 'border border-orange-500/30 bg-orange-950/10' : 'border border-slate-700/30'} ${a.fromBackend ? 'border-l-4 border-blue-500' : ''}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${a.severity === 'CRITICAL' ? 'bg-red-600/40 text-red-300 border border-red-500/50 font-bold' : a.severity === 'HIGH' ? 'bg-orange-600/30 text-orange-400 border border-orange-500/30' : a.severity === 'MEDIUM' ? 'bg-yellow-600/30 text-yellow-400 border border-yellow-500/30' : 'bg-blue-600/30 text-blue-400 border border-blue-500/30'}`}>
+                          {a.severity === 'CRITICAL' ? '🚨 CRITICAL' : a.severity === 'HIGH' ? '⚠️ HIGH' : '⚡ MEDIUM'}
+                        </span>
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${a.source.includes('Ahmia') ? 'text-purple-400 bg-purple-900/30 border border-purple-500/30' : a.source.includes('URLhaus') ? 'text-red-400 bg-red-900/30 border border-red-500/30' : a.fromBackend ? 'text-blue-400 bg-blue-900/30 border border-blue-500/30' : 'text-green-400 bg-green-900/30 border border-green-500/30'}`}>
+                          {a.fromBackend ? '🗄️ BACKEND' : a.source}
+                        </span>
+                        {a.tags?.includes('news') && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-blue-600/30 text-blue-400 border border-blue-500/30">📰 NEWS</span>}
+                        {a.tags?.includes('darkweb') && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-600/30 text-purple-400 border border-purple-500/30">🌐 DARK WEB</span>}
+                        {a.tags?.includes('urlhaus') && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-600/30 text-red-400 border border-red-500/30">🔗 URLHAUS</span>}
+                      </div>
+                      <span className="text-[10px] text-slate-600 font-mono">{a.created?.slice(0, 16)}</span>
+                    </div>
+                    <h3 className={`text-sm font-bold font-mono mb-1 ${a.severity === 'CRITICAL' ? 'text-red-300' : 'text-white'}`}>{a.title}</h3>
+                    <p className="text-slate-400 text-xs font-mono line-clamp-3">{a.description}</p>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="text-cyan-400 text-[10px] font-mono">Target: <span className="text-white">{a.target}</span></span>
+                      {a.link && <a href={a.link} target="_blank" rel="noopener noreferrer" className="text-red-400 text-[10px] font-mono hover:text-red-300"><FiExternalLink size={10} /> VIEW SOURCE</a>}
+                    </div>
+                  </div>
+                ))}
+                {philBreachAlerts.length === 0 && !philBreachLoading && (
+                  <div className="card-cyber p-6 rounded-lg text-center">
+                    <p className="text-slate-500 font-mono text-sm mb-3">No PH breach alerts detected yet.</p>
+                    <button onClick={fetchBackendBreachAlerts} className="btn-cyber px-4 py-2 rounded text-xs font-mono flex items-center gap-2 mx-auto"><FiAlertTriangle /> FETCH FROM BACKEND</button>
+                    <button onClick={fetchPhilBreachAlerts} className="btn-cyber px-4 py-2 rounded text-xs font-mono flex items-center gap-2 mx-auto mt-2"><FiSearch /> SCAN FEEDS NOW</button>
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Actions */}
+              <div className="card-cyber p-4 rounded-lg mt-5 bg-blue-950/10 border border-blue-500/20">
+                <h3 className="title-cyber text-xs font-bold text-blue-400 mb-3">⚡ QUICK ACTIONS</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <button onClick={fetchBackendBreachAlerts} className="p-3 rounded cyber-border bg-slate-900/50 hover:bg-slate-800/50 text-left">
+                    <p className="text-blue-400 text-xs font-mono font-bold">🗄️ FETCH FROM BACKEND</p>
+                    <p className="text-slate-500 text-[10px] font-mono mt-1">Get persisted alerts from API</p>
+                  </button>
+                  <button onClick={fetchPhilBreachAlerts} className="p-3 rounded cyber-border bg-slate-900/50 hover:bg-slate-800/50 text-left">
+                    <p className="text-green-400 text-xs font-mono font-bold">🌐 SCAN RSS FEEDS</p>
+                    <p className="text-slate-500 text-[10px] font-mono mt-1">Scan PH news for breach keywords</p>
+                  </button>
+                  <button onClick={() => { playCriticalAlert(); }} className="p-3 rounded cyber-border bg-slate-900/50 hover:bg-slate-800/50 text-left">
+                    <p className="text-red-400 text-xs font-mono font-bold">🔔 TEST SOUND ALERT</p>
+                    <p className="text-slate-500 text-[10px] font-mono mt-1">Verify audio notification works</p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Tracked Targets */}
+              <div className="card-cyber p-4 rounded-lg mt-5 bg-yellow-950/10 border border-yellow-500/20">
+                <h3 className="title-cyber text-xs font-bold text-yellow-400 mb-3">🇵🇭 TRACKED PH ENTITIES ({PH_BREACH_TARGETS.length})</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {PH_BREACH_TARGETS.slice(0, 30).map((t, i) => (
+                    <span key={i} className="text-[9px] font-mono px-2 py-1 rounded bg-slate-800/50 text-slate-500 border border-slate-700 hover:text-yellow-400 hover:border-yellow-500/30 transition">{t}</span>
+                  ))}
+                </div>
+                <p className="text-slate-500 text-[9px] font-mono mt-2">Showing 30 of {PH_BREACH_TARGETS.length} tracked entities. Backend monitors all.</p>
               </div>
             </div>
           )}
