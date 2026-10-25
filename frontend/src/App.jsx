@@ -9,7 +9,8 @@ import MediaForensics from './pages/MediaForensics'
 import DarkWebMonitor from './pages/DarkWebMonitor'
 import GovMonitor from './pages/GovMonitor'
 import ThreatDashboard from './pages/ThreatDashboard'
-import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal, FiCamera, FiEye, FiServer, FiAlertTriangle } from 'react-icons/fi'
+import BreachAlertsDashboard from './pages/BreachAlertsDashboard'
+import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal, FiCamera, FiEye, FiServer, FiAlertTriangle, FiBell } from 'react-icons/fi'
 import { APP_NAME, DEVELOPER, VERSION } from './config'
 
 function App() {
@@ -76,6 +77,11 @@ function App() {
                 <FiServer size={16} /> <span className="text-sm">PH GOV MONITOR</span>
               </NavLink>
             </li>
+            <li>
+              <NavLink to="/breach-alerts" className={({isActive}) => `flex items-center gap-3 p-2.5 rounded transition-all ${isActive ? 'bg-red-900/30 text-red-400 border border-red-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-red-300 border border-transparent'}`}>
+                <FiBell size={16} /> <span className="text-sm font-bold">BREACH ALERTS</span>
+              </NavLink>
+            </li>
           </ul>
 
           <div className="mt-8 p-3 bg-slate-900/50 rounded cyber-border text-xs">
@@ -103,6 +109,7 @@ function App() {
             <Route path="/tmcs" element={<ThreatDashboard />} />
             <Route path="/darkweb" element={<DarkWebMonitor />} />
             <Route path="/gov" element={<GovMonitor />} />
+            <Route path="/breach-alerts" element={<BreachAlertsDashboard />} />
           </Routes>
         </main>
       </div>
