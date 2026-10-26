@@ -1,12 +1,118 @@
 services:
+  # PostgreSQL Database
+  - type: pserv
+    name: auosint-db
+    plan: free
+    region: singapore
+    ipAllowList: []
+
+  # Redis for Celery
+  - type: redis
+    name: auosint-redis
+    plan: free
+    region: singapore
+    ipAllowList: []
+
+  # Backend API
   - type: web
     name: advance-ultimate-osint-api
     runtime: python
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    region: singapore
+    plan: free
     envVars:
       - key: PYTHON_VERSION
         value: "3.12"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: auosint-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: auosint-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: auosint-redis
+          property: connectionString
       - key: ALLOWED_ORIGINS
-        value: https://fajardoclark359-alt.github.io
+        value: https://advance-ultimate-osint-frontend.onrender.com
+      - key: API_KEY
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+
+  # Celery Worker (Background Tasks)
+  - type: worker
+    name: auosint-worker
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A app.celery_app worker --loglevel=info --concurrency=4
+    region: singapore
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: auosint-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: auosint-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: auosint-redis
+          property: connectionString
+
+  # Celery Beat (Scheduled Tasks)
+  - type: worker
+    name: auosint-beat
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A app.celery_app beat --loglevel=info
+    region: singapore
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: auosint-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: auosint-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: auosint-redis
+          property: connectionString
+
+  # Frontend (Static Site)
+  - type: web
+    name: advance-ultimate-osint-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    region: singapore
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        value: https://advance-ultimate-osint-api.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
