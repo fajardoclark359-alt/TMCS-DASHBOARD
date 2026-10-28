@@ -30,6 +30,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install 'setuptools>=65,<80'
+          pip install 'Pillow>=9,<10'
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
       
