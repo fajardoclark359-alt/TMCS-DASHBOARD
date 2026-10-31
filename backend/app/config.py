@@ -54,7 +54,30 @@ RATE_LIMIT_SEARCH = os.getenv("RATE_LIMIT_SEARCH", "10/minute")
 BREACH_ALERT_DIR = Path(os.getenv("BREACH_ALERT_DIR", str(BACKEND_DIR / "breach_alerts"))).resolve()
 
 # Database
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite+aiosqlite:///{BACKEND_DIR / 'auosint.db'}")
+
+
+def _normalize_database_url(url: str) -> str:
+    """Make provider-issued URLs usable by SQLAlchemy's asyncpg dialect.
+
+    Render (and Heroku) hand out ``postgres://`` / ``postgresql://`` URLs, but
+    the async engine needs the ``postgresql+asyncpg://`` driver prefix. asyncpg
+    also expects ``ssl=`` rather than libpq's ``sslmode=`` query parameter.
+    """
+    for prefix in ("postgres://", "postgresql://"):
+        if url.startswith(prefix):
+            url = "postgresql+asyncpg://" + url[len(prefix):]
+            break
+
+    if "sslmode=" in url:
+        for mode in ("require", "verify-ca", "verify-full", "prefer", "allow", "disable"):
+            url = url.replace(f"sslmode={mode}", f"ssl={mode}")
+
+    return url
+
+
+DATABASE_URL = _normalize_database_url(
+    os.getenv("DATABASE_URL", f"sqlite+aiosqlite:///{BACKEND_DIR / 'auosint.db'}")
+)
 DATABASE_ECHO = os.getenv("DATABASE_ECHO", "").lower() in {"1", "true", "yes"}
 
 # Celery / Redis

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { analyzeMedia, clientAnalyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence, mediaExportUrl } from '../services/api'
+import { analyzeMedia, clientAnalyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence, downloadMediaEvidence } from '../services/api'
 import { FiSearch, FiShield, FiCamera, FiVideo, FiMapPin, FiSave, FiFileText, FiClock, FiTag, FiCheck, FiDownload, FiEye, FiTrash2, FiCopy, FiTerminal, FiCrosshair } from 'react-icons/fi'
 
 function downloadFile(filename, content, mime) {
@@ -451,7 +451,7 @@ function MediaForensics() {
                       downloadFile(`${ev.evidence_id}.json`, JSON.stringify(data, null, 2), 'application/json')
                     } catch { alert('Evidence not found') }
                   }} className="text-slate-400 hover:text-slate-200 text-[10px] flex items-center gap-1"><FiDownload /> JSON</button>
-                  <button onClick={() => window.open(mediaExportUrl(ev.evidence_id, 'html'), '_blank')} className="text-slate-400 hover:text-slate-200 text-[10px] flex items-center gap-1"><FiDownload /> HTML</button>
+                  <button onClick={() => downloadMediaEvidence(ev.evidence_id, 'html')} className="text-slate-400 hover:text-slate-200 text-[10px] flex items-center gap-1"><FiDownload /> HTML</button>
                   <button onClick={async () => {
                     try { await deleteMediaEvidence(ev.evidence_id); fetchEvidenceList() }
                     catch { alert('Could not delete evidence') }

@@ -8,8 +8,10 @@ phonenumbers==8.13.31
 celery[redis]==5.3.6
 redis==5.0.1
 sqlalchemy==2.0.25
+asyncpg==0.29.0
 alembic==1.13.1
 python-dotenv==1.0.0
+email-validator==2.1.0.post1
 Pillow==10.2.0
 mutagen==1.46.0
 python-multipart==0.0.9

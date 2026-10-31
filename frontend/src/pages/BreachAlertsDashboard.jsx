@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { apiUrl, apiHeaders } from '../services/http'
 import {
   FiBell, FiAlertTriangle, FiSearch, FiFilter, FiRefreshCw, FiDownload,
   FiEye, FiTrash2, FiEdit, FiPlus, FiLoader, FiX, FiCheck, FiClock,
@@ -35,7 +36,7 @@ const TYPE_COLORS = {
   manual: 'text-yellow-400 bg-yellow-900/30 border-yellow-500/30',
 }
 
-const API_BASE = '/api/breach-alerts'
+const BREACH_API = apiUrl('/breach-alerts')
 
 function BreachAlertsDashboard() {
   const [alerts, setAlerts] = useState([])
@@ -105,7 +106,7 @@ function BreachAlertsDashboard() {
       if (filters.target) params.append('target', filters.target)
       if (filters.source) params.append('source', filters.source)
       
-      const res = await fetch(`${API_BASE}/?${params}`)
+      const res = await fetch(`${BREACH_API}/?${params}`, { headers: apiHeaders() })
       const data = await res.json()
       setAlerts(data.alerts || [])
       setPagination(p => ({ ...p, total: data.total || 0 }))
@@ -124,7 +125,7 @@ function BreachAlertsDashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch(`${API_BASE}/stats`)
+      const res = await fetch(`${BREACH_API}/stats`, { headers: apiHeaders() })
       const data = await res.json()
       setStats(data)
     } catch (err) {
@@ -134,7 +135,7 @@ function BreachAlertsDashboard() {
 
   const fetchTargets = async () => {
     try {
-      const res = await fetch(`${API_BASE}/targets`)
+      const res = await fetch(`${BREACH_API}/targets`, { headers: apiHeaders() })
       const data = await res.json()
       setTargets(data)
     } catch (err) {
@@ -144,7 +145,7 @@ function BreachAlertsDashboard() {
 
   const triggerScan = async () => {
     try {
-      const res = await fetch(`${API_BASE}/scan`, { method: 'POST' })
+      const res = await fetch(`${BREACH_API}/scan`, { method: 'POST', headers: apiHeaders() })
       const data = await res.json()
       setLastScan(data)
       // Poll for completion
@@ -170,9 +171,9 @@ function BreachAlertsDashboard() {
         ...createForm,
         tags: createForm.tags.split(',').map(t => t.trim()).filter(t => t),
       }
-      const res = await fetch(`${API_BASE}/`, {
+      const res = await fetch(`${BREACH_API}/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: apiHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       })
       if (res.ok) {
@@ -194,7 +195,7 @@ function BreachAlertsDashboard() {
   const deleteAlert = async (alertId) => {
     if (!confirm('Delete this alert?')) return
     try {
-      await fetch(`${API_BASE}/${alertId}`, { method: 'DELETE' })
+      await fetch(`${BREACH_API}/${alertId}`, { method: 'DELETE', headers: apiHeaders() })
       await fetchAlerts()
       await fetchStats()
     } catch (err) {
@@ -213,7 +214,7 @@ function BreachAlertsDashboard() {
 
   const exportAlerts = async () => {
     try {
-      const res = await fetch(`${API_BASE}/?limit=10000`)
+      const res = await fetch(`${BREACH_API}/?limit=10000`, { headers: apiHeaders() })
       const data = await res.json()
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
       const url = URL.createObjectURL(blob)

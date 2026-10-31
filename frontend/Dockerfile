@@ -9,6 +9,13 @@ RUN npm ci
 
 # Build application
 COPY . .
+
+# Bake the optional API key into the bundle (must match backend API_KEY)
+ARG VITE_API_URL=""
+ARG VITE_API_KEY=""
+ENV VITE_API_URL=$VITE_API_URL \
+    VITE_API_KEY=$VITE_API_KEY
+
 RUN npm run build
 
 # Production stage with Nginx

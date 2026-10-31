@@ -1,17 +1,24 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: auosint-db
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Postgres databases must be declared under the root-level `databases:` key,
+# not as entries in `services:`. Everything else (web, worker, keyvalue,
+# static site) belongs in `services:`.
+
+databases:
+  - name: auosint-db
+    databaseName: auosint
+    user: auosint
     plan: free
     region: singapore
-    ipAllowList: []
+    ipAllowList: [] # Private network only
 
-  # Redis for Celery
-  - type: redis
+services:
+  # Render Key Value (Redis-compatible) for Celery
+  - type: keyvalue
     name: auosint-redis
     plan: free
     region: singapore
-    ipAllowList: []
+    ipAllowList: [] # Private network only
+    maxmemoryPolicy: allkeys-lru
 
   # Backend API
   - type: web
@@ -20,6 +27,7 @@ services:
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     region: singapore
     plan: free
     envVars:
@@ -31,12 +39,12 @@ services:
           property: connectionString
       - key: CELERY_BROKER_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: auosint-redis
           property: connectionString
       - key: CELERY_RESULT_BACKEND
         fromService:
-          type: redis
+          type: keyvalue
           name: auosint-redis
           property: connectionString
       - key: ALLOWED_ORIGINS
@@ -64,12 +72,12 @@ services:
           property: connectionString
       - key: CELERY_BROKER_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: auosint-redis
           property: connectionString
       - key: CELERY_RESULT_BACKEND
         fromService:
-          type: redis
+          type: keyvalue
           name: auosint-redis
           property: connectionString
 
@@ -91,12 +99,12 @@ services:
           property: connectionString
       - key: CELERY_BROKER_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: auosint-redis
           property: connectionString
       - key: CELERY_RESULT_BACKEND
         fromService:
-          type: redis
+          type: keyvalue
           name: auosint-redis
           property: connectionString
 
@@ -107,11 +115,17 @@ services:
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
-    region: singapore
-    plan: free
     envVars:
       - key: VITE_API_URL
         value: https://advance-ultimate-osint-api.onrender.com
+      # Keep the SPA in sync with the API's generated key. Note that any value
+      # baked into a static bundle is publicly readable, so this only stops
+      # casual/automated abuse — it is not a true secret.
+      - key: VITE_API_KEY
+        fromService:
+          type: web
+          name: advance-ultimate-osint-api
+          envVarKey: API_KEY
     routes:
       - type: rewrite
         source: /*

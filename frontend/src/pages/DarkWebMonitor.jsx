@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { FiEye, FiSearch, FiShield, FiAlertTriangle, FiGlobe, FiLock, FiServer, FiTerminal, FiSave, FiFileText, FiClock, FiTag, FiCheck, FiExternalLink, FiCopy, FiActivity, FiMessageCircle } from 'react-icons/fi'
+import { apiUrl, apiHeaders } from '../services/http'
 
 const DEFAULT_KEYWORDS = ['764', 'nihilistic extremism', 'accelerationism', 'O9A', 'Order of Nine Angles', 'siege culture', 'chan terrorism', 'radicalization', 'lone wolf', 'violent ideology', '764 network', 'cult of the frozen photons', 'com 764', 'NULSEC', 'philippines breach', 'philippine hacktivist', 'pinoy ransomware']
 
@@ -891,7 +892,7 @@ function DarkWebMonitor() {
   const fetchBackendBreachAlerts = async () => {
     setPhilBreachLoading(true)
     try {
-      const resp = await fetch('http://127.0.0.1:8000/api/breach-alerts/', { mode: 'cors' })
+      const resp = await fetch(apiUrl('/breach-alerts/'), { mode: 'cors', headers: apiHeaders() })
       if (resp.ok) {
         const data = await resp.json()
         // Convert backend format to frontend format

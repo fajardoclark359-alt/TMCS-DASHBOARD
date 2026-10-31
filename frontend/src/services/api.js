@@ -1,11 +1,30 @@
 import axios from 'axios'
+import { API_BASE, apiHeaders } from './http'
 
-// '/api' by default (vite dev proxy + docker nginx). For GitHub Pages or a
-// separately hosted backend, set VITE_API_URL, e.g. VITE_API_URL=https://my-backend.onrender.com
-const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api`
+// Attach the optional API key to every axios request. '/api' by default
+// (vite dev proxy + docker nginx); set VITE_API_URL for a hosted backend.
+const defaultHeaders = apiHeaders()
+if (Object.keys(defaultHeaders).length > 0) {
+  axios.defaults.headers.common = {
+    ...axios.defaults.headers.common,
+    ...defaultHeaders,
+  }
+}
 
 export const mediaExportUrl = (evidenceId, format = 'json') =>
   `${API_BASE}/media/evidence/${evidenceId}/export?format=${format}`
+
+// Opening a plain URL cannot attach the X-API-Key header, so download the
+// export as a blob and open that instead.
+export const downloadMediaEvidence = async (evidenceId, format = 'json') => {
+  const response = await axios.get(`${API_BASE}/media/evidence/${evidenceId}/export`, {
+    params: { format },
+    responseType: 'blob',
+  })
+  const url = URL.createObjectURL(response.data)
+  window.open(url, '_blank')
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
+}
 
 export const searchUsername = async (username) => {
   const response = await axios.post(`${API_BASE}/username/search`, { username })
