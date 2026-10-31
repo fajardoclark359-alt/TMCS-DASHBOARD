@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { FiEye, FiSearch, FiShield, FiAlertTriangle, FiGlobe, FiLock, FiServer, FiTerminal, FiSave, FiFileText, FiClock, FiTag, FiCheck, FiExternalLink, FiCopy, FiActivity, FiMessageCircle } from 'react-icons/fi'
 import { apiUrl, apiHeaders } from '../services/http'
 
-const DEFAULT_KEYWORDS = ['764', 'nihilistic extremism', 'accelerationism', 'O9A', 'Order of Nine Angles', 'siege culture', 'chan terrorism', 'radicalization', 'lone wolf', 'violent ideology', '764 network', 'cult of the frozen photons', 'com 764', 'nullsec', 'philippines breach', 'philippine hacktivist', 'pinoy ransomware', 'happygoluckyph', '3musketeerz', 'philippine exodus security', 'deathnote hackers', 'philippine cyber alliance', 'anonymous philippines']
+const DEFAULT_KEYWORDS = ['764', 'nihilistic extremism', 'accelerationism', 'O9A', 'Order of Nine Angles', 'siege culture', 'chan terrorism', 'radicalization', 'lone wolf', 'violent ideology', '764 network', 'cult of the frozen photons', 'com 764', 'nullsec', 'philippines breach', 'philippine hacktivist', 'pinoy ransomware', 'happygoluckyph', '3musketeerz', 'philippine exodus security', 'deathnote hackers', 'philippine cyber alliance', 'anonymous philippines', 'qilin', 'psbank', 'philippine savings bank', 'deep web konek', 'newsbytes']
 
 const SOURCE_COLORS = {
   'AlienVault OTX': 'text-orange-400 bg-orange-900/30 border-orange-500/30',
@@ -56,6 +56,9 @@ const SOCIAL_FEEDS = [
   { name: 'Manila Bulletin Tech', url: 'https://www.mb.com.ph/feed', type: 'rss', desc: 'Manila Bulletin tech and business' },
   { name: 'ABS-CBN News Tech', url: 'https://news.abs-cbn.com/feed', type: 'rss', desc: 'ABS-CBN news feed' },
   { name: 'Philstar Tech', url: 'https://www.philstar.com/feed', type: 'rss', desc: 'Philstar news feed' },
+  { name: 'Newsbytes.PH', url: 'https://newsbytes.ph/feed', type: 'rss', desc: 'Philippine tech/cybersecurity news — breach reports, DICT updates' },
+  // Deep Web Konek — Facebook page (no RSS; monitor via FB Graph API or manual)
+  { name: 'Deep Web Konek (FB)', url: 'https://www.facebook.com/TheDeepWebKonekOfficial/', type: 'fb-page', desc: 'PH cybersecurity advocacy — dark web monitoring, breach alerts, defacement reports' },
 ]
 
 // ═══════════════════════════════════════════════════════════════
@@ -202,6 +205,7 @@ const ONGOING_INCIDENTS = [
   { group: '3Musketeerz', target: 'Bureau of Internal Revenue (BIR)', status: 'ACTIVE', since: '2026-09-08', type: 'defacement', severity: 'MEDIUM', detail: 'BIR homepage defaced with "3Musketeerz was here" + flood-control message; restored, taxpayer data and core systems unaffected. (Manila Standard, BIR)' },
   { group: 'Philippine Exodus Security', target: 'Philippine Army / Navy / DND', status: 'ACTIVE', since: '2025-02', type: 'intrusion claim', severity: 'HIGH', detail: 'Claims of Army/DND and Navy mail breaches (alleged 300 GB + 15 GB); AFP calls claims unverified, Army confirmed "illegal access attempt" only. (The Record, Daily Tribune, Newsbytes)' },
   { group: 'Anonymous Philippines', target: '19 government portals (ARTA, BOC, DICT, DEPDev, LGUs)', status: 'ACTIVE', since: '2025-09-21', type: 'mass defacement', severity: 'HIGH', detail: '19 sites defaced during anti-corruption protests; DICT says no verified data exfiltration; attribution suspected but denied. (DICT, Sunstar)' },
+  { group: 'Qilin', target: 'Philippine Savings Bank (PSBank / Metrobank Group)', status: 'ACTIVE', since: '2026-01-28', type: 'ransomware', severity: 'CRITICAL', detail: 'Qilin claimed attack on PSBank (psbank.com.ph) Jan 28, 2026; threatened data leak unless negotiation; 1,358+ global victims Apr 2025–Mar 2026 per Black Kite. (DeXpose, Black Kite 2026 Ransomware Report)' },
 ]
 
 const PH_RANSOMWARE_ACTORS = [
@@ -209,6 +213,7 @@ const PH_RANSOMWARE_ACTORS = [
   { name: 'BlackCat/ALPHV (PH)', desc: 'BlackCat ransomware — healthcare, education targets in PH' },
   { name: 'Medusa (PH)', desc: 'Medusa ransomware — Philippine government and business targets' },
   { name: 'Play (PH)', desc: 'Play ransomware — Philippine infrastructure targets' },
+  { name: 'Qilin (PH targets)', desc: 'Qilin ransomware — claimed Philippine Savings Bank (PSBank/Metrobank Group) attack Jan 28, 2026; 1,358+ victims globally Apr 2025–Mar 2026 (DeXpose, Black Kite)' },
   { name: 'PH-origin crews', desc: 'Locally operated ransomware targeting PH SMEs' },
 ]
 
@@ -223,6 +228,8 @@ const PH_DATA_BREACH_KEYWORDS = [
   'house of representatives defaced', 'bir defaced', 'dmw breach',
   'nbi defaced', 'philippine exodus security', 'deathnote hackers',
   'philippine cyber alliance', 'anonymous philippines',
+  'qilin', 'psbank', 'philippine savings bank', 'metrobank group',
+  'deep web konek', 'newsbytes.ph', 'newsbytes',
 ]
 
 // ═══════════════════════════════════════════════════════════════
@@ -423,6 +430,11 @@ function DarkWebMonitor() {
   const [philBreachLoading, setPhilBreachLoading] = useState(false)
   const [showBreachReport, setShowBreachReport] = useState(false)
   const [selectedBreach, setSelectedBreach] = useState(null)
+  // Facebook monitoring state
+  const [fbHackingAlerts, setFbHackingAlerts] = useState([])
+  const [fbHackingAlertCount, setFbHackingAlertCount] = useState(0)
+  const [fbMonitorLoading, setFbMonitorLoading] = useState(false)
+  const [fbMonitorEnabled, setFbMonitorEnabled] = useState(false)
 
   // Known PH breach targets for detection
   const PH_BREACH_TARGETS = [
@@ -478,7 +490,7 @@ function DarkWebMonitor() {
     } catch {}
   }
 
-  useEffect(() => { fetchFeeds(); fetchAlerts(); fetchTrends(); fetchForums(); fetchSocial(); fetchPhil(); fetchPhilBreachAlerts(); fetchBackendBreachAlerts(); fetchOsaec(); fetchSchool() }, [])
+  useEffect(() => { fetchFeeds(); fetchAlerts(); fetchTrends(); fetchForums(); fetchSocial(); fetchPhil(); fetchPhilBreachAlerts(); fetchBackendBreachAlerts(); fetchOsaec(); fetchSchool(); if (fbMonitorEnabled) fetchFacebookHackingAlerts() }, [])
 
   // ═══ FEEDS ═══
   const fetchFeeds = async () => {
@@ -754,6 +766,77 @@ function DarkWebMonitor() {
       return total
     })
     setPhilBreachLoading(false)
+  }
+
+  // ═══ FACEBOOK PAGE MONITORING — Alert on new hacking posts ═══
+  // Requires: VITE_FB_ACCESS_TOKEN in .env (Graph API token with pages_read_engagement)
+  // FB pages to monitor: Deep Web Konek, Newsbytes.PH, The Manila Times, Inquirer, Rappler, etc.
+  const fetchFacebookHackingAlerts = async () => {
+    const FB_TOKEN = import.meta.env.VITE_FB_ACCESS_TOKEN
+    const FB_PAGES = [
+      { name: 'Deep Web Konek', id: 'TheDeepWebKonekOfficial', url: 'https://www.facebook.com/TheDeepWebKonekOfficial/' },
+      { name: 'Newsbytes.PH', id: 'newsbytes.ph', url: 'https://www.facebook.com/newsbytes.ph/' },
+      { name: 'Rappler', id: 'rapplerdotcom', url: 'https://www.facebook.com/rapplerdotcom/' },
+      { name: 'Inquirer.net', id: 'inquirerdotnet', url: 'https://www.facebook.com/inquirerdotnet/' },
+      { name: 'Philstar', id: 'philstarnews', url: 'https://www.facebook.com/philstarnews/' },
+      { name: 'The Manila Times', id: 'TheManilaTimes', url: 'https://www.facebook.com/TheManilaTimes/' },
+      { name: 'ABS-CBN News', id: 'ABSCBNnews', url: 'https://www.facebook.com/ABSCBNnews/' },
+      { name: 'GMA News', id: 'gmanetwork', url: 'https://www.facebook.com/gmanetwork/' },
+      { name: 'DICT Philippines', id: 'DICTPhilippines', url: 'https://www.facebook.com/DICTPhilippines/' },
+    ]
+    const HACKING_KEYWORDS = ['hacked', 'hack', 'breach', 'leak', 'defaced', 'defacement', 'ransomware', 'data breach', 'cyberattack', 'cyber attack', 'stolen', 'exposed', 'compromised', 'vulnerability', 'exploit', 'phishing', 'malware', 'ddos', 'ddos attack', 'unauthorized access', 'illegal access', 'dark web', 'breachforums', 'hacker', 'hacktivist', 'nullsec', 'happygoluckyph', '3musketeerz', 'exodus security', 'deathnote', 'philippine cyber alliance', 'anonymous', 'qilin', 'psbank', 'philippine savings bank']
+
+    if (!FB_TOKEN) {
+      console.warn('[FB Monitor] VITE_FB_ACCESS_TOKEN not set — Facebook page monitoring disabled. Add token to .env to enable.')
+      return
+    }
+
+    setFbMonitorLoading(true)
+    const newAlerts = []
+    const existingFbIds = new Set(fbHackingAlerts.map(a => a.fbPostId))
+
+    for (const page of FB_PAGES) {
+      try {
+        // Graph API: /{page-id}/posts?fields=id,message,created_time,permalink_url,attachments&limit=10
+        const resp = await fetch(`https://graph.facebook.com/v19.0/${page.id}/posts?fields=id,message,created_time,permalink_url,attachments{media_type,url,title,description}&limit=10&access_token=${FB_TOKEN}`, { mode: 'cors' })
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}))
+          console.warn(`[FB Monitor] ${page.name}: ${err.error?.message || resp.statusText}`)
+          continue
+        }
+        const data = await resp.json()
+        for (const post of (data.data || []).slice(0, 10)) {
+          const text = (post.message || '').toLowerCase()
+          const isHacking = HACKING_KEYWORDS.some(kw => text.includes(kw))
+          if (isHacking) {
+            const alertId = post.id
+            if (!existingFbIds.has(alertId)) {
+              newAlerts.push({
+                id: `fb-${alertId}`,
+                fbPostId: alertId,
+                pageName: page.name,
+                pageUrl: page.url,
+                message: post.message?.slice(0, 500) || '',
+                created: post.created_time,
+                link: post.permalink_url,
+                attachments: post.attachments?.data || [],
+                severity: ['critical', 'major', 'massive', 'million', 'thousand', 'ransomware'].some(kw => text.includes(kw)) ? 'CRITICAL' : 'HIGH',
+              })
+            }
+          }
+        }
+      } catch (e) {
+        console.warn(`[FB Monitor] ${page.name} error:`, e)
+      }
+    }
+
+    if (newAlerts.length > 0) {
+      // Play alert sound for new FB hacking posts
+      playCriticalAlert()
+      setFbHackingAlerts(prev => [...newAlerts, ...prev].slice(0, 50))
+      setFbHackingAlertCount(prev => prev + newAlerts.length)
+    }
+    setFbMonitorLoading(false)
   }
 
   // ═══ BACKEND BREACH ALERTS API ═══
@@ -1152,6 +1235,7 @@ function DarkWebMonitor() {
     { id: 'social', label: 'SOCIAL / NEWS', icon: FiGlobe },
     { id: 'philippines', label: '🇵🇭 PHILIPPINES', icon: FiShield },
     { id: 'breach-alerts', label: '🇵🇭 BREACH ALERTS', icon: FiAlertTriangle },
+    { id: 'fb-monitor', label: '📘 FB MONITOR', icon: FiMessageCircle },
     { id: 'osaec', label: '🔴 OSAEC ALERT', icon: FiAlertTriangle },
     { id: 'school', label: '🏫 SCHOOL SAFETY', icon: FiServer },
     { id: 'search', label: 'DARK WEB SEARCH', icon: FiSearch },
@@ -1525,6 +1609,79 @@ function DarkWebMonitor() {
                   </div>
                 ))}
                 {philPosts.length === 0 && !philLoading && <p className="text-slate-500 font-mono text-sm">No PH threat data loaded. Click REFRESH to scan.</p>}
+              </div>
+            </div>
+          )}
+
+          {/* ═══ FACEBOOK MONITOR TAB — New hacking posts from PH pages ═══ */}
+          {activeTab === 'fb-monitor' && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="title-cyber text-sm font-bold text-blue-400">📘 FACEBOOK PAGE MONITOR — Hacking Activity Alerts</h2>
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-slate-400 text-[10px] font-mono">
+                    <input type="checkbox" checked={fbMonitorEnabled} onChange={e => setFbMonitorEnabled(e.target.checked)} className="w-4 h-4 accent-blue-500" />
+                    Auto-monitor (requires VITE_FB_ACCESS_TOKEN)
+                  </label>
+                  <button onClick={fetchFacebookHackingAlerts} disabled={fbMonitorLoading || !fbMonitorEnabled} className="text-xs text-slate-500 hover:text-blue-400 font-mono">{fbMonitorLoading ? '⟳ SCANNING...' : '🔍 SCAN NOW'}</button>
+                </div>
+              </div>
+
+              {!import.meta.env.VITE_FB_ACCESS_TOKEN && (
+                <div className="card-cyber p-4 rounded-lg mb-4 bg-yellow-950/30 border border-yellow-500/30">
+                  <h3 className="text-yellow-400 text-xs font-bold font-mono mb-2">⚠️ FACEBOOK MONITORING DISABLED</h3>
+                  <p className="text-slate-400 text-[10px] font-mono mb-2">Add <code className="bg-slate-800 px-1 rounded">VITE_FB_ACCESS_TOKEN</code> to your <code className="bg-slate-800 px-1 rounded">.env</code> file to enable Facebook Graph API monitoring.</p>
+                  <p className="text-slate-500 text-[10px] font-mono mb-2">Get a token from <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">Graph API Explorer</a> with <code>pages_read_engagement</code> permission.</p>
+                  <p className="text-slate-500 text-[10px] font-mono">Monitored pages: Deep Web Konek, Newsbytes.PH, Rappler, Inquirer, Philstar, Manila Times, ABS-CBN, GMA, DICT.</p>
+                </div>
+              )}
+
+              {fbMonitorEnabled && fbHackingAlerts.length > 0 && (
+                <div className="card-cyber p-4 rounded-lg mb-4 bg-red-950/30 border-2 border-red-500/50 animate-pulse">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="text-red-400 text-2xl">📘🚨</div>
+                      <div>
+                        <h3 className="text-red-400 text-sm font-bold font-mono">FB HACKING ALERTS — {fbHackingAlerts.length} NEW POSTS DETECTED</h3>
+                        <p className="text-red-300/70 text-[10px] font-mono mt-0.5">{fbHackingAlertCount} total alerts this session</p>
+                      </div>
+                    </div>
+                    <button onClick={() => playCriticalAlert()} className="text-[10px] font-mono px-3 py-1.5 rounded bg-red-600/30 text-red-400 border border-red-500/30 hover:bg-red-500/30">🔔 TEST ALERT</button>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                {fbHackingAlerts.length === 0 && !fbMonitorLoading && (
+                  <p className="text-slate-500 font-mono text-sm text-center py-8">No hacking-related posts detected. Enable monitoring and click SCAN NOW.</p>
+                )}
+                {fbHackingAlerts.map((alert, i) => (
+                  <div key={i} className={`card-cyber p-4 rounded-lg ${alert.severity === 'CRITICAL' ? 'border border-red-500/30 bg-red-950/10' : 'border border-orange-500/30 bg-orange-950/10'}`}>
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${alert.severity === 'CRITICAL' ? 'bg-red-600/30 text-red-400 border border-red-500/30' : 'bg-orange-600/30 text-orange-400 border border-orange-500/30'}`}>{alert.severity}</span>
+                        <span className="text-blue-300 text-xs font-mono font-bold">{alert.pageName}</span>
+                      </div>
+                      <span className="text-[9px] text-slate-600 font-mono">{new Date(alert.created).toLocaleString()}</span>
+                    </div>
+                    <p className="text-slate-300 text-[11px] font-mono mb-2">{alert.message}</p>
+                    {alert.attachments?.length > 0 && (
+                      <div className="flex gap-2 flex-wrap mb-2">
+                        {alert.attachments.map((att, j) => (
+                          <div key={j} className="bg-slate-800/50 p-2 rounded text-[9px] font-mono">
+                            {att.title && <p className="text-cyan-400">{att.title}</p>}
+                            {att.description && <p className="text-slate-400">{att.description.slice(0, 100)}</p>}
+                            {att.url && <a href={att.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">🔗 View</a>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <a href={alert.link} target="_blank" rel="noopener noreferrer" className="text-[10px] font-mono px-3 py-1 rounded bg-blue-600/30 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30">🔗 View on Facebook</a>
+                      <a href={alert.pageUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] font-mono px-3 py-1 rounded bg-slate-700/30 text-slate-400 border border-slate-600 hover:bg-slate-600/30">📘 Page</a>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
