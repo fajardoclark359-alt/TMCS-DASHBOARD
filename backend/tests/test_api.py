@@ -130,7 +130,7 @@ def test_breach_alerts_stats(client):
     data = response.json()
     assert data["total"] == 0
     assert "by_severity" in data
-    assert data["tracked_targets"] == 80
+    assert data["tracked_targets"] == 84
 
 
 def test_breach_alerts_targets(client):
@@ -138,7 +138,7 @@ def test_breach_alerts_targets(client):
     assert response.status_code == 200
     data = response.json()
     assert "targets" in data
-    assert data["count"] == 80
+    assert data["count"] == 84
     assert "categories" in data
     assert "DepEd" in data["targets"]
     assert "PhilHealth" in data["targets"]

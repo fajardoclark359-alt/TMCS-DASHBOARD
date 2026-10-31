@@ -25,6 +25,7 @@ PH_BREACH_TARGETS = {
     "Official Gazette", "Malacañang", "Senate", "House of Representatives",
     "Supreme Court", "COA", "CSC", "NEDA", "PSA", "DFA", "DMW", "DOLE",
     "DENR", "DPWH", "DOTr", "DTI", "DA", "DOST", "DOH", "DSWD",
+    "ARTA", "BOC", "DEPDev", "UPOU",
     # Financial
     "BDO", "BPI", "Metrobank", "Land Bank", "Security Bank", "UnionBank",
     "RCBC", "PNB", "EastWest", "UBP", "Robinsons Bank", "China Bank",
