@@ -1244,7 +1244,7 @@ function DarkWebMonitor() {
   ]
 
   const filteredForums = forumFilter === 'all' ? forums : forums.filter(f => f.cat === forumFilter)
-  const filteredSocial = socialFilter === 'nve' ? socialPosts.filter(p => p.isNVE) : socialFilter === 'all' ? socialPosts : socialPosts.filter(p => p.source.toLowerCase().includes(socialFilter.toLowerCase()))
+  const filteredSocial = socialFilter === 'nve' ? socialPosts.filter(p => p.isNVE) : socialFilter === 'all' ? socialPosts : socialFilter === 'newsbytes' ? socialPosts.filter(p => p.source === 'Newsbytes.PH') : socialFilter === 'deepwebkonek' ? socialPosts.filter(p => p.source === 'Deep Web Konek (FB)') : socialPosts.filter(p => p.source.toLowerCase().includes(socialFilter.toLowerCase()))
 
   return (
     <div>
@@ -1362,6 +1362,8 @@ function DarkWebMonitor() {
                   { id: 'krebs', label: 'KrebsOnSecurity' },
                   { id: 'bleeping', label: 'BleepingComputer' },
                   { id: 'record', label: 'The Record' },
+                  { id: 'newsbytes', label: `Newsbytes.PH (${socialPosts.filter(p => p.source === 'Newsbytes.PH').length})` },
+                  { id: 'deepwebkonek', label: `Deep Web Konek (${socialPosts.filter(p => p.source === 'Deep Web Konek (FB)').length})` },
                 ].map(f => (
                   <button key={f.id} onClick={() => setSocialFilter(f.id)} className={`text-[10px] font-mono px-3 py-1 rounded ${socialFilter === f.id ? 'bg-red-900/30 text-red-400 border border-red-500/30' : 'bg-slate-900/50 text-slate-500 border border-slate-700'}`}>{f.label}</button>
                 ))}
