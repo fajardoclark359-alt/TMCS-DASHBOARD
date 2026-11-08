@@ -1,17 +1,16 @@
 """Authentication and user management API endpoints."""
 
-from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Depends, status, Query
-from pydantic import BaseModel, Field, EmailStr
-from sqlalchemy.ext.asyncio import AsyncSession
-from passlib.context import CryptContext
-from jose import jwt, JWTError
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
-from app.database import get_db
-from app.models import User, UserRole, APIKey
-from app.auth import verify_api_key
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from pydantic import BaseModel, EmailStr, Field
+
 from app import config
+from app.auth import verify_api_key
+from app.database import get_db_context
+from app.models import APIKey, User, UserRole
 
 router = APIRouter(tags=["Auth"])
 
@@ -34,10 +33,10 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    email: Optional[EmailStr] = None
-    password: Optional[str] = Field(None, min_length=8, max_length=128)
-    role: Optional[UserRole] = None
-    is_active: Optional[bool] = None
+    email: EmailStr | None = None
+    password: str | None = Field(None, min_length=8, max_length=128)
+    role: UserRole | None = None
+    is_active: bool | None = None
 
 
 class UserResponse(BaseModel):
@@ -46,7 +45,7 @@ class UserResponse(BaseModel):
     email: str
     role: str
     is_active: bool
-    last_login: Optional[str]
+    last_login: str | None
     created_at: str
 
 
@@ -63,9 +62,9 @@ class TokenResponse(BaseModel):
 
 class APIKeyCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
-    expires_days: Optional[int] = Field(None, ge=1, le=3650)
-    scopes: List[str] = Field(default_factory=list)
-    rate_limit: Optional[str] = Field(None, pattern="^\\d+/(second|minute|hour|day)$")
+    expires_days: int | None = Field(None, ge=1, le=3650)
+    scopes: list[str] = Field(default_factory=list)
+    rate_limit: str | None = Field(None, pattern="^\\d+/(second|minute|hour|day)$")
 
 
 class APIKeyResponse(BaseModel):
@@ -74,18 +73,18 @@ class APIKeyResponse(BaseModel):
     name: str
     user_id: int
     is_active: bool
-    expires_at: Optional[str]
-    scopes: List[str]
-    rate_limit: Optional[str]
+    expires_at: str | None
+    scopes: list[str]
+    rate_limit: str | None
     created_at: str
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(UTC) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -113,7 +112,7 @@ async def get_current_user(token: str = Depends(verify_api_key)) -> User:
     except JWTError:
         raise credentials_exception
     
-    async for db in get_db():
+    async with get_db_context() as db:
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.username == username))
         user = result.scalar_one_or_none()
@@ -125,7 +124,7 @@ async def get_current_user(token: str = Depends(verify_api_key)) -> User:
 @router.post("/login", response_model=TokenResponse)
 async def login(request: TokenRequest):
     """Authenticate user and return JWT token."""
-    async for db in get_db():
+    async with get_db_context() as db:
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.username == request.username))
         user = result.scalar_one_or_none()
@@ -141,7 +140,7 @@ async def login(request: TokenRequest):
             raise HTTPException(status_code=400, detail="Inactive user")
         
         # Update last login
-        user.last_login = datetime.now(timezone.utc)
+        user.last_login = datetime.now(UTC)
         await db.commit()
         
         access_token = create_access_token(data={"sub": user.username, "role": user.role.value})
@@ -154,7 +153,7 @@ async def login(request: TokenRequest):
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(request: UserCreate):
     """Register a new user (admin only in production)."""
-    async for db in get_db():
+    async with get_db_context() as db:
         from sqlalchemy import select
         # Check existing
         existing = await db.execute(select(User).where(
@@ -174,14 +173,14 @@ async def register(request: UserCreate):
         return user.to_dict()
 
 
-@router.get("/users", response_model=List[UserResponse])
+@router.get("/users", response_model=list[UserResponse])
 async def list_users(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     _: None = Depends(verify_api_key) if config.API_KEY else None,
 ):
     """List all users."""
-    async for db in get_db():
+    async with get_db_context() as db:
         from sqlalchemy import select
         result = await db.execute(select(User).offset(skip).limit(limit))
         users = result.scalars().all()
@@ -194,7 +193,7 @@ async def get_user(
     _: None = Depends(verify_api_key) if config.API_KEY else None,
 ):
     """Get a specific user."""
-    async for db in get_db():
+    async with get_db_context() as db:
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()
@@ -210,7 +209,7 @@ async def update_user(
     _: None = Depends(verify_api_key) if config.API_KEY else None,
 ):
     """Update a user."""
-    async for db in get_db():
+    async with get_db_context() as db:
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()
@@ -233,7 +232,7 @@ async def update_user(
 @router.delete("/users/{user_id}", dependencies=auth_dep)
 async def delete_user(user_id: int):
     """Delete a user."""
-    async for db in get_db():
+    async with get_db_context() as db:
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()
@@ -246,7 +245,7 @@ async def delete_user(user_id: int):
 @router.post("/api-keys", response_model=APIKeyResponse, status_code=status.HTTP_201_CREATED, dependencies=auth_dep)
 async def create_api_key(request: APIKeyCreate):
     """Create a new API key for the current user."""
-    async for db in get_db():
+    async with get_db_context() as db:
         # For now, use a default user (in production, get from auth)
         from sqlalchemy import select
         result = await db.execute(select(User).where(User.role == UserRole.ADMIN))
@@ -266,7 +265,7 @@ async def create_api_key(request: APIKeyCreate):
         
         expires_at = None
         if request.expires_days:
-            expires_at = datetime.now(timezone.utc) + timedelta(days=request.expires_days)
+            expires_at = datetime.now(UTC) + timedelta(days=request.expires_days)
         
         api_key = APIKey(
             key_id=key_id,
@@ -285,13 +284,13 @@ async def create_api_key(request: APIKeyCreate):
         return response
 
 
-@router.get("/api-keys", response_model=List[APIKeyResponse], dependencies=auth_dep)
+@router.get("/api-keys", response_model=list[APIKeyResponse], dependencies=auth_dep)
 async def list_api_keys(
-    user_id: Optional[int] = None,
+    user_id: int | None = None,
     _: None = Depends(verify_api_key) if config.API_KEY else None,
 ):
     """List API keys."""
-    async for db in get_db():
+    async with get_db_context() as db:
         from sqlalchemy import select
         query = select(APIKey)
         if user_id:
@@ -304,7 +303,7 @@ async def list_api_keys(
 @router.delete("/api-keys/{key_id}", dependencies=auth_dep)
 async def revoke_api_key(key_id: str):
     """Revoke an API key."""
-    async for db in get_db():
+    async with get_db_context() as db:
         from sqlalchemy import select
         result = await db.execute(select(APIKey).where(APIKey.key_id == key_id))
         api_key = result.scalar_one_or_none()

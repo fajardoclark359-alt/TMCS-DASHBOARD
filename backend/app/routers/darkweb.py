@@ -5,8 +5,7 @@ Aggregates open-source threat intelligence from legal, public feeds.
 import asyncio
 import hashlib
 import re
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 import httpx
 from fastapi import APIRouter, Query
@@ -179,7 +178,7 @@ async def get_threat_feeds(limit: int = Query(20, ge=1, le=100)):
         "feeds": all_items[:limit],
         "total": len(all_items),
         "sources": list(RSS_FEEDS.keys()) + ["URLhaus", "AlienVault OTX"],
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -234,14 +233,14 @@ async def search_darkweb(
         "query": q,
         "results": results,
         "total": len(results),
-        "searched_at": datetime.now(timezone.utc).isoformat(),
+        "searched_at": datetime.now(UTC).isoformat(),
         "source": "Ahmia.fi (Legal Dark Web Search Engine)",
     }
 
 
 @router.get("/keywords")
 async def monitor_keywords(
-    keywords: Optional[str] = Query(None, description="Comma-separated keywords to monitor"),
+    keywords: str | None = Query(None, description="Comma-separated keywords to monitor"),
     limit: int = Query(15, ge=1, le=50),
 ):
     """Monitor keywords across open-source threat feeds."""
@@ -293,7 +292,7 @@ async def monitor_keywords(
         "matches": {k: v[:limit] for k, v in matches.items()},
         "match_count": {k: len(v) for k, v in matches.items()},
         "total_matches": sum(len(v) for v in matches.values()),
-        "monitored_at": datetime.now(timezone.utc).isoformat(),
+        "monitored_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -352,7 +351,7 @@ async def get_alerts(limit: int = Query(20, ge=1, le=50)):
     return {
         "alerts": alerts[:limit],
         "total": len(alerts),
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -400,7 +399,7 @@ async def get_trends():
         "topics": [{"topic": k, "count": v} for k, v in sorted(topic_counts.items(), key=lambda x: -x[1])],
         "sources": [{"source": k, "count": v} for k, v in sorted(source_counts.items(), key=lambda x: -x[1])],
         "total_articles": len(all_items),
-        "analyzed_at": datetime.now(timezone.utc).isoformat(),
+        "analyzed_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -461,5 +460,5 @@ async def get_indicators(
         "query": q,
         "indicators": indicators,
         "total": total,
-        "scanned_at": datetime.now(timezone.utc).isoformat(),
+        "scanned_at": datetime.now(UTC).isoformat(),
     }

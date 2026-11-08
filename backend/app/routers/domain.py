@@ -1,12 +1,13 @@
 import asyncio
-from typing import List, Optional
 
 import dns.resolver
 import httpx
 import whois
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
+from app import config
+from app.rate_limit import limiter
 from app.services import evidence_store
 from app.services.validators import normalize_domain
 
@@ -33,10 +34,10 @@ class DomainRequest(BaseModel):
 
 class EvidenceRequest(BaseModel):
     domain: str
-    notes: Optional[str] = ""
-    tags: Optional[List[str]] = []
-    priority: Optional[str] = "medium"
-    case_id: Optional[str] = ""
+    notes: str | None = ""
+    tags: list[str] | None = []
+    priority: str | None = "medium"
+    case_id: str | None = ""
 
 
 def _whois_dict(domain: str) -> dict:
@@ -58,7 +59,7 @@ def _whois_dict(domain: str) -> dict:
     }
 
 
-def _dns_dict(domain: str, record_types: List[str]) -> dict:
+def _dns_dict(domain: str, record_types: list[str]) -> dict:
     records = {}
     for record_type in record_types:
         try:
@@ -69,7 +70,7 @@ def _dns_dict(domain: str, record_types: List[str]) -> dict:
     return records
 
 
-def _subdomains(domain: str, candidates: List[str]) -> list:
+def _subdomains(domain: str, candidates: list[str]) -> list:
     found = []
     for sub in candidates:
         try:
@@ -81,8 +82,9 @@ def _subdomains(domain: str, candidates: List[str]) -> list:
 
 
 @router.post("/whois")
-async def whois_lookup(request: DomainRequest):
-    domain = normalize_domain(request.domain)
+@limiter.limit(config.RATE_LIMIT_SEARCH)
+async def whois_lookup(request: Request, body: DomainRequest):
+    domain = normalize_domain(body.domain)
     data = await asyncio.to_thread(_whois_dict, domain)
     if not data:
         raise HTTPException(status_code=502, detail=f"WHOIS lookup failed for '{domain}'")
@@ -90,22 +92,25 @@ async def whois_lookup(request: DomainRequest):
 
 
 @router.post("/dns")
-async def dns_lookup(request: DomainRequest):
-    domain = normalize_domain(request.domain)
+@limiter.limit(config.RATE_LIMIT_SEARCH)
+async def dns_lookup(request: Request, body: DomainRequest):
+    domain = normalize_domain(body.domain)
     records = await asyncio.to_thread(_dns_dict, domain, DNS_RECORD_TYPES)
     return {"domain": domain, "records": records}
 
 
 @router.post("/subdomains")
-async def subdomain_enum(request: DomainRequest):
-    domain = normalize_domain(request.domain)
+@limiter.limit(config.RATE_LIMIT_SEARCH)
+async def subdomain_enum(request: Request, body: DomainRequest):
+    domain = normalize_domain(body.domain)
     found = await asyncio.to_thread(_subdomains, domain, COMMON_SUBDOMAINS)
     return {"domain": domain, "subdomains": found, "total_found": len(found)}
 
 
 @router.post("/footprint")
-async def domain_footprint(request: DomainRequest):
-    domain = normalize_domain(request.domain)
+@limiter.limit(config.RATE_LIMIT_SEARCH)
+async def domain_footprint(request: Request, body: DomainRequest):
+    domain = normalize_domain(body.domain)
     footprint = {
         "domain": domain,
         "whois": await asyncio.to_thread(_whois_dict, domain),

@@ -2,25 +2,19 @@
 
 import hashlib
 import json
-import os
-import tempfile
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 from celery import shared_task
 
-from app import config
-from app.models import BreachAlert, ScanHistory
 from app.database import get_db_context
+from app.models import BreachAlert, ScanHistory
 from app.services.breach_alerts import (
-    PH_BREACH_TARGETS,
-    create_breach_alert,
-    extract_ph_target,
-    is_philippines_related,
     scan_philippines_news_feeds as _scan_news,
 )
 from app.services.darkweb_scanner import (
     scan_philippines_darkweb as _scan_darkweb,
+)
+from app.services.darkweb_scanner import (
     scan_philippines_ransomware as _scan_ransomware,
 )
 
@@ -63,7 +57,7 @@ def _create_scan_record(scan_type: str, triggered_by: str = "scheduler", paramet
     import asyncio
     import uuid
     
-    scan_id = f"SCAN-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{uuid.uuid4().hex[:6].upper()}"
+    scan_id = f"SCAN-{datetime.now(UTC).strftime('%Y%m%d%H%M%S')}-{uuid.uuid4().hex[:6].upper()}"
     
     async def _save():
         async with get_db_context() as db:
@@ -73,7 +67,7 @@ def _create_scan_record(scan_type: str, triggered_by: str = "scheduler", paramet
                 status="running",
                 triggered_by=triggered_by,
                 parameters=parameters or {},
-                started_at=datetime.now(timezone.utc).isoformat(),
+                started_at=datetime.now(UTC).isoformat(),
             )
             db.add(scan)
             await db.flush()
@@ -99,11 +93,11 @@ def _update_scan_record(scan_id: str, status: str, results_summary: dict = None,
                 if error:
                     scan.error_message = error
                 if status in ("completed", "failed", "partial"):
-                    scan.completed_at = datetime.now(timezone.utc).isoformat()
+                    scan.completed_at = datetime.now(UTC).isoformat()
                     if scan.started_at:
                         from dateutil import parser
                         start = parser.isoparse(scan.started_at)
-                        scan.duration_seconds = (datetime.now(timezone.utc) - start).total_seconds()
+                        scan.duration_seconds = (datetime.now(UTC) - start).total_seconds()
     
     asyncio.run(_update())
 

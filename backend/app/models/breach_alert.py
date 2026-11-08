@@ -1,8 +1,9 @@
 """Breach alert model."""
 
 import enum
-from typing import Optional
-from sqlalchemy import String, Text, Index, JSON, Enum as SQLEnum
+
+from sqlalchemy import JSON, Index, String, Text
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin
@@ -36,14 +37,14 @@ class BreachAlert(Base, TimestampMixin):
     severity: Mapped[AlertSeverity] = mapped_column(SQLEnum(AlertSeverity), nullable=False, index=True)
     source: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    link: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    link: Mapped[str | None] = mapped_column(String(500), nullable=True)
     alert_type: Mapped[AlertType] = mapped_column(SQLEnum(AlertType), default=AlertType.NEWS, nullable=False, index=True)
     tags: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
     evidence_hash: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     alert_metadata: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     acknowledged: Mapped[bool] = mapped_column(default=False, nullable=False)
-    acknowledged_by: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    acknowledged_at: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    acknowledged_by: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    acknowledged_at: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     __table_args__ = (
         Index("ix_breach_severity_created", "severity", "created_at"),

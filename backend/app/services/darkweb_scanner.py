@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import httpx
-from typing import Any
 
 from app.services.breach_alerts import (
     PH_BREACH_TARGETS,
     create_breach_alert,
     extract_ph_target,
-    is_philippines_related,
 )
 
 AHMIA_API = "https://ahmia.fi/api/v1/search"

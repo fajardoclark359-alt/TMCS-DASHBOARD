@@ -1,8 +1,9 @@
 """Evidence record model."""
 
 import enum
-from typing import Optional
-from sqlalchemy import String, Text, Index, JSON, Enum as SQLEnum
+
+from sqlalchemy import JSON, Index, String, Text
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin
@@ -28,14 +29,14 @@ class EvidenceRecord(Base, TimestampMixin):
     evidence_type: Mapped[EvidenceType] = mapped_column(SQLEnum(EvidenceType), nullable=False, index=True)
     target: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     data: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     evidence_hash: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
-    case_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
+    case_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     priority: Mapped[str] = mapped_column(String(16), default="medium", nullable=False)
     tags: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
-    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    source: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     __table_args__ = (
         Index("ix_evidence_type_target", "evidence_type", "target"),

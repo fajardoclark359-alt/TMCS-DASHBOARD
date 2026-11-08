@@ -1,14 +1,16 @@
-import httpx
 import re
-from typing import Dict, Any, List
+from typing import Any
+
+import httpx
 import phonenumbers
-from phonenumbers import carrier, timezone, geocoder
+from phonenumbers import carrier, geocoder, timezone
+
 
 class PhoneService:
     def __init__(self):
         self.numverify_api = "http://apilayer.net/api/validate"
 
-    async def lookup_phone(self, phone_number: str, country_code: str = "US") -> Dict[str, Any]:
+    async def lookup_phone(self, phone_number: str, country_code: str = "US") -> dict[str, Any]:
         result = {
             "phone_number": phone_number,
             "valid": False,
@@ -89,7 +91,7 @@ class PhoneService:
             result["local_digits"] = digits_only
 
         except Exception as e:
-            result["error"] = f"Invalid phone number format: {str(e)}"
+            result["error"] = f"Invalid phone number format: {e!s}"
             return result
 
         async with httpx.AsyncClient(follow_redirects=True, timeout=8.0) as client:
@@ -103,7 +105,7 @@ class PhoneService:
 
         return result
 
-    async def _trace_owner(self, client: httpx.AsyncClient, phone_number: str, info: Dict) -> Dict[str, Any]:
+    async def _trace_owner(self, client: httpx.AsyncClient, phone_number: str, info: dict) -> dict[str, Any]:
         owner = {
             "possible_names": [],
             "possible_locations": [],
@@ -135,7 +137,7 @@ class PhoneService:
 
         try:
             resp = await client.get(
-                f"https://api.numverify.com/v2/validate",
+                "https://api.numverify.com/v2/validate",
                 params={"access_key": "free", "number": phone_number, "country_code": info.get("country", "")}
             )
             if resp.status_code == 200:
@@ -151,7 +153,7 @@ class PhoneService:
 
         return owner
 
-    async def _check_phone_social(self, client: httpx.AsyncClient, phone_number: str, info: Dict) -> Dict[str, Any]:
+    async def _check_phone_social(self, client: httpx.AsyncClient, phone_number: str, info: dict) -> dict[str, Any]:
         accounts = {}
         phone_digits = re.sub(r'[^\d]', '', phone_number)
 
@@ -174,7 +176,7 @@ class PhoneService:
             pass
 
         try:
-            resp = await client.get(f"https://api.viber.com/api/get_user_details", params={"id": phone_digits})
+            resp = await client.get("https://api.viber.com/api/get_user_details", params={"id": phone_digits})
             if resp.status_code == 200:
                 data = resp.json()
                 if data.get("status") == 0:
@@ -191,7 +193,7 @@ class PhoneService:
 
         return accounts
 
-    async def _check_phone_breaches(self, client: httpx.AsyncClient, phone_number: str) -> List[Dict[str, Any]]:
+    async def _check_phone_breaches(self, client: httpx.AsyncClient, phone_number: str) -> list[dict[str, Any]]:
         breaches = []
         phone_digits = re.sub(r'[^\d]', '', phone_number)
 
@@ -217,12 +219,12 @@ class PhoneService:
 
         return breaches
 
-    async def _check_spam(self, client: httpx.AsyncClient, phone_number: str) -> List[Dict[str, Any]]:
+    async def _check_spam(self, client: httpx.AsyncClient, phone_number: str) -> list[dict[str, Any]]:
         reports = []
         phone_digits = re.sub(r'[^\d]', '', phone_number)
 
         try:
-            resp = await client.get(f"https://api.numverify.com/v2/validate", params={"access_key": "free", "number": phone_digits})
+            resp = await client.get("https://api.numverify.com/v2/validate", params={"access_key": "free", "number": phone_digits})
             if resp.status_code == 200:
                 data = resp.json()
                 if data.get("valid") is False:
@@ -232,7 +234,7 @@ class PhoneService:
 
         return reports
 
-    async def _find_linked_emails(self, client: httpx.AsyncClient, phone_number: str, info: Dict) -> List[Dict[str, Any]]:
+    async def _find_linked_emails(self, client: httpx.AsyncClient, phone_number: str, info: dict) -> list[dict[str, Any]]:
         emails = []
         phone_digits = re.sub(r'[^\d]', '', phone_number)
 
@@ -248,7 +250,7 @@ class PhoneService:
 
         return emails
 
-    def _calculate_reputation(self, data: Dict) -> Dict[str, Any]:
+    def _calculate_reputation(self, data: dict) -> dict[str, Any]:
         score = 100
         flags = []
 
@@ -292,7 +294,7 @@ class PhoneService:
 
         return {"score": score, "risk_level": risk, "flags": flags}
 
-    def validate_email(self, email: str) -> Dict[str, Any]:
+    def validate_email(self, email: str) -> dict[str, Any]:
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         is_valid = bool(re.match(pattern, email))
 

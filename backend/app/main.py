@@ -1,22 +1,30 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Depends, status
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from app import config
+from app.database import close_db, init_db
+from app.rate_limit import limiter
 from app.routers import (
-    breach_alerts, darkweb, domain, email, media, phone, url, username,
-    evidence, scan_history, auth as auth_router,
+    auth as auth_router,
 )
-from app.services import evidence_store
+from app.routers import (
+    breach_alerts,
+    darkweb,
+    domain,
+    email,
+    evidence,
+    media,
+    phone,
+    scan_history,
+    url,
+    username,
+)
 from app.services.breach_alerts import init_breach_alert_store
-from app.auth import verify_api_key
-from app.database import init_db, close_db
-
-# Rate limiter with default limits
-limiter = Limiter(key_func=get_remote_address, default_limits=[config.RATE_LIMIT_DEFAULT])
 
 # API Key auth (optional - can be enabled via env)
 API_KEY = config.API_KEY  # Set in .env to enable auth
@@ -39,12 +47,12 @@ app = FastAPI(
     description=f"{config.APP_DESCRIPTION} Maintained by {config.DEVELOPER}.",
     version=config.VERSION,
     lifespan=lifespan,
-    dependencies=[Depends(verify_api_key)] if API_KEY else None,
 )
 
 # Rate limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -96,15 +104,10 @@ def meta():
     }
 
 
-@app.get("/api/evidence/{evidence_id}")
-def get_any_evidence(evidence_id: str):
-    """Fetch any evidence record regardless of investigation type (legacy file-based)."""
-    return evidence_store.load(evidence_id)
-
-
 @app.get("/api/evidence/{evidence_id}/verify")
 def verify_evidence(evidence_id: str):
     """Recompute the chain-of-custody hash and report whether it still matches (legacy)."""
+    from app.services import evidence_store
     document = evidence_store.load(evidence_id)
     stored = document.get("metadata", {}).get("chain_of_custody", {}).get("hash")
     if not stored:

@@ -1,14 +1,15 @@
 """Scan History API endpoints."""
 
-from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Depends, BackgroundTasks
-from pydantic import BaseModel, Field
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_db
-from app.models import ScanHistory, ScanType, ScanStatus
-from app.auth import verify_api_key
+from datetime import UTC
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from pydantic import BaseModel, Field
+
 from app import config
+from app.auth import verify_api_key
+from app.database import get_db_context
+from app.models import ScanHistory, ScanStatus, ScanType
 
 router = APIRouter(tags=["Scan History"])
 
@@ -63,16 +64,16 @@ async def trigger_scan(request: ScanCreateRequest, background_tasks: BackgroundT
 
 @router.get("/", response_model=ScanResponse)
 async def list_scans(
-    scan_type: Optional[str] = Query(None, pattern="^(breach_news|darkweb_ahmia|darkweb_urlhaus|ransomware|domain|email|username|url|phone|media|full)$"),
-    status: Optional[str] = Query(None, pattern="^(pending|running|completed|failed|partial)$"),
-    triggered_by: Optional[str] = Query(None, max_length=100),
+    scan_type: str | None = Query(None, pattern="^(breach_news|darkweb_ahmia|darkweb_urlhaus|ransomware|domain|email|username|url|phone|media|full)$"),
+    status: str | None = Query(None, pattern="^(pending|running|completed|failed|partial)$"),
+    triggered_by: str | None = Query(None, max_length=100),
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0),
     _: None = Depends(verify_api_key) if config.API_KEY else None,
 ):
     """List scan history records."""
-    from sqlalchemy import select, func
-    async for db in get_db():
+    from sqlalchemy import func, select
+    async with get_db_context() as db:
         query = select(ScanHistory)
         count_query = select(func.count(ScanHistory.id))
         
@@ -108,7 +109,7 @@ async def get_scan(
 ):
     """Get a specific scan record."""
     from sqlalchemy import select
-    async for db in get_db():
+    async with get_db_context() as db:
         result = await db.execute(select(ScanHistory).where(ScanHistory.scan_id == scan_id))
         record = result.scalar_one_or_none()
         if not record:
@@ -121,8 +122,8 @@ async def get_scan_stats(
     _: None = Depends(verify_api_key) if config.API_KEY else None,
 ):
     """Get scan statistics summary."""
-    from sqlalchemy import select, func
-    async for db in get_db():
+    from sqlalchemy import func, select
+    async with get_db_context() as db:
         # Total scans
         total_scans = await db.execute(select(func.count(ScanHistory.id)))
         
@@ -139,8 +140,8 @@ async def get_scan_stats(
             type_counts[t.value] = count.scalar()
         
         # Recent scans (last 7 days)
-        from datetime import datetime, timezone, timedelta
-        cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+        from datetime import datetime, timedelta
+        cutoff = datetime.now(UTC) - timedelta(days=7)
         recent = await db.execute(
             select(func.count(ScanHistory.id)).where(ScanHistory.created_at >= cutoff)
         )
@@ -161,7 +162,7 @@ async def get_scan_stats(
 async def delete_scan(scan_id: str):
     """Delete a scan record."""
     from sqlalchemy import select
-    async for db in get_db():
+    async with get_db_context() as db:
         result = await db.execute(select(ScanHistory).where(ScanHistory.scan_id == scan_id))
         record = result.scalar_one_or_none()
         if not record:

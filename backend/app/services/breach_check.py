@@ -1,14 +1,18 @@
-import httpx
 import hashlib
-import dns.resolver
 import re
-from typing import Optional, Dict, Any, List
+from typing import Any
+
+import dns.resolver
+import httpx
+
+from app import config
+
 
 class BreachService:
     def __init__(self):
         self.hibp_api_url = "https://haveibeenpwned.com/api/v3"
 
-    async def check_email_breaches(self, email: str, api_key: Optional[str] = None) -> Dict[str, Any]:
+    async def check_email_breaches(self, email: str, api_key: str | None = None) -> dict[str, Any]:
         headers = {
             "hibp-api-key": api_key or "",
             "user-agent": "OSINT-Tool-1.0"
@@ -102,7 +106,7 @@ class BreachService:
 
         return result
 
-    def _extract_leaked_info(self, breaches: List[Dict]) -> List[Dict[str, Any]]:
+    def _extract_leaked_info(self, breaches: list[dict]) -> list[dict[str, Any]]:
         leaked = []
         for breach in breaches:
             classes = breach.get("data_classes", [])
@@ -145,7 +149,7 @@ class BreachService:
                 leaked.append(entry)
         return leaked
 
-    def _extract_leaked_files(self, breaches: List[Dict]) -> List[Dict[str, Any]]:
+    def _extract_leaked_files(self, breaches: list[dict]) -> list[dict[str, Any]]:
         files = []
         for breach in breaches:
             classes = breach.get("data_classes", [])
@@ -169,7 +173,7 @@ class BreachService:
                 })
         return files
 
-    def _estimate_email_age(self, email: str) -> Dict[str, Any]:
+    def _estimate_email_age(self, email: str) -> dict[str, Any]:
         domain = email.split('@')[1]
         result = {"domain": domain, "estimated_age": None, "domain_creation": None, "is_estimated": True}
         try:
@@ -187,7 +191,7 @@ class BreachService:
             pass
         return result
 
-    def _extract_username_hints(self, email: str) -> Dict[str, Any]:
+    def _extract_username_hints(self, email: str) -> dict[str, Any]:
         local = email.split('@')[0]
         hints = {"local_part": local, "possible_usernames": [], "possible_names": []}
         cleaned = re.sub(r'[0-9]+', '', local).replace('.', '').replace('_', '').replace('-', '')
@@ -202,7 +206,7 @@ class BreachService:
         hints["possible_usernames"] = list(set(hints["possible_usernames"]))
         return hints
 
-    async def _check_gravatar(self, email: str) -> Dict[str, Any]:
+    async def _check_gravatar(self, email: str) -> dict[str, Any]:
         email_hash = hashlib.md5(email.lower().strip().encode()).hexdigest()
         url = f"https://www.gravatar.com/avatar/{email_hash}?d=404"
         result = {"exists": False, "url": f"https://gravatar.com/{email_hash}", "profile_url": None}
@@ -224,7 +228,7 @@ class BreachService:
             pass
         return result
 
-    def _check_email_dns(self, email: str) -> Dict[str, Any]:
+    def _check_email_dns(self, email: str) -> dict[str, Any]:
         domain = email.split('@')[1]
         result = {
             "domain": domain,
@@ -277,7 +281,7 @@ class BreachService:
             pass
         return result
 
-    async def _check_social_accounts(self, email: str) -> Dict[str, Any]:
+    async def _check_social_accounts(self, email: str) -> dict[str, Any]:
         accounts = {}
         username_hints = self._extract_username_hints(email)
         possible_usernames = username_hints.get("possible_usernames", [])
@@ -344,13 +348,18 @@ class BreachService:
                     except Exception:
                         continue
 
-            # Facebook - check via graph API
+            # Facebook - check via graph API (requires FACEBOOK_ACCESS_TOKEN)
+            fb_token = config.FACEBOOK_ACCESS_TOKEN
             try:
-                resp = await client.get(f"https://graph.facebook.com/{email}", timeout=5.0)
+                params = {"access_token": fb_token} if fb_token else {}
+                resp = await client.get(f"https://graph.facebook.com/{email}", params=params, timeout=5.0)
                 if resp.status_code == 200:
                     data = resp.json()
                     if data.get("id"):
                         accounts["facebook"] = {"id": data.get("id"), "url": f"https://facebook.com/{data.get('id')}", "source": "email lookup"}
+                elif resp.status_code == 400 and not fb_token:
+                    # Token missing — silently skip rather than fail the whole lookup
+                    pass
             except Exception:
                 pass
 
@@ -469,7 +478,7 @@ class BreachService:
 
         return accounts
 
-    def _calculate_reputation(self, data: Dict) -> Dict[str, Any]:
+    def _calculate_reputation(self, data: dict) -> dict[str, Any]:
         score = 100
         reasons = []
 

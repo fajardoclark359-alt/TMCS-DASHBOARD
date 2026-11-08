@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -7,7 +7,12 @@ from pydantic import BaseModel
 
 from app import config
 from app.services import evidence_store
-from app.services.media_metadata import IMAGE_EXTS, VIDEO_EXTS, analyze_media, build_html_report
+from app.services.media_metadata import (
+    IMAGE_EXTS,
+    VIDEO_EXTS,
+    analyze_media,
+    build_html_report,
+)
 
 router = APIRouter()
 
@@ -17,11 +22,11 @@ ALLOWED_EXTS = IMAGE_EXTS | VIDEO_EXTS
 
 class EvidenceCaptureRequest(BaseModel):
     filename: str
-    analysis: Dict[str, Any]
-    notes: Optional[str] = ""
-    tags: Optional[List[str]] = []
-    priority: Optional[str] = "medium"
-    case_id: Optional[str] = ""
+    analysis: dict[str, Any]
+    notes: str | None = ""
+    tags: list[str] | None = []
+    priority: str | None = "medium"
+    case_id: str | None = ""
 
 
 @router.post("/analyze")

@@ -30,3 +30,8 @@ Thumbs.db
 # Test / lint caches
 .pytest_cache/
 .ruff_cache/
+
+# Runtime data (tracked as fixtures in this repo; do not add new ones)
+backend/auosint.db
+backend/evidence/*.json
+backend/breach_alerts/*.json

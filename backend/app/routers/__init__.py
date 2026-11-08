@@ -1,18 +1,27 @@
 from app.routers import (
-    breach_alerts, darkweb, domain, email, media, phone, url, username,
-    evidence, scan_history, auth,
+    auth,
+    breach_alerts,
+    darkweb,
+    domain,
+    email,
+    evidence,
+    media,
+    phone,
+    scan_history,
+    url,
+    username,
 )
 
 __all__ = [
+    "auth",
     "breach_alerts",
     "darkweb",
     "domain",
     "email",
+    "evidence",
     "media",
     "phone",
+    "scan_history",
     "url",
     "username",
-    "evidence",
-    "scan_history",
-    "auth",
 ]

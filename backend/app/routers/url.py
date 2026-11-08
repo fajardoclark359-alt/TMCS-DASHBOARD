@@ -1,9 +1,10 @@
-from typing import List, Optional
 from urllib.parse import urlparse
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
+from app import config
+from app.rate_limit import limiter
 from app.services import evidence_store
 from app.services.url_investigation import url_investigation_service
 from app.services.validators import assert_public_host, normalize_url
@@ -19,10 +20,10 @@ class URLRequest(BaseModel):
 
 class EvidenceRequest(BaseModel):
     url: str
-    notes: Optional[str] = ""
-    tags: Optional[List[str]] = []
-    priority: Optional[str] = "medium"
-    case_id: Optional[str] = ""
+    notes: str | None = ""
+    tags: list[str] | None = []
+    priority: str | None = "medium"
+    case_id: str | None = ""
 
 
 async def _investigate(raw_url: str) -> dict:
@@ -36,8 +37,9 @@ async def _investigate(raw_url: str) -> dict:
 
 
 @router.post("/investigate")
-async def investigate_url(request: URLRequest):
-    return await _investigate(request.url)
+@limiter.limit(config.RATE_LIMIT_SEARCH)
+async def investigate_url(request: Request, body: URLRequest):
+    return await _investigate(body.url)
 
 
 @router.post("/evidence/capture")

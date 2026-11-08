@@ -1,0 +1,49 @@
+[project]
+name = "auosint"
+requires-python = ">=3.12"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["."]
+
+[tool.ruff.lint]
+# Keep only rules that catch real bugs / correctness issues; ignore noisy style.
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "B",   # flake8-bugbear
+    "BLE", # blind-except
+    "C4",  # comprehensions/dicts
+    "S",   # bandit security
+    "I",   # isort
+]
+ignore = [
+    "E501",   # line too long
+    "B008",   # function call in default argument (FastAPI Depends pattern)
+    "BLE001", # blind except (intentional in OSINT network code)
+    "S110",   # try-except-pass (intentional in OSINT network code)
+    "S112",   # try-except-continue (intentional in OSINT network code)
+    "B904",   # raise without from err (defensive network code)
+    "S324",   # hashlib md5 (legacy non-security hashing)
+    "S105",   # hardcoded password (token_type string literal)
+    "E701",   # multiple statements on one line
+    "E711",   # comparison to None (existing code style)
+    "E712",   # comparison to False (existing code style)
+    "C408",   # dict() call instead of literal
+    "B905",   # zip() without strict=
+    "B007",   # loop control variable not used
+    "B018",   # useless expression
+    "S101",   # assert used (acceptable in dev tooling)
+    "S108",   # tmpdir not empty (defensive)
+    "S603",   # subprocess shell (not used)
+    "S607",   # subprocess partial path (not used)
+    "F821",   # undefined name (handled in code)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"

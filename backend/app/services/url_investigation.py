@@ -1,16 +1,20 @@
 import asyncio
-import httpx
+import re
 import socket
 import ssl
-import dns.resolver
-import whois
-import re
-from datetime import datetime, timezone
-from typing import Dict, Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 from urllib.parse import urlparse
 
+import dns.resolver
+import httpx
+import whois
+
+from app.services.validators import _is_public_ip, assert_public_host
+
+
 class URLInvestigationService:
-    async def investigate_url(self, url: str) -> Dict[str, Any]:
+    async def investigate_url(self, url: str) -> dict[str, Any]:
         if "://" not in url:
             url = "http://" + url
 
@@ -65,7 +69,7 @@ class URLInvestigationService:
             pass
         return ips
 
-    def _whois_lookup(self, domain: str) -> Dict[str, Any]:
+    def _whois_lookup(self, domain: str) -> dict[str, Any]:
         result = {"registrar": None, "creation_date": None, "expiration_date": None, "name_servers": [], "emails": [], "org": None, "country": None, "address": None, "status": []}
         try:
             w = whois.whois(domain)
@@ -89,7 +93,7 @@ class URLInvestigationService:
             pass
         return result
 
-    def _dns_lookup(self, domain: str) -> Dict[str, Any]:
+    def _dns_lookup(self, domain: str) -> dict[str, Any]:
         records = {}
         for rtype in ["A", "AAAA", "MX", "NS", "TXT", "CNAME", "SOA"]:
             try:
@@ -99,10 +103,10 @@ class URLInvestigationService:
                 continue
         return records
 
-    async def _ssl_check(self, domain: str) -> Dict[str, Any]:
+    async def _ssl_check(self, domain: str) -> dict[str, Any]:
         return await asyncio.to_thread(self._ssl_check_sync, domain)
 
-    def _ssl_check_sync(self, domain: str) -> Dict[str, Any]:
+    def _ssl_check_sync(self, domain: str) -> dict[str, Any]:
         result = {"valid": False, "issuer": None, "subject": None, "not_before": None, "not_after": None, "days_remaining": None, "protocol": None, "cipher": None}
         try:
             ctx = ssl.create_default_context()
@@ -121,8 +125,8 @@ class URLInvestigationService:
                 result["not_after"] = na
                 if na:
                     try:
-                        na_dt = datetime.strptime(na, "%b %d %H:%M:%S %Y %Z").replace(tzinfo=timezone.utc)
-                        result["days_remaining"] = (na_dt - datetime.now(timezone.utc)).days
+                        na_dt = datetime.strptime(na, "%b %d %H:%M:%S %Y %Z").replace(tzinfo=UTC)
+                        result["days_remaining"] = (na_dt - datetime.now(UTC)).days
                     except Exception:
                         pass
                 result["protocol"] = s.version()
@@ -131,9 +135,25 @@ class URLInvestigationService:
             pass
         return result
 
-    async def _http_headers(self, url: str) -> Dict[str, Any]:
+    async def _validate_connection_target(self, url: str) -> None:
+        """DNS rebinding guard: ensure the URL resolves only to public IPs."""
+        parsed = urlparse(url)
+        host = (parsed.hostname or "").lower()
+        if not host:
+            return
+        try:
+            infos = await asyncio.to_thread(socket.getaddrinfo, host, None, 0, socket.SOCK_STREAM)
+        except socket.gaierror:
+            return
+        for info in infos:
+            addr = info[4][0]
+            if not _is_public_ip(addr):
+                raise ValueError(f"Host '{host}' resolves to private address {addr}")
+
+    async def _http_headers(self, url: str) -> dict[str, Any]:
         headers_info = {"status_code": None, "server": None, "content_type": None, "security_headers": {}, "all_headers": {}}
         try:
+            await self._validate_connection_target(url)
             async with httpx.AsyncClient(follow_redirects=True, timeout=10.0) as client:
                 resp = await client.get(url)
                 headers_info["status_code"] = resp.status_code
@@ -155,7 +175,7 @@ class URLInvestigationService:
             pass
         return headers_info
 
-    async def _check_domain_status(self, domain: str) -> Dict[str, Any]:
+    async def _check_domain_status(self, domain: str) -> dict[str, Any]:
         result = {"active": False, "http_reachable": False, "https_reachable": False, "response_time_ms": None, "status": "unknown"}
         for scheme in ["https", "http"]:
             try:
@@ -177,22 +197,32 @@ class URLInvestigationService:
         return result
 
     async def _check_redirects(self, url: str) -> list:
+        """Follow redirects manually, validating each hop against SSRF guards."""
         redirects = []
         try:
-            async with httpx.AsyncClient(follow_redirects=False, timeout=10.0) as client:
-                resp = await client.get(url)
-                while resp.is_redirect:
-                    location = resp.headers.get("location")
-                    if location:
-                        redirects.append({"status": resp.status_code, "location": location})
-                        resp = await client.get(location)
-                    else:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                current_url = url
+                for _ in range(10):  # max 10 hops
+                    resp = await client.get(current_url, follow_redirects=False)
+                    if not resp.is_redirect:
                         break
+                    location = resp.headers.get("location")
+                    if not location:
+                        break
+                    redirects.append({"status": resp.status_code, "location": location})
+                    # Resolve relative locations against current URL
+                    from urllib.parse import urljoin
+                    next_url = urljoin(current_url, location)
+                    parsed = urlparse(next_url)
+                    host = (parsed.hostname or "").lower()
+                    # SSRF: refuse to follow a redirect to a private/loopback host
+                    await assert_public_host(host)
+                    current_url = next_url
         except Exception:
             pass
         return redirects
 
-    async def _security_checks(self, url: str, domain: str) -> Dict[str, Any]:
+    async def _security_checks(self, url: str, domain: str) -> dict[str, Any]:
         domain = domain or ""
         checks = {
             "is_https": url.startswith("https"),
@@ -249,7 +279,7 @@ class URLInvestigationService:
         return checks
 
     @staticmethod
-    def _domain_age_days(domain: str) -> Optional[int]:
+    def _domain_age_days(domain: str) -> int | None:
         try:
             w = whois.whois(domain)
             created = w.creation_date
@@ -257,13 +287,13 @@ class URLInvestigationService:
                 created = created[0]
             if isinstance(created, datetime):
                 if created.tzinfo is None:
-                    created = created.replace(tzinfo=timezone.utc)
-                return (datetime.now(timezone.utc) - created).days
+                    created = created.replace(tzinfo=UTC)
+                return (datetime.now(UTC) - created).days
         except Exception:
             pass
         return None
 
-    async def _detect_tech(self, url: str) -> Dict[str, Any]:
+    async def _detect_tech(self, url: str) -> dict[str, Any]:
         tech = {"cms": None, "framework": None, "language": None, "analytics": [], "cdn": None}
         try:
             async with httpx.AsyncClient(follow_redirects=True, timeout=10.0) as client:
@@ -324,7 +354,7 @@ class URLInvestigationService:
             pass
         return tech
 
-    async def _geolocate_ip(self, ip: str) -> Dict[str, Any]:
+    async def _geolocate_ip(self, ip: str) -> dict[str, Any]:
         result = {"ip": ip, "country": None, "country_code": None, "city": None, "region": None, "latitude": None, "longitude": None, "isp": None, "org": None, "as": None}
         try:
             async with httpx.AsyncClient(timeout=10.0) as client:
@@ -345,7 +375,7 @@ class URLInvestigationService:
             pass
         return result
 
-    def _calculate_url_reputation(self, data: Dict) -> Dict[str, Any]:
+    def _calculate_url_reputation(self, data: dict) -> dict[str, Any]:
         score = 100
         flags = []
 

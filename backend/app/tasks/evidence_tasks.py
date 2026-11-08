@@ -3,9 +3,10 @@
 import asyncio
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import Any
+
 from celery import shared_task
-from typing import Any, Dict
 
 from app.database import get_db_context
 from app.models import EvidenceRecord, EvidenceType
@@ -19,7 +20,7 @@ def _compute_hash(document: dict) -> str:
 
 
 @shared_task
-def capture_evidence_task(evidence_data: Dict[str, Any]) -> Dict[str, Any]:
+def capture_evidence_task(evidence_data: dict[str, Any]) -> dict[str, Any]:
     """Capture evidence record to database."""
     
     async def _capture():
@@ -46,12 +47,12 @@ def capture_evidence_task(evidence_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @shared_task
-def list_evidence_task(evidence_type: str = None, target: str = None, limit: int = 100, offset: int = 0) -> Dict[str, Any]:
+def list_evidence_task(evidence_type: str = None, target: str = None, limit: int = 100, offset: int = 0) -> dict[str, Any]:
     """List evidence records from database."""
     
     async def _list():
         async with get_db_context() as db:
-            from sqlalchemy import select, func
+            from sqlalchemy import func, select
             query = select(EvidenceRecord)
             count_query = select(func.count(EvidenceRecord.id))
             
@@ -81,7 +82,7 @@ def list_evidence_task(evidence_type: str = None, target: str = None, limit: int
 
 
 @shared_task
-def get_evidence_task(evidence_id: str) -> Dict[str, Any]:
+def get_evidence_task(evidence_id: str) -> dict[str, Any]:
     """Get single evidence record."""
     
     async def _get():
@@ -114,7 +115,7 @@ def delete_evidence_task(evidence_id: str) -> bool:
 
 
 @shared_task
-def export_evidence_task(evidence_type: str = None, case_id: str = None) -> Dict[str, Any]:
+def export_evidence_task(evidence_type: str = None, case_id: str = None) -> dict[str, Any]:
     """Export evidence records for backup/analysis."""
     
     async def _export():
@@ -132,7 +133,7 @@ def export_evidence_task(evidence_type: str = None, case_id: str = None) -> Dict
             records = result.scalars().all()
             
             return {
-                "exported_at": datetime.now(timezone.utc).isoformat(),
+                "exported_at": datetime.now(UTC).isoformat(),
                 "count": len(records),
                 "evidence": [r.to_dict() for r in records],
             }

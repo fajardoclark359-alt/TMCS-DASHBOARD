@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
-from typing import Optional, List
 
 from app import config
+from app.rate_limit import limiter
 from app.services import evidence_store
 from app.services.social_media import social_media_service
 from app.services.validators import validate_username
@@ -18,15 +19,16 @@ class UsernameRequest(BaseModel):
 
 class EvidenceRequest(BaseModel):
     username: str
-    notes: Optional[str] = ""
-    tags: Optional[List[str]] = []
-    priority: Optional[str] = "medium"
-    case_id: Optional[str] = ""
+    notes: str | None = ""
+    tags: list[str] | None = []
+    priority: str | None = "medium"
+    case_id: str | None = ""
 
 
 @router.post("/search")
-async def search_username(request: UsernameRequest):
-    username = validate_username(request.username)
+@limiter.limit(config.RATE_LIMIT_SEARCH)
+async def search_username(request: Request, body: UsernameRequest):
+    username = validate_username(body.username)
     data = await social_media_service.search_all(username)
     return {
         "username": username,

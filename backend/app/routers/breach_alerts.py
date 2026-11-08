@@ -1,21 +1,22 @@
 """Philippines breach alert API endpoints."""
 
-from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from app.auth import verify_api_key
+from app.config import API_KEY
 from app.services.breach_alerts import (
-    list_alerts,
+    PH_BREACH_TARGETS,
     count_alerts,
     create_breach_alert,
+    list_alerts,
     scan_philippines_news_feeds,
-    PH_BREACH_TARGETS,
-    BreachAlertStore,
 )
-from app.services.darkweb_scanner import scan_philippines_darkweb, scan_philippines_ransomware
-from app.config import API_KEY
-from app.auth import verify_api_key
+from app.services.darkweb_scanner import (
+    scan_philippines_darkweb,
+    scan_philippines_ransomware,
+)
 
 router = APIRouter(prefix="/api/breach-alerts", tags=["PH Breach Alerts"])
 
@@ -29,9 +30,9 @@ class AlertCreateRequest(BaseModel):
     severity: str = Field(..., pattern="^(INFO|LOW|MEDIUM|HIGH|CRITICAL)$")
     source: str = Field(..., min_length=1, max_length=100)
     description: str = Field(..., min_length=10, max_length=5000)
-    link: Optional[str] = Field(None, max_length=500)
+    link: str | None = Field(None, max_length=500)
     alert_type: str = Field("news", pattern="^(news|darkweb|urlhaus|forum|social)$")
-    tags: Optional[list[str]] = Field(default_factory=list)
+    tags: list[str] | None = Field(default_factory=list)
 
 
 class ScanResponse(BaseModel):
@@ -44,9 +45,9 @@ class ScanResponse(BaseModel):
 
 @router.get("/")
 async def get_alerts(
-    severity: Optional[str] = Query(None, pattern="^(INFO|LOW|MEDIUM|HIGH|CRITICAL)$"),
-    target: Optional[str] = Query(None, max_length=100),
-    source: Optional[str] = Query(None, max_length=100),
+    severity: str | None = Query(None, pattern="^(INFO|LOW|MEDIUM|HIGH|CRITICAL)$"),
+    target: str | None = Query(None, max_length=100),
+    source: str | None = Query(None, max_length=100),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     _: None = Depends(verify_api_key) if API_KEY else None,
@@ -65,7 +66,7 @@ async def get_alerts(
 
 @router.get("/stats")
 async def get_stats(
-    since: Optional[str] = Query(None, description="ISO timestamp filter (e.g., 2024-01-01T00:00:00)"),
+    since: str | None = Query(None, description="ISO timestamp filter (e.g., 2024-01-01T00:00:00)"),
     _: None = Depends(verify_api_key) if API_KEY else None,
 ):
     """Get alert statistics."""

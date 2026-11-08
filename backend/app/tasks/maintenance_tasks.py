@@ -1,22 +1,23 @@
 """Maintenance and cleanup tasks."""
 
 import asyncio
-from datetime import datetime, timezone, timedelta
-from typing import Any, Dict
+from datetime import UTC, datetime, timedelta
+from typing import Any
+
 from celery import shared_task
 
 from app.database import get_db_context
-from app.models import ScanHistory, BreachAlert, EvidenceRecord
+from app.models import BreachAlert, EvidenceRecord, ScanHistory
 
 
 @shared_task
-def cleanup_old_scans_task(days: int = 90) -> Dict[str, Any]:
+def cleanup_old_scans_task(days: int = 90) -> dict[str, Any]:
     """Clean up old scan history records."""
     
     async def _cleanup():
         async with get_db_context() as db:
-            from sqlalchemy import select, delete
-            cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+            from sqlalchemy import delete, select
+            cutoff = datetime.now(UTC) - timedelta(days=days)
             
             # Count first
             count_result = await db.execute(
@@ -36,13 +37,13 @@ def cleanup_old_scans_task(days: int = 90) -> Dict[str, Any]:
 
 
 @shared_task
-def cleanup_old_breach_alerts_task(days: int = 365, keep_acknowledged: bool = True) -> Dict[str, Any]:
+def cleanup_old_breach_alerts_task(days: int = 365, keep_acknowledged: bool = True) -> dict[str, Any]:
     """Clean up old breach alerts."""
     
     async def _cleanup():
         async with get_db_context() as db:
-            from sqlalchemy import select, delete
-            cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+            from sqlalchemy import delete, select
+            cutoff = datetime.now(UTC) - timedelta(days=days)
             
             query = select(BreachAlert).where(BreachAlert.created_at < cutoff)
             if keep_acknowledged:
@@ -63,13 +64,13 @@ def cleanup_old_breach_alerts_task(days: int = 365, keep_acknowledged: bool = Tr
 
 
 @shared_task
-def cleanup_unreferenced_evidence_task(days: int = 30) -> Dict[str, Any]:
+def cleanup_unreferenced_evidence_task(days: int = 30) -> dict[str, Any]:
     """Clean up evidence records not linked to cases."""
     
     async def _cleanup():
         async with get_db_context() as db:
-            from sqlalchemy import select, delete
-            cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+            from sqlalchemy import delete, select
+            cutoff = datetime.now(UTC) - timedelta(days=days)
             
             query = select(EvidenceRecord).where(
                 EvidenceRecord.created_at < cutoff,
@@ -93,7 +94,7 @@ def cleanup_unreferenced_evidence_task(days: int = 30) -> Dict[str, Any]:
 
 
 @shared_task
-def vacuum_database_task() -> Dict[str, Any]:
+def vacuum_database_task() -> dict[str, Any]:
     """Run database vacuum (SQLite) or analyze (PostgreSQL)."""
     
     async def _vacuum():
@@ -110,12 +111,12 @@ def vacuum_database_task() -> Dict[str, Any]:
 
 
 @shared_task
-def health_check_task() -> Dict[str, Any]:
+def health_check_task() -> dict[str, Any]:
     """System health check."""
     
     async def _check():
         async with get_db_context() as db:
-            from sqlalchemy import select, func
+            from sqlalchemy import func, select
             
             # Check database connectivity
             await db.execute(select(1))
@@ -133,7 +134,7 @@ def health_check_task() -> Dict[str, Any]:
                     "breach_alerts": alert_count.scalar(),
                     "evidence": evidence_count.scalar(),
                 },
-                "checked_at": datetime.now(timezone.utc).isoformat(),
+                "checked_at": datetime.now(UTC).isoformat(),
             }
     
     return asyncio.run(_check())

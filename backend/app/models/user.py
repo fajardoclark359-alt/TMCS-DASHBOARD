@@ -3,9 +3,10 @@
 import enum
 import hashlib
 import secrets
-from typing import Optional
-from datetime import datetime, timezone
-from sqlalchemy import String, Text, Index, JSON, Enum as SQLEnum, Boolean, DateTime, ForeignKey
+from datetime import datetime
+
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, String
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin
@@ -27,7 +28,7 @@ class User(Base, TimestampMixin):
     password_hash: Mapped[str] = mapped_column(String(128), nullable=False)
     role: Mapped[UserRole] = mapped_column(SQLEnum(UserRole), default=UserRole.VIEWER, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    last_login: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_login: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     preferences: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
 
     api_keys: Mapped[list["APIKey"]] = relationship(back_populates="user", cascade="all, delete-orphan")
@@ -58,10 +59,10 @@ class APIKey(Base, TimestampMixin):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     scopes: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
-    rate_limit: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    rate_limit: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
     user: Mapped["User"] = relationship(back_populates="api_keys")
 

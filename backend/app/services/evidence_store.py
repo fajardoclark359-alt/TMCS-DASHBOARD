@@ -17,9 +17,10 @@ import os
 import re
 import tempfile
 import uuid
-from datetime import datetime, timezone
+from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from fastapi import HTTPException
 
@@ -36,7 +37,7 @@ HASH_ALGORITHM = "sha256"
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def utcnow_iso() -> str:

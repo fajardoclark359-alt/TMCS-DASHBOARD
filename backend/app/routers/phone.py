@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
-from typing import Optional, List, Dict
 
 from app import config
+from app.rate_limit import limiter
 from app.services import evidence_store
 from app.services.phone_lookup import phone_service
 
@@ -13,29 +14,31 @@ PREFIX = "EVD-PHONE"
 
 class PhoneRequest(BaseModel):
     phone_number: str
-    country_code: Optional[str] = "US"
+    country_code: str | None = "US"
 
 
 class EvidenceRequest(BaseModel):
     phone_number: str
-    country_code: Optional[str] = "US"
-    investigation_type: Optional[str] = "phone_lookup"
-    notes: Optional[str] = ""
-    tags: Optional[List[str]] = []
-    screenshots: Optional[List[Dict[str, str]]] = []
-    attachments: Optional[List[Dict[str, str]]] = []
-    priority: Optional[str] = "medium"
-    case_id: Optional[str] = ""
+    country_code: str | None = "US"
+    investigation_type: str | None = "phone_lookup"
+    notes: str | None = ""
+    tags: list[str] | None = []
+    screenshots: list[dict[str, str]] | None = []
+    attachments: list[dict[str, str]] | None = []
+    priority: str | None = "medium"
+    case_id: str | None = ""
 
 
 @router.post("/lookup")
-async def lookup_phone(request: PhoneRequest):
-    return await phone_service.lookup_phone(request.phone_number, request.country_code)
+@limiter.limit(config.RATE_LIMIT_SEARCH)
+async def lookup_phone(request: Request, body: PhoneRequest):
+    return await phone_service.lookup_phone(body.phone_number, body.country_code)
 
 
 @router.post("/validate")
-async def validate_phone(request: PhoneRequest):
-    return await phone_service.lookup_phone(request.phone_number, request.country_code)
+@limiter.limit(config.RATE_LIMIT_SEARCH)
+async def validate_phone(request: Request, body: PhoneRequest):
+    return await phone_service.lookup_phone(body.phone_number, body.country_code)
 
 
 @router.post("/evidence/capture")

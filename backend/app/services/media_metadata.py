@@ -6,11 +6,11 @@ gracefully when a format has no embedded metadata.
 import hashlib
 import io
 import os
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 try:
-    from PIL import Image, ExifTags
+    from PIL import ExifTags, Image
     _PIL_AVAILABLE = True
 except ImportError:  # pragma: no cover
     _PIL_AVAILABLE = False
@@ -46,7 +46,7 @@ def _human_size(n: int) -> str:
     return f"{n:.1f} GB"
 
 
-def _rational_to_float(value: Any) -> Optional[float]:
+def _rational_to_float(value: Any) -> float | None:
     try:
         if isinstance(value, (tuple, list)) and len(value) == 2:
             num, den = value
@@ -56,7 +56,7 @@ def _rational_to_float(value: Any) -> Optional[float]:
         return None
 
 
-def _dms_to_decimal(dms: Any, ref: Any) -> Optional[float]:
+def _dms_to_decimal(dms: Any, ref: Any) -> float | None:
     try:
         d = _rational_to_float(dms[0])
         m = _rational_to_float(dms[1])
@@ -87,8 +87,8 @@ def _decode_value(value: Any) -> Any:
     return value
 
 
-def _decode_ifd(ifd: Any, tag_names: Dict[int, str]) -> Dict[str, Any]:
-    decoded: Dict[str, Any] = {}
+def _decode_ifd(ifd: Any, tag_names: dict[int, str]) -> dict[str, Any]:
+    decoded: dict[str, Any] = {}
     try:
         items = list(ifd.items())
     except Exception:
@@ -103,7 +103,7 @@ def _decode_ifd(ifd: Any, tag_names: Dict[int, str]) -> Dict[str, Any]:
     return decoded
 
 
-def _decode_exif(image: "Image.Image") -> Dict[str, Any]:
+def _decode_exif(image: "Image.Image") -> dict[str, Any]:
     try:
         top = image.getexif()
     except Exception:
@@ -120,7 +120,7 @@ def _decode_exif(image: "Image.Image") -> Dict[str, Any]:
             continue
         for k, v in _decode_ifd(sub, ExifTags.TAGS).items():
             decoded.setdefault(k, v)
-    gps_raw: Dict[str, Any] = {}
+    gps_raw: dict[str, Any] = {}
     try:
         gps_ifd = top.get_ifd(0x8825)
         for k, v in list(gps_ifd.items()):
@@ -132,7 +132,7 @@ def _decode_exif(image: "Image.Image") -> Dict[str, Any]:
     return decoded
 
 
-def _extract_gps(exif: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def _extract_gps(exif: dict[str, Any]) -> dict[str, Any] | None:
     gps = exif.get("GPSInfo")
     if not isinstance(gps, dict):
         return None
@@ -141,7 +141,7 @@ def _extract_gps(exif: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if lat is None or lon is None:
         return None
     alt = _rational_to_float(gps.get("GPSAltitude"))
-    out: Dict[str, Any] = {"latitude": lat, "longitude": lon,
+    out: dict[str, Any] = {"latitude": lat, "longitude": lon,
                            "maps_url": f"https://www.google.com/maps?q={lat},{lon}"}
     if alt is not None:
         out["altitude_m"] = round(alt, 2)
@@ -150,8 +150,8 @@ def _extract_gps(exif: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return out
 
 
-def _extract_image_metadata(data: bytes) -> Dict[str, Any]:
-    result: Dict[str, Any] = {"exif": {}, "gps": None, "image": {}}
+def _extract_image_metadata(data: bytes) -> dict[str, Any]:
+    result: dict[str, Any] = {"exif": {}, "gps": None, "image": {}}
     if not _PIL_AVAILABLE:
         result["warning"] = "Pillow not installed; EXIF extraction unavailable"
         return result
@@ -167,8 +167,8 @@ def _extract_image_metadata(data: bytes) -> Dict[str, Any]:
     return result
 
 
-def _extract_video_metadata(data: bytes, filename: str) -> Dict[str, Any]:
-    result: Dict[str, Any] = {"tags": {}, "streams": {}, "gps": None}
+def _extract_video_metadata(data: bytes, filename: str) -> dict[str, Any]:
+    result: dict[str, Any] = {"tags": {}, "streams": {}, "gps": None}
     if not _MUTAGEN_AVAILABLE:
         result["warning"] = "mutagen not installed; container tag extraction unavailable"
         return result
@@ -211,9 +211,9 @@ def _extract_video_metadata(data: bytes, filename: str) -> Dict[str, Any]:
     return result
 
 
-def _assess_risk(exif: Dict[str, Any], gps: Optional[Dict[str, Any]],
-                 tags: Dict[str, Any], kind: str) -> Dict[str, Any]:
-    flags: List[str] = []
+def _assess_risk(exif: dict[str, Any], gps: dict[str, Any] | None,
+                 tags: dict[str, Any], kind: str) -> dict[str, Any]:
+    flags: list[str] = []
     score = 0
     if gps:
         flags.append("GPS coordinates embedded — exact location disclosed")
@@ -240,7 +240,7 @@ def _assess_risk(exif: Dict[str, Any], gps: Optional[Dict[str, Any]],
     return {"score": score, "risk_level": level, "flags": flags}
 
 
-def analyze_media(data: bytes, filename: str, content_type: Optional[str] = None) -> Dict[str, Any]:
+def analyze_media(data: bytes, filename: str, content_type: str | None = None) -> dict[str, Any]:
     ext = os.path.splitext(filename)[1].lower()
     if ext in IMAGE_EXTS:
         kind = "image"
@@ -255,9 +255,9 @@ def analyze_media(data: bytes, filename: str, content_type: Optional[str] = None
                  "extension": ext, "kind": kind,
                  "sha256": _sha256(data), "md5": _md5(data)}
 
-    exif: Dict[str, Any] = {}
+    exif: dict[str, Any] = {}
     gps = None
-    video: Dict[str, Any] = {}
+    video: dict[str, Any] = {}
     if kind == "image":
         parsed = _extract_image_metadata(data)
         exif, gps = parsed.get("exif", {}), parsed.get("gps")
@@ -282,11 +282,11 @@ def analyze_media(data: bytes, filename: str, content_type: Optional[str] = None
 
     return {"file": file_info, "kind": kind, "exif": exif, "gps": gps,
             "video": video, "risk": risk,
-            "analyzed_at": datetime.now(timezone.utc).isoformat(),
+            "analyzed_at": datetime.now(UTC).isoformat(),
             "tool": "OSINT TMC/CLARK media-forensics 1.0"}
 
 
-def build_html_report(analysis: Dict[str, Any], title: str = "Media Metadata Report") -> str:
+def build_html_report(analysis: dict[str, Any], title: str = "Media Metadata Report") -> str:
     f = analysis.get("file", {})
     gps = analysis.get("gps")
     exif = analysis.get("exif", {})

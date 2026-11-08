@@ -1,8 +1,9 @@
 """Scan history model."""
 
 import enum
-from typing import Optional
-from sqlalchemy import String, Text, Index, JSON, Enum as SQLEnum
+
+from sqlalchemy import JSON, Index, String, Text
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin
@@ -38,14 +39,14 @@ class ScanHistory(Base, TimestampMixin):
     scan_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
     scan_type: Mapped[ScanType] = mapped_column(SQLEnum(ScanType), nullable=False, index=True)
     status: Mapped[ScanStatus] = mapped_column(SQLEnum(ScanStatus), default=ScanStatus.PENDING, nullable=False, index=True)
-    triggered_by: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    triggered_by: Mapped[str | None] = mapped_column(String(100), nullable=True)
     parameters: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     results_summary: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     alerts_created: Mapped[int] = mapped_column(default=0, nullable=False)
-    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    started_at: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    completed_at: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    duration_seconds: Mapped[Optional[float]] = mapped_column(nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    started_at: Mapped[str | None] = mapped_column(Text, nullable=True)
+    completed_at: Mapped[str | None] = mapped_column(Text, nullable=True)
+    duration_seconds: Mapped[float | None] = mapped_column(nullable=True)
 
     __table_args__ = (
         Index("ix_scan_type_status", "scan_type", "status"),

@@ -1,7 +1,9 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
-from typing import Optional, List
 
+from fastapi import APIRouter, Request
+from pydantic import BaseModel
+
+from app import config
+from app.rate_limit import limiter
 from app.services import evidence_store
 from app.services.breach_check import breach_service
 from app.services.phone_lookup import phone_service
@@ -14,32 +16,34 @@ PREFIX = "EVD-EMAIL"
 
 class EmailRequest(BaseModel):
     email: str
-    api_key: Optional[str] = None
+    api_key: str | None = None
 
 
 class EvidenceRequest(BaseModel):
     email: str
-    api_key: Optional[str] = None
-    notes: Optional[str] = ""
-    tags: Optional[List[str]] = []
-    priority: Optional[str] = "medium"
-    case_id: Optional[str] = ""
+    api_key: str | None = None
+    notes: str | None = ""
+    tags: list[str] | None = []
+    priority: str | None = "medium"
+    case_id: str | None = ""
 
 
-async def _investigate(email: str, api_key: Optional[str]) -> dict:
+async def _investigate(email: str, api_key: str | None) -> dict:
     validation = phone_service.validate_email(email)
     breaches = await breach_service.check_email_breaches(email, api_key)
     return {"email": email, "validation": validation, "breaches": breaches}
 
 
 @router.post("/search")
-async def search_email(request: EmailRequest):
-    return await _investigate(validate_email(request.email), request.api_key)
+@limiter.limit(config.RATE_LIMIT_SEARCH)
+async def search_email(request: Request, body: EmailRequest):
+    return await _investigate(validate_email(body.email), body.api_key)
 
 
 @router.post("/validate")
-async def validate_email_endpoint(request: EmailRequest):
-    return phone_service.validate_email(validate_email(request.email))
+@limiter.limit(config.RATE_LIMIT_SEARCH)
+async def validate_email_endpoint(request: Request, body: EmailRequest):
+    return phone_service.validate_email(validate_email(body.email))
 
 
 @router.post("/evidence/capture")

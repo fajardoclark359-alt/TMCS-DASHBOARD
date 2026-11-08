@@ -6,9 +6,8 @@ import hashlib
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable
 
 from fastapi import HTTPException
 
@@ -46,12 +45,12 @@ SEVERITY_ORDER = {"INFO": 0, "LOW": 1, "MEDIUM": 2, "HIGH": 3, "CRITICAL": 4}
 
 
 def utcnow_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def new_alert_id() -> str:
     """Collision-resistant alert ID."""
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    stamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
     return f"ALRT-PH-{stamp}-{os.urandom(3).hex().upper()}"
 
 
@@ -215,7 +214,6 @@ class BreachAlertStore:
     async def scan_and_alert() -> dict:
         """Run automated scan for new PH breaches and create alerts."""
         # This would be called by a scheduled task
-        from app.services.breach_check import breach_service
         from app.services.darkweb_scanner import scan_philippines_darkweb
 
         results = {"news_alerts": 0, "darkweb_alerts": 0, "errors": []}

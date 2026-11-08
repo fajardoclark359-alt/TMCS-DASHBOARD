@@ -1,8 +1,10 @@
 import asyncio
-import httpx
 import hashlib
 import re
-from typing import Dict, Any, List
+from typing import Any
+
+import httpx
+
 
 class SocialMediaService:
     def __init__(self):
@@ -61,7 +63,7 @@ class SocialMediaService:
             "hackthebox": self._check_hackthebox,
         }
 
-    async def search_all(self, username: str) -> Dict[str, Any]:
+    async def search_all(self, username: str) -> dict[str, Any]:
         # Platforms are queried concurrently (bounded) instead of one after the
         # other: 50+ sequential requests with a 6s timeout could take minutes.
         semaphore = asyncio.Semaphore(8)
@@ -92,7 +94,7 @@ class SocialMediaService:
             "evidence": evidence,
         }
 
-    def _build_evidence(self, profiles: List[Dict], username: str) -> Dict[str, Any]:
+    def _build_evidence(self, profiles: list[dict], username: str) -> dict[str, Any]:
         total = len(profiles)
         email_candidates = []
         full_name = None
@@ -471,7 +473,7 @@ class SocialMediaService:
         try:
             resp = await client.get(f"https://discord.com/api/v10/users/@{username}", headers={"Authorization": "Bot none"})
             if resp.status_code == 200:
-                return {"url": f"https://discord.com", "bio": "Discord account found"}
+                return {"url": "https://discord.com", "bio": "Discord account found"}
         except Exception:
             pass
         return None
