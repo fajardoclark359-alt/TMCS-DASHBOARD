@@ -121,7 +121,7 @@ function MediaForensics() {
       // Fall back to pure-browser deep forensics so Deep Forensics still works.
       try {
         setDeepClientMode(true)
-        setDeepResults(await clientDeepAnalyzeMedia(file, results))
+        setDeepResults(await clientDeepAnalyzeMedia(file, results || {}))
       } catch (clientErr) {
         setDeepClientMode(false)
         setError(`Deep forensics failed: ${clientErr.message || 'Backend unavailable'}`)

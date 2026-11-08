@@ -274,7 +274,7 @@ function summary(level, score, trailing, carved, strings) {
 export async function clientDeepAnalyzeMedia(file, base = {}) {
   const buffer = await file.arrayBuffer()
   const data = new Uint8Array(buffer)
-  const exif = base.exif || {}
+  const exif = base?.exif || {}
   const filename = file.name || "upload"
 
   const [entropy, strings, carved, trailing, integrity] = await Promise.all([
