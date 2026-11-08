@@ -272,9 +272,11 @@ function summary(level, score, trailing, carved, strings) {
  * @returns {Promise<Object>} deep report matching the backend deep-analysis shape
  */
 export async function clientDeepAnalyzeMedia(file, base = {}) {
+  if (!file) throw new Error('No file provided')
   const buffer = await file.arrayBuffer()
   const data = new Uint8Array(buffer)
-  const exif = base?.exif || {}
+  const b = base || {}
+  const exif = (b && b.exif) ? b.exif : {}
   const filename = file.name || "upload"
 
   const [entropy, strings, carved, trailing, integrity] = await Promise.all([
