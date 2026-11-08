@@ -44,6 +44,39 @@ async def analyze_upload(file: UploadFile = File(...)):
     return analyze_media(data, file.filename or "upload", file.content_type)
 
 
+@router.post("/deep-analysis")
+async def deep_analyze_upload(file: UploadFile = File(...)):
+    """Deep media forensics: ELA, entropy map, OSINT strings, signature
+    carving, trailing-data detection and metadata integrity checks."""
+    ext = os.path.splitext(file.filename or "")[1].lower()
+    if ext not in ALLOWED_EXTS:
+        raise HTTPException(status_code=400, detail=f"Unsupported file type '{ext}'. Allowed: {sorted(ALLOWED_EXTS)}")
+
+    data = await file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="Empty file")
+    if len(data) > config.MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="File exceeds the 25 MB limit")
+
+    base = analyze_media(data, file.filename or "upload", file.content_type)
+    deep = base.get("deep") or {}
+    if not deep:
+        try:
+            from app.services.media_deep import deep_analysis
+            deep = deep_analysis(data, os.path.basename(file.filename or "upload"), base.get("exif", {}))
+        except Exception as exc:  # pragma: no cover - defensive
+            raise HTTPException(status_code=500, detail=f"Deep analysis unavailable: {exc}") from exc
+    return {
+        "file": base.get("file", {}),
+        "kind": base.get("kind"),
+        "gps": base.get("gps"),
+        "risk": base.get("risk"),
+        "deep": deep,
+        "analyzed_at": base.get("analyzed_at"),
+        "tool": base.get("tool"),
+    }
+
+
 @router.post("/evidence/capture")
 async def capture_evidence(request: EvidenceCaptureRequest):
     document = evidence_store.record(

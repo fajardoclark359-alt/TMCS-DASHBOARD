@@ -19,6 +19,7 @@ from app.routers import (
     email,
     evidence,
     media,
+    network,
     phone,
     scan_history,
     url,
@@ -70,6 +71,7 @@ app.include_router(phone.router, prefix="/api/phone", tags=["Phone"])
 app.include_router(domain.router, prefix="/api/domain", tags=["Domain"])
 app.include_router(url.router, prefix="/api/url", tags=["URL"])
 app.include_router(media.router, prefix="/api/media", tags=["Media"])
+app.include_router(network.router, prefix="/api/network", tags=["Network Scan"])
 app.include_router(darkweb.router)
 app.include_router(breach_alerts.router)
 app.include_router(evidence.router, prefix="/api/evidence", tags=["Evidence"])

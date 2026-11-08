@@ -179,6 +179,15 @@ export const analyzeMedia = async (file) => {
   return response.data
 }
 
+export const deepAnalyzeMedia = async (file) => {
+  const form = new FormData()
+  form.append('file', file)
+  const response = await axios.post(`${API_BASE}/media/deep-analysis`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return response.data
+}
+
 export const captureMediaEvidence = async (data) => {
   const response = await axios.post(`${API_BASE}/media/evidence/capture`, data)
   return response.data

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { analyzeMedia, clientAnalyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence, downloadMediaEvidence } from '../services/api'
+import { analyzeMedia, deepAnalyzeMedia, clientAnalyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence, downloadMediaEvidence } from '../services/api'
 import { FiSearch, FiShield, FiCamera, FiVideo, FiMapPin, FiSave, FiFileText, FiClock, FiTag, FiCheck, FiDownload, FiEye, FiTrash2, FiCopy, FiTerminal, FiCrosshair } from 'react-icons/fi'
 
 function downloadFile(filename, content, mime) {
@@ -80,6 +80,8 @@ function MediaForensics() {
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState('')
   const [clientMode, setClientMode] = useState(false)
+  const [deepResults, setDeepResults] = useState(null)
+  const [deepLoading, setDeepLoading] = useState(false)
 
   useEffect(() => { fetchEvidenceList() }, [])
 
@@ -106,6 +108,17 @@ function MediaForensics() {
       }
     }
     setLoading(false)
+  }
+
+  const handleDeepAnalyze = async () => {
+    if (!file) return
+    setDeepLoading(true); setDeepResults(null); setError('')
+    try {
+      setDeepResults(await deepAnalyzeMedia(file))
+    } catch (err) {
+      setError(`Deep forensics failed: ${err.message || 'Backend unavailable'}`)
+    }
+    setDeepLoading(false)
   }
 
   const handleCapture = async () => {
@@ -184,6 +197,10 @@ function MediaForensics() {
         <button type="submit" disabled={loading || !file} className="btn-cyber px-6 py-3 rounded flex items-center gap-2 text-sm mt-3 disabled:opacity-50">
           <FiSearch /> {loading ? 'SCANNING...' : 'SCAN METADATA'}
         </button>
+        <button type="button" disabled={loading || !file} onClick={handleDeepAnalyze}
+          className="px-6 py-3 rounded flex items-center gap-2 text-sm mt-3 border border-purple-500/50 text-purple-400 hover:bg-purple-900/30 disabled:opacity-50">
+          <FiCrosshair /> {deepLoading ? 'ANALYZING...' : 'DEEP FORENSICS'}
+        </button>
       </form>
 
       {error && (
@@ -217,6 +234,87 @@ function MediaForensics() {
               <button onClick={handleExportHTML} className="btn-cyber px-4 py-2 rounded text-xs font-mono flex items-center gap-2"><FiDownload /> EXPORT HTML</button>
               <button onClick={handleCopy} className="px-4 py-2 rounded text-xs font-mono flex items-center gap-2 bg-slate-800/60 text-slate-300 border border-slate-700"><FiCopy /> {copied ? 'COPIED!' : 'COPY JSON'}</button>
             </div>
+          </div>
+
+          {/* ── DEEP FORENSICS PANEL ── */}
+          <div className={`card-cyber p-5 rounded-lg mb-5 border ${deepLoading || deepResults ? 'border-purple-500/50' : 'border-transparent'}`}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="title-cyber text-lg font-bold flex items-center gap-2 text-purple-400"><FiCrosshair /> DEEP FORENSICS</h2>
+              <button onClick={handleDeepAnalyze} disabled={deepLoading || !file}
+                className="px-4 py-1.5 rounded text-[10px] font-mono flex items-center gap-1 border border-purple-500/50 text-purple-400 hover:bg-purple-900/30 disabled:opacity-50">
+                {deepLoading ? 'ANALYZING...' : 'RUN DEEP SCAN'}
+              </button>
+            </div>
+            {deepLoading && <p className="text-purple-400 text-xs font-mono">Running ELA, entropy, strings, carving & trailing-data analysis…</p>}
+            {deepResults && !deepLoading && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="bg-slate-900/50 p-3 rounded cyber-border text-xs font-mono">
+                    <div className="text-purple-400 text-[10px] font-bold mb-1">suspicion score</div>
+                    <div className="text-2xl font-bold text-white">{deepResults.suspicion_score}</div>
+                    <div className={`text-xs ${deepResults.suspicion_level === 'CRITICAL' || deepResults.suspicion_level === 'HIGH' ? 'text-red-400' : deepResults.suspicion_level === 'MEDIUM' ? 'text-orange-400' : 'text-blue-400'}`}>{deepResults.suspicion_level}</div>
+                  </div>
+                  <div className="bg-slate-900/50 p-3 rounded cyber-border text-xs font-mono">
+                    <div className="text-blue-400 text-[10px] font-bold mb-1">embedded signatures</div>
+                    <div className="text-white">{deepResults.carved?.count || 0}</div>
+                    <div className="text-slate-500">{deepResults.carved?.suspicious ? 'suspicious files found' : 'none'}</div>
+                  </div>
+                  <div className="bg-slate-900/50 p-3 rounded cyber-border text-xs font-mono">
+                    <div className="text-cyan-400 text-[10px] font-bold mb-1">osint strings</div>
+                    <div className="text-white">{deepResults.strings?.count || 0}</div>
+                    <div className="text-slate-500">urls · ips · emails · cmds</div>
+                  </div>
+                </div>
+                {deepResults.trailing_data?.present && (
+                  <div className="bg-red-950/20 p-3 rounded border border-red-500/20 mb-3 text-xs font-mono">
+                    <div className="text-red-400 font-bold mb-1">⚠ trailing data after EOF</div>
+                    <div className="text-red-300">{deepResults.trailing_data.bytes} bytes ({deepResults.trailing_data.content_type}) at {deepResults.trailing_data.offset_hex}</div>
+                    <div className="text-slate-500 mt-1">{deepResults.trailing_data.preview}</div>
+                  </div>
+                )}
+                {deepResults.carved?.embedded_files?.length > 0 && (
+                  <div className="mb-3">
+                    <div className="text-purple-400 text-[10px] font-bold mb-1">embedded file signatures</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono">
+                      {deepResults.carved.embedded_files.map((f, i) => (
+                        <div key={i} className="bg-slate-900/40 p-2 rounded border border-slate-700/30 flex justify-between">
+                          <span>{f.type}</span>
+                          <span className="text-slate-500">{f.offset_hex}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {(deepResults.strings?.urls?.length || deepResults.strings?.ips?.length || deepResults.strings?.emails?.length || deepResults.strings?.commands?.length) && (
+                  <div className="mb-3">
+                    <div className="text-cyan-400 text-[10px] font-bold mb-1">extracted osint strings</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono">
+                      {deepResults.strings.urls.map((u, i) => (<div key={i} className="bg-slate-900/40 p-1 rounded text-cyan-300 truncate" title={u}>{u}</div>))}
+                      {deepResults.strings.ips.map((ip, i) => (<div key={i} className="bg-slate-900/40 p-1 rounded text-cyan-300">{ip}</div>))}
+                      {deepResults.strings.emails.map((e, i) => (<div key={i} className="bg-slate-900/40 p-1 rounded text-cyan-300">{e}</div>))}
+                      {deepResults.strings.commands.map((c, i) => (<div key={i} className="bg-slate-900/40 p-1 rounded text-red-300 truncate" title={c}>{c}</div>))}
+                    </div>
+                  </div>
+                )}
+                {deepResults.integrity?.checks?.some((c) => c.verdict === 'SUSPICIOUS') && (
+                  <div className="mb-3">
+                    <div className="text-red-400 text-[10px] font-bold mb-1">integrity flags</div>
+                    <div className="space-y-1 text-xs font-mono">
+                      {deepResults.integrity.checks.filter((c) => c.verdict === 'SUSPICIOUS').map((c, i) => (
+                        <div key={i} className="bg-red-950/20 p-1 rounded border border-red-500/30 text-red-300">{c.note}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="mt-3 bg-slate-900/40 p-3 rounded border border-slate-700/30">
+                  <div className="text-slate-500 text-[10px] font-bold mb-1">summary</div>
+                  <div className="text-slate-300 text-xs font-mono">{deepResults.summary}</div>
+                </div>
+              </>
+            )}
+            {deepResults?.error && (
+              <p className="text-red-400 text-xs font-mono">! {deepResults.error}</p>
+            )}
           </div>
 
           {/* ── DATA ORIGIN PANEL ── */}

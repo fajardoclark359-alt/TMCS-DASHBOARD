@@ -212,7 +212,8 @@ def _extract_video_metadata(data: bytes, filename: str) -> dict[str, Any]:
 
 
 def _assess_risk(exif: dict[str, Any], gps: dict[str, Any] | None,
-                 tags: dict[str, Any], kind: str) -> dict[str, Any]:
+                 tags: dict[str, Any], kind: str,
+                 deep: dict[str, Any] | None = None) -> dict[str, Any]:
     flags: list[str] = []
     score = 0
     if gps:
@@ -235,6 +236,49 @@ def _assess_risk(exif: dict[str, Any], gps: dict[str, Any] | None,
         flags.append("No EXIF metadata found — already stripped or never embedded")
     if kind == "video" and not tags:
         flags.append("No container tags found — already stripped or minimal muxing")
+    score = min(score, 100)
+
+    # ── Deep-analysis signals folded into the same risk score ──
+    if deep:
+        if deep.get("trailing_data", {}).get("present"):
+            flags.append(f"Trailing data after image EOF: {deep['trailing_data']['human_size']} "
+                         f"({deep['trailing_data']['content_type']}) at offset "
+                         f"{deep['trailing_data']['offset_hex']}")
+            score += 20
+        if deep.get("carved", {}).get("suspicious"):
+            types = ", ".join(sorted({f['type'] for f in deep['carved']['embedded_files']}))
+            flags.append(f"Embedded file signatures carved: {types}")
+            score += 25
+        if deep.get("integrity", {}).get("suspicious"):
+            for chk in deep["integrity"]["checks"]:
+                if chk.get("verdict") == "SUSPICIOUS":
+                    flags.append(f"Integrity: {chk['note']}")
+                    score += 8
+        if deep.get("entropy", {}).get("global") is not None and deep["entropy"]["global"] > 7.5:
+            flags.append(f"Global byte entropy {deep['entropy']['global']} — encrypted/compressed payload likely")
+            score += 10
+        if deep.get("strings", {}).get("count"):
+            urls = deep["strings"].get("urls", [])
+            if urls:
+                flags.append("Embedded URLs found: " + "; ".join(urls[:3])[:180])
+                score += 12
+            ips = deep["strings"].get("ips", [])
+            if ips:
+                flags.append("Embedded IP addresses: " + "; ".join(ips[:5])[:180])
+                score += 8
+            cmds = deep["strings"].get("commands", [])
+            if cmds:
+                flags.append("Shell/command strings embedded: " + "; ".join(cmds[:2])[:160])
+                score += 10
+        if deep.get("ela", {}).get("available"):
+            mean_err = deep["ela"]["stats"].get("mean_error", 0)
+            if mean_err > 40:
+                flags.append(f"ELA mean error {mean_err} — heavy editing/compositing detected")
+                score += 18
+            elif mean_err > 18:
+                flags.append(f"ELA mean error {mean_err} — possible localized edit")
+                score += 10
+
     score = min(score, 100)
     level = "LOW" if score < 25 else "MEDIUM" if score < 50 else "HIGH" if score < 75 else "CRITICAL"
     return {"score": score, "risk_level": level, "flags": flags}
@@ -278,12 +322,21 @@ def analyze_media(data: bytes, filename: str, content_type: str | None = None) -
                 except (ValueError, IndexError):
                     pass
 
-    risk = _assess_risk(exif, gps, video.get("tags", {}) if isinstance(video, dict) else {}, kind)
+    # ── DEEP FORENSICS (ELA, entropy, strings, carving, trailing data) ──
+    deep: dict[str, Any] = {}
+    try:
+        from app.services.media_deep import deep_analysis
+        deep = deep_analysis(data, file_info["filename"], exif)
+    except Exception as exc:  # pragma: no cover - defensive
+        deep = {"error": f"deep analysis unavailable: {exc}"}
+
+    risk = _assess_risk(exif, gps, video.get("tags", {}) if isinstance(video, dict) else {}, kind,
+                        deep=deep)
 
     return {"file": file_info, "kind": kind, "exif": exif, "gps": gps,
-            "video": video, "risk": risk,
+            "video": video, "risk": risk, "deep": deep,
             "analyzed_at": datetime.now(UTC).isoformat(),
-            "tool": "OSINT TMC/CLARK media-forensics 1.0"}
+            "tool": "OSINT TMC/CLARK media-forensics 2.0 (deep)"}
 
 
 def build_html_report(analysis: dict[str, Any], title: str = "Media Metadata Report") -> str:

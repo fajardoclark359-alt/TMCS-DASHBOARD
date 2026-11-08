@@ -1,0 +1,88 @@
+{
+  "name": "tmcs-deep-media-nmap",
+  "description": "Upgrade Media Forensics with deep analysis (ELA, entropy, stego) and add NMAP network scanning with evidence capture",
+  "tasks": [
+    {
+      "id": 1,
+      "description": "Create backend/app/services/media_deep.py: Error Level Analysis, byte entropy map, embedded strings (URLs/IPs/emails), file signature carving, JPEG/PNG trailing data detection",
+      "status": "inprogress",
+      "created_at": "2026-11-08T09:09:00.596470804+00:00",
+      "updated_at": "2026-11-08T09:27:16.314644731+00:00",
+      "depends_on": [],
+      "tags": [
+        "backend",
+        "media"
+      ]
+    },
+    {
+      "id": 2,
+      "description": "Integrate deep analysis into media_metadata.analyze_media and upgrade risk scoring (tmcs-deep-media-nmap task)",
+      "status": "inprogress",
+      "created_at": "2026-11-08T09:09:00.596470804+00:00",
+      "updated_at": "2026-11-08T09:12:17.102556374+00:00",
+      "depends_on": [
+        1
+      ],
+      "tags": [
+        "backend",
+        "media"
+      ]
+    },
+    {
+      "id": 3,
+      "description": "Create backend/app/services/network_scan.py: nmap binary integration (XML parse) with pure-Python asyncio TCP fallback, service detection, preset profiles",
+      "status": "inprogress",
+      "created_at": "2026-11-08T09:09:00.596470804+00:00",
+      "updated_at": "2026-11-08T09:14:09.629832086+00:00",
+      "depends_on": [],
+      "tags": [
+        "backend",
+        "nmap"
+      ]
+    },
+    {
+      "id": 4,
+      "description": "Create backend/app/routers/scan.py with evidence capture/list/get/delete + SSRF guards, wire into main.py and config",
+      "status": "inprogress",
+      "created_at": "2026-11-08T09:09:00.596470804+00:00",
+      "updated_at": "2026-11-08T09:19:18.958958198+00:00",
+      "depends_on": [
+        3
+      ],
+      "tags": [
+        "backend",
+        "nmap"
+      ]
+    },
+    {
+      "id": 5,
+      "description": "Create frontend NetworkScan.jsx page, api client functions, App.jsx route + nav entry; extend MediaForensics.jsx with deep-analysis panel",
+      "status": "pending",
+      "created_at": "2026-11-08T09:09:00.596470804+00:00",
+      "updated_at": "2026-11-08T09:09:00.596470804+00:00",
+      "depends_on": [
+        1,
+        4
+      ],
+      "tags": [
+        "frontend"
+      ]
+    },
+    {
+      "id": 6,
+      "description": "Add nmap to Dockerfile, add tests, run backend tests + frontend build, sync docs/, commit and push",
+      "status": "pending",
+      "created_at": "2026-11-08T09:09:00.596470804+00:00",
+      "updated_at": "2026-11-08T09:09:00.596470804+00:00",
+      "depends_on": [
+        5
+      ],
+      "tags": [
+        "deploy",
+        "test"
+      ]
+    }
+  ],
+  "created_at": "2026-11-08T09:09:00.596470804+00:00",
+  "updated_at": "2026-11-08T09:27:16.314651501+00:00"
+}
