@@ -46,12 +46,16 @@ jobs:
       
       - name: Run tests
         run: |
-          python -m pytest tests/ -v --tb=short
-      
+          python -m pytest tests/ -v --tb=short \
+            --cov=app --cov-report=term --cov-report=xml:coverage.xml
+
       - name: Upload coverage
         uses: codecov/codecov-action@v5
         if: always()
         continue-on-error: true
+        with:
+          files: backend/coverage.xml
+          fail_ci_if_error: false
 
   # Frontend Build & Test
   frontend-build:
@@ -172,7 +176,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
