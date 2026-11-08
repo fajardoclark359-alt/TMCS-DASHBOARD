@@ -272,49 +272,68 @@ function summary(level, score, trailing, carved, strings) {
  * @returns {Promise<Object>} deep report matching the backend deep-analysis shape
  */
 export async function clientDeepAnalyzeMedia(file, base = {}) {
-  if (!file) throw new Error('No file provided')
-  const buffer = await file.arrayBuffer()
-  const data = new Uint8Array(buffer)
-  const b = base || {}
-  const exif = (b && b.exif) ? b.exif : {}
-  const filename = file.name || "upload"
+  // Never throw — GitHub Pages static host blocks POST (405), so this
+  // client-side fallback must always return a safe result even if
+  // some internal check fails on a particular file type.
+  try {
+    if (!file) throw new Error('No file provided')
+    const buffer = await file.arrayBuffer()
+    const data = new Uint8Array(buffer)
+    const b = base || {}
+    const exif = (b && b.exif) ? b.exif : {}
+    const filename = file.name || "upload"
 
-  const [entropy, strings, carved, trailing, integrity] = await Promise.all([
-    entropyMap(data),
-    extractStrings(data),
-    carveSignatures(data),
-    trailingData(data, filename),
-    integrityChecks(exif),
-  ])
+    const [entropy, strings, carved, trailing, integrity] = await Promise.all([
+      entropyMap(data).catch(() => ({ available: false, global: null, blocks: [], high_entropy_regions: [], max_block_entropy: 0.0 })),
+      extractStrings(data).catch(() => ({ urls: [], ips: [], emails: [], commands: [], count: 0 })),
+      carveSignatures(data).catch(() => ({ embedded_files: [], count: 0, suspicious: false })),
+      trailingData(data, filename).catch(() => ({ present: false, bytes: 0, offset: null, offset_hex: null, content_type: "unknown", human_size: null, preview: null })),
+      integrityChecks(exif).catch(() => ({ checks: [], suspicious: false })),
+    ])
 
-  // Composite suspicion score 0-100 (mirrors backend media_deep.py)
-  let score = 0
-  // ELA unavailable client-side → use entropy as proxy
-  if (entropy.global != null && entropy.global > HIGH_ENTROPY_THRESHOLD) score += 10
-  if (trailing.present) score += 20
-  if (carved.suspicious) score += 25
-  if (integrity.suspicious) score += 15
-  if (strings.count > 0) score += Math.min(10, strings.count)
-  score = Math.min(100, score)
+    // Composite suspicion score 0-100 (mirrors backend media_deep.py)
+    let score = 0
+    if (entropy.global != null && entropy.global > HIGH_ENTROPY_THRESHOLD) score += 10
+    if (trailing.present) score += 20
+    if (carved.suspicious) score += 25
+    if (integrity.suspicious) score += 15
+    if (strings.count > 0) score += Math.min(10, strings.count)
+    score = Math.min(100, score)
 
-  let level = "LOW"
-  if (score >= 70) level = "CRITICAL"
-  else if (score >= 45) level = "HIGH"
-  else if (score >= 20) level = "MEDIUM"
+    let level = "LOW"
+    if (score >= 70) level = "CRITICAL"
+    else if (score >= 45) level = "HIGH"
+    else if (score >= 20) level = "MEDIUM"
 
-  const ela = { available: false, error: "ELA requires the backend (Pillow re-save diff)", stats: {}, findings: ["ELA not available client-side — install backend for JPEG re-save difference analysis"] }
+    const ela = { available: false, error: "ELA requires the backend (Pillow re-save diff)", stats: {}, findings: ["ELA not available client-side — install backend for JPEG re-save difference analysis"] }
 
-  const deep = {
-    ela,
-    entropy,
-    strings,
-    carved,
-    trailing_data: trailing,
-    integrity,
-    suspicion_score: score,
-    suspicion_level: level,
-    summary: summary(level, score, trailing, carved, strings),
-    client_mode: true,
+    const deep = {
+      ela,
+      entropy,
+      strings,
+      carved,
+      trailing_data: trailing,
+      integrity,
+      suspicion_score: score,
+      suspicion_level: level,
+      summary: summary(level, score, trailing, carved, strings),
+      client_mode: true,
+    }
+    return deep
+  } catch (err) {
+    // Last-resort safe result — never propagates a 405 or any other error
+    return {
+      ela: { available: false, error: err.message || 'Deep forensics unavailable', stats: {}, findings: ['Client-side deep scan failed — file may be unsupported or corrupt'] },
+      entropy: { available: false, global: null, blocks: [], high_entropy_regions: [], max_block_entropy: 0.0 },
+      strings: { urls: [], ips: [], emails: [], commands: [], count: 0 },
+      carved: { embedded_files: [], count: 0, suspicious: false },
+      trailing_data: { present: false, bytes: 0, offset: null, offset_hex: null, content_type: "unknown", human_size: null, preview: null },
+      integrity: { checks: [], suspicious: false },
+      suspicion_score: 0,
+      suspicion_level: "LOW",
+      summary: 'Deep scan unavailable — fallback result only',
+      client_mode: true,
+      client_error: err.message || 'Unknown error',
+    }
   }
-  return deep
 }
