@@ -31,7 +31,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install 'setuptools>=65,<80'
-          pip install 'Pillow>=9,<10'
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
       
@@ -50,8 +49,9 @@ jobs:
           python -m pytest tests/ -v --tb=short
       
       - name: Upload coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         if: always()
+        continue-on-error: true
 
   # Frontend Build & Test
   frontend-build:
@@ -166,11 +166,14 @@ jobs:
   # Security Scan
   security-scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - uses: actions/checkout@v4
       
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -178,7 +181,7 @@ jobs:
           output: 'trivy-results.sarif'
       
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
 
