@@ -188,6 +188,21 @@ export const deepAnalyzeMedia = async (file) => {
   return response.data
 }
 
+export const listProfiles = async () => {
+  const response = await axios.get(`${API_BASE}/network/profiles`)
+  return response.data
+}
+
+export const scanNetwork = async (target, profile = 'standard', portSpec, authorized) => {
+  const response = await axios.post(`${API_BASE}/network/scan`, {
+    target,
+    profile,
+    ports: portSpec,
+    authorized: !!authorized,
+  })
+  return response.data
+}
+
 export const captureMediaEvidence = async (data) => {
   const response = await axios.post(`${API_BASE}/media/evidence/capture`, data)
   return response.data

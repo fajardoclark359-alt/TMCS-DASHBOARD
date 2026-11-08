@@ -6,11 +6,12 @@ import PhoneSearch from './pages/PhoneSearch'
 import DomainSearch from './pages/DomainSearch'
 import URLInvestigation from './pages/URLInvestigation'
 import MediaForensics from './pages/MediaForensics'
+import NetworkScan from './pages/NetworkScan'
 import DarkWebMonitor from './pages/DarkWebMonitor'
 import GovMonitor from './pages/GovMonitor'
 import ThreatDashboard from './pages/ThreatDashboard'
 import BreachAlertsDashboard from './pages/BreachAlertsDashboard'
-import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal, FiCamera, FiEye, FiServer, FiAlertTriangle, FiBell } from 'react-icons/fi'
+import { FiHome, FiUser, FiMail, FiPhone, FiGlobe, FiLink, FiShield, FiTerminal, FiCamera, FiWifi, FiEye, FiServer, FiAlertTriangle, FiBell } from 'react-icons/fi'
 import { APP_NAME, DEVELOPER, VERSION } from './config'
 
 function App() {
@@ -63,6 +64,11 @@ function App() {
               </NavLink>
             </li>
             <li>
+              <NavLink to="/network" className={({isActive}) => `flex items-center gap-3 p-2.5 rounded transition-all ${isActive ? 'bg-red-900/40 text-red-400 border border-red-500/40' : 'text-slate-400 hover:bg-slate-800/50 hover:text-red-300 border border-transparent'}`}>
+                <FiWifi size={16} /> <span className="text-sm font-bold">NMAP NETWORK SCAN</span>
+              </NavLink>
+            </li>
+            <li>
               <NavLink to="/tmcs" className={({isActive}) => `flex items-center gap-3 p-2.5 rounded transition-all ${isActive ? 'bg-red-900/40 text-red-400 border border-red-500/40' : 'text-slate-400 hover:bg-slate-800/50 hover:text-red-300 border border-transparent'}`}>
                 <FiAlertTriangle size={16} /> <span className="text-sm font-bold">TMCS DASHBOARD</span>
               </NavLink>
@@ -106,6 +112,7 @@ function App() {
             <Route path="/domain" element={<DomainSearch />} />
             <Route path="/url" element={<URLInvestigation />} />
             <Route path="/media" element={<MediaForensics />} />
+            <Route path="/network" element={<NetworkScan />} />
             <Route path="/tmcs" element={<ThreatDashboard />} />
             <Route path="/darkweb" element={<DarkWebMonitor />} />
             <Route path="/gov" element={<GovMonitor />} />
