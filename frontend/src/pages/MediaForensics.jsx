@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { analyzeMedia, deepAnalyzeMedia, clientAnalyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence, downloadMediaEvidence } from '../services/api'
+import { analyzeMedia, deepAnalyzeMedia, clientAnalyzeMedia, clientDeepAnalyzeMedia, captureMediaEvidence, listMediaEvidence, getMediaEvidence, deleteMediaEvidence, downloadMediaEvidence } from '../services/api'
 import { FiSearch, FiShield, FiCamera, FiVideo, FiMapPin, FiSave, FiFileText, FiClock, FiTag, FiCheck, FiDownload, FiEye, FiTrash2, FiCopy, FiTerminal, FiCrosshair } from 'react-icons/fi'
 
 function downloadFile(filename, content, mime) {
@@ -82,6 +82,7 @@ function MediaForensics() {
   const [clientMode, setClientMode] = useState(false)
   const [deepResults, setDeepResults] = useState(null)
   const [deepLoading, setDeepLoading] = useState(false)
+  const [deepClientMode, setDeepClientMode] = useState(false)
 
   useEffect(() => { fetchEvidenceList() }, [])
 
@@ -112,11 +113,19 @@ function MediaForensics() {
 
   const handleDeepAnalyze = async () => {
     if (!file) return
-    setDeepLoading(true); setDeepResults(null); setError('')
+    setDeepLoading(true); setDeepResults(null); setError(''); setDeepClientMode(false)
     try {
       setDeepResults(await deepAnalyzeMedia(file))
     } catch (err) {
-      setError(`Deep forensics failed: ${err.message || 'Backend unavailable'}`)
+      // Backend unavailable or POST blocked (e.g. GitHub Pages static host → 405).
+      // Fall back to pure-browser deep forensics so Deep Forensics still works.
+      try {
+        setDeepClientMode(true)
+        setDeepResults(await clientDeepAnalyzeMedia(file, results))
+      } catch (clientErr) {
+        setDeepClientMode(false)
+        setError(`Deep forensics failed: ${clientErr.message || 'Backend unavailable'}`)
+      }
     }
     setDeepLoading(false)
   }
@@ -246,6 +255,11 @@ function MediaForensics() {
               </button>
             </div>
             {deepLoading && <p className="text-purple-400 text-xs font-mono">Running ELA, entropy, strings, carving & trailing-data analysis…</p>}
+            {deepClientMode && deepResults && !deepLoading && (
+              <div className="card-cyber p-3 rounded-lg mb-4 border border-yellow-500/30 bg-yellow-950/10">
+                <p className="text-yellow-300 text-xs font-mono">⚡ Deep scan in-browser — backend unreachable (POST blocked on static host). ELA unavailable; entropy, strings, carving & trailing-data only.</p>
+              </div>
+            )}
             {deepResults && !deepLoading && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">

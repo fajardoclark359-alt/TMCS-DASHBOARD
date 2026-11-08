@@ -226,3 +226,7 @@ export const deleteMediaEvidence = async (evidenceId) => {
 // Client-side fallback — uses exifr in the browser, no backend needed
 import { clientAnalyzeMedia as _clientAnalyzeMedia } from './clientExif'
 export const clientAnalyzeMedia = _clientAnalyzeMedia
+
+// Client-side deep forensics fallback (no backend) for GitHub Pages compatibility
+import { clientDeepAnalyzeMedia as _clientDeepAnalyzeMedia } from './clientDeep'
+export const clientDeepAnalyzeMedia = _clientDeepAnalyzeMedia
